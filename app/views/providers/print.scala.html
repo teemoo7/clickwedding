@@ -1,0 +1,160 @@
+@(provider: models.providers.Provider)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helpers._
+@import helper._
+@import play.api.Play.current
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>click-wedding | @provider.title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body style="font-family: verdana,helvetica,arial,sans-serif; font-size: 1em;" onload="window.print();">
+<table cellspacing="0" cellpadding="0" width="100%"
+       align="center">
+    <tbody>
+    <tr>
+        <td><br />
+            <table style="background-color: #d9dadb;" cellspacing="0" cellpadding="1" align="center"
+                   bgcolor="#D9DADB">
+                <tbody>
+                <tr>
+                    <td>
+                        <table
+                                style="font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 20px; background-color: #ffffff; font-color: black;"
+                                cellspacing="0" cellpadding="0" width="600" align="center" bgcolor="#ffffff">
+                            <tbody>
+                            <tr>
+                                <td width="30">&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td width="30">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td width="30">&nbsp;</td>
+                                <td>
+                                    <div style="padding: 10mm;">
+                                        <div>
+                                            <table cellpadding="5" cellspacing="5" width="100%">
+                                                <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <h1>@provider.title</h1>
+
+                                                        @if(provider.slogan.isDefined){
+                                                            <h3>&laquo; @provider.slogan.get &raquo;</h3>
+                                                        }
+                                                    </td>
+                                                    <td align="center">
+                                                        @if(provider.hasLogo) {
+                                                            <img src="@models.providers.Provider.getProviderLogoPictureLink(provider.logo.get).getOrElse("#")" alt="@provider.logo.get.filename" />
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        @if(provider.description.isDefined){
+                                                            <div>@provider.description.get</div>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div>
+                                            <table cellpadding="5" cellspacing="5" width="100%" align="center">
+                                                <tbody>
+                                                <tr>
+                                                    <td valign="top">
+                                                        <table cellpadding="5" cellspacing="5" align="center">
+                                                            <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div>@provider.name</div>
+                                                                    <div>@provider.street @provider.streetNb.getOrElse("")</div>
+                                                                    <div>@provider.zip @provider.place</div>
+                                                                    <div>@Messages("main.providers.countries."+provider.country)</div>
+                                                                </td>
+                                                                <td width="50">
+                                                                    &nbsp;
+                                                                </td>
+                                                                <td>
+                                                                    @if(provider.phone.isDefined) {
+                                                                        <div>
+                                                                            <img src="@routes.Assets.at("images/icons/16/phone.png")" alt="@Messages("main.providers.phone")"/> @provider.phone
+                                                                        </div>
+                                                                    }
+                                                                    @if(provider.website.isDefined) {
+                                                                        <div>
+                                                                            <img src="@routes.Assets.at("images/icons/16/internet.png")" alt="@provider.website"/> <a href="@provider.website" class="btn" target="_blank">@provider.website</a>
+                                                                        </div>
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="center">
+                                                        <img style="border: 1px solid #CCCCCC;" src="@{
+                                                            var src = "https://maps.googleapis.com/maps/api/staticmap?size=400x300&sensor=false"
+                                                            src += "&zoom=16"
+                                                            src += "&markers="
+                                                            src += "shadow:false%7C"
+                                                            src += provider.latitude+","+provider.longitude
+                                                            src
+                                                            }" alt="Google Map" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="center">
+                                                        <p align="center">
+                                                            @Messages("main.providers.findOtherProviders")
+                                                            <br/>
+                                                            <a href="@controllers.providers.routes.Provider.list.absoluteURL(helpers.UtilsHelper.isSecureConnection)">@controllers.providers.routes.Provider.list.absoluteURL(helpers.UtilsHelper.isSecureConnection)</a>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td width="30">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td width="30">&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td width="30">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td width="30">&nbsp;</td>
+                                <td><hr/></td>
+                                <td width="30">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td width="30">&nbsp;</td>
+                                <td><p style="font-size: 9px; color: #999; line-height: 12px; margin-top: 0px; text-align: center; font-family: Arial, Helvetica, sans-serif;"
+                                       align="center"><br />@Messages("main.notification.pleaseConsultTermsConditions")</p></td>
+                                <td width="30">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td width="30">&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td width="30">&nbsp;</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            &nbsp;
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

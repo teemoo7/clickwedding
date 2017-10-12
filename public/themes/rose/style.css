@@ -1,0 +1,97 @@
+html {
+	background-color: #FFFFFF;
+	background-image: url('images/background.jpg');
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+
+body {
+	background-color: transparent;
+    background-image:none;
+}
+
+#globalContainer {
+	background-color: transparent;
+    background-image:none;
+    border: 1px solid #3e3e3e;
+    border-radius: 5px;
+}
+
+#globalContainerInner {
+    background: rgba(0,0,0,0.2);
+}
+
+.navbar-inner {
+	background-color: #3e3e3e;
+    border-bottom-right-radius: 5px;
+}
+
+a {
+    color: #970606;
+}
+
+a:visited {
+    color: #970606;
+}
+
+a:hover {
+    color: #970606;
+}
+
+a.question {
+    color: #970606;
+    border-bottom: 1px dashed #970606;
+}
+
+.btn {
+    color: #970606;
+}
+
+.btn:hover {
+    color: #970606;
+}
+
+.btn-danger {
+    color: #FFFFFF;
+}
+
+.btn-danger:hover {
+    color: #FFFFFF;
+}
+
+.navbar .nav li.dropdown.open > .dropdown-toggle, .navbar .nav li.dropdown.active > .dropdown-toggle, .navbar .nav li.dropdown.open.active > .dropdown-toggle {
+    background-color:#3e3e3e;
+}
+
+.dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a, .dropdown-menu .active > a, .dropdown-menu .active > a:hover, .navbar .nav > li > a:focus, .navbar .nav > li > a:hover {
+    color: #3e3e3e;
+    background-color:#FFFFFF;
+}
+
+.btn-primary, .btn-primary:hover {
+    background-color:#3e3e3e;
+    color: #FFFFFF;
+}
+
+#footer {
+    background-color: #3e3e3e;
+    background-image: none;
+    color: #000000;
+    padding: 5px;
+}
+
+#footer a {
+    color: #FFFFFF;
+}
+
+#footer a:visited {
+    color: #FFFFFF;
+}
+
+#footer a:hover {
+    color: #FFFFFF;
+}
+
+.welcomePicLabel {
+    color: #970606;
+}

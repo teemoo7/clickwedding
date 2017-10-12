@@ -1,0 +1,51 @@
+Protection des données
+
+1. Quelle information collectons-nous?
+
+Nous collectons des informations lorsque vous vous enregistrez sur notre site.
+
+Lors d'un achat ou d'une inscription sur notre site, selon le cas, vous pouvez être amené à devoir saisir votre: nom or adresse e-mail. Vous pouvez cependant visiter notre site anonymement.
+
+2. Pour quoi votre information est-elle utilisée?
+
+Toutes les informations que nous collectons de vouspeuvent être utilisées de l'une ou l'autre des manières suivantes:
+
+; Afin d'améliorer notre site internet
+(nous nous efforçons continuellement d'améliorer l'offre de notre site sur la base des informations et des retours que nous recevons de vous)
+
+;Afin d'améliorer notre service clientèle
+(vos informations nous aident à répondre plus efficacement aux demandes de nos clients et à leurs besoins de support)
+
+3. Comment protégeons-nous vos informations?
+
+Nous implémentons diverses mesures de sécurité afin de maintenir la sécurité de vos informations personnelles lorsque vous passez une commande, accédez, saisissez, transmettez vos informations.
+
+Nous offrons l'utilisation d'un serveur sécurisé. Toute les informations sensibles (paiements) sont transmises via un protocole de communication sécurisé (SSL), puis décryptées par nos fournisseurs de passerelle de paiements dans leurs bases de données, lesquelles ne sont accessibles que par les personnes autorisées disposant de droits d'accès à ces systèmes, et qui sont tenues de garder ces informations confidentielles.
+
+Suite à une transaction, vos informations privées (carte de crédit, numéro de sécurité sociale, financières, etc.) ne seront pas enregistrées sur nos serveurs.
+
+4. Utilisons-nous des cookies?
+
+Nous n'utilisons pas de cookies, sauf celui permettant de se souvenir de la langue que vous préférez.
+
+5. Transmettons-nous des informations en-dehors de l'entreprise?
+
+Nous ne vendons pas, n'échangeons pas, ne transférons pas vos informations personnellement identifiées à des tierces parties. Cela n'inclut pas les tierces parties de confiance nous assistant dans la maintenance de notre site, la conduite de notre entreprise, ou vous assistant, du moment que ces parties acceptent de garder ces informations confidentielles. Nous pouvons également divulguer vos informations lorsque nous croyons que c'est approprié afin de respecter la loi, appliquons les politiques de notre site, ou protégeons nos droits, propriétés ou sécurité, ou autres. Cependant, des informations ne permettant pas une identification personnelle des visiteurs peut être fournie à d'autres parties pour du marketing, de la publicité, ou d'autres utilisations.
+
+6. Liens vers des tierces parties
+
+Parfois, à notre discrétion, nous pouvons inclure ou offrir des produits ou des services de tiers sur notre site. Les sites de ces tierces parties ont leur propre politiques de protection des données, indépendamment des nôtres. Nous rejetons toute responsabilité à prpos du contenu et des activités de ces sites. Néanmoins, nous cherchons à protéger l'intégrité de notre site et tout commentaire à ce propos est le bienvenu.
+
+7. Politique de protection des données en ligne uniquement
+
+Cette politique de protection des données en ligne s'applique uniquement aux informations collectées sur notre site et non aux informations collectés hors-ligne.
+
+8. Votre consentement
+
+En utilisant notre site, vous acceptez notre politique de protection des données.
+
+9. Modifications de notre politique de protection des données
+
+Si nous décidonc de changer notre politique de protection des données, les changements seront postés sur cette page, et/ou la date de modification de la politique de protection des données ci-dessous sera mise à jour.
+
+Cette politique de protection des données a été modifiée pour la dernière fois le 08.08.2013

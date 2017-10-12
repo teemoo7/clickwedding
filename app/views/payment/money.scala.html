@@ -1,0 +1,122 @@
+@(wedding: models.wedding.Wedding, paymentForm: Form[models.payment.Payment], promotionForm: Form[models.payment.Promotion])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@isTab2Active = @{ promotionForm.globalError.isDefined || promotionForm.hasErrors }
+
+@main(Messages("main.payment.addMoney"), wedding = Some(wedding)){
+    <script type="text/javascript" xmlns="http://www.w3.org/1999/html">
+        function computeTotalCost() {
+            var moneyAmount = $('#moneyAmount').val();
+            if (!isNaN(moneyAmount)) {
+                $('#totalCost').val(Math.round(moneyAmount)+".00");
+            }
+        }
+    </script>
+}{
+    @views.html.payment.remaining(wedding)
+
+    <div class="clearfix"><p>&nbsp;</p></div>
+
+    <div class="tabbable"> <!-- Only required for left/right tabs -->
+        <ul class="nav nav-tabs">
+            <li @if( !isTab2Active ) {class="active"}><a href="#tab1" data-toggle="tab">@Messages("main.payment.addMoney")</a></li>
+            <li @if( isTab2Active ) {class="active"}><a href="#tab2" data-toggle="tab">@Messages("main.payment.promotionCode")</a></li>
+            <li><a href="#tab3" data-toggle="tab">@Messages("main.payment.transactions")</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane  @if( !isTab2Active ) {active}" id="tab1">
+
+                <h2>@Messages("main.payment.addMoney")</h2>
+
+                @paymentForm.globalError.map { error =>
+                    <div class="alert alert-error">
+                        <a href="#" class="close" data-dismiss="alert">×</a>
+                        <strong>@Messages("main.error")!</strong> @error.message
+                    </div>
+                }
+
+                @form(action = controllers.payment.routes.Money.buy(wedding.uid), 'class -> "form-horizontal") {
+                    <fieldset>
+                        @inputText(
+                            field = paymentForm("moneyAmount"),
+                            args =  '_label -> Messages("main.payment.addMoney"),
+                                    '_showConstraints -> false,
+                                    'onchange -> "computeTotalCost();"
+                        )
+                        @inputHidden(
+                            field = paymentForm("currency")
+                        )
+                        @inputText(
+                            field = paymentForm("totalCost"),
+                            args =  '_label -> Messages("main.payment.totalCost").concat(" (").concat(paymentForm("currency").value.get).concat(")"),
+                                    '_showConstraints -> false,
+                                    'readonly -> true
+                        )
+                        @termsCheckbox(
+                            field = paymentForm("conditions")
+                        )
+                    </fieldset>
+
+                    <div class="actions">
+                        <input type="image" src="@Messages("main.payment.paypalCheckoutButtonSrc")" align="center" style="margin-right:7px;" alt="@Messages("main.payment.buy")">
+                        <div class="info">
+                            <p class="small">@Messages("main.payment.noPaypalAccountRequired")</p>
+                            <p><input type="image" src="@routes.Assets.at("images/paypalsecured.jpg")" align="center" style="margin-right:7px;" alt="@Messages("main.payment.buy")"></p>
+                            <p><a href="https://www.paypal.com/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open('https://www.paypal.com/webapps/mpp/paypal-popup','WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700'); return false;">@Messages("main.payment.howPaypalWorks")</a></p>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+            <div class="tab-pane @if( isTab2Active ) {active}" id="tab2">
+
+                <h2>@Messages("main.payment.promotionCode")</h2>
+                @promotionForm.globalError.map { error =>
+                    <div class="alert alert-error">
+                        <a href="#" class="close" data-dismiss="alert">×</a>
+                        <strong>@Messages("main.error")!</strong> @error.message
+                    </div>
+                }
+
+                @form(action = controllers.payment.routes.Money.check(wedding.uid), 'class -> "form-horizontal") {
+                    <fieldset>
+                        @inputText(
+                            field = promotionForm("code"),
+                            args =  '_label -> Messages("main.payment.enterPromotionCode"),
+                                    '_showConstraints -> false
+                        )
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.payment.check")" class="btn btn-primary"><br/>
+                    </div>
+                }
+
+            </div>
+
+            <div class="tab-pane" id="tab3">
+
+                <h2>@Messages("main.payment.transactions")</h2>
+
+                @button(
+                    href = controllers.payment.routes.Money.listTransactions(wedding.uid),
+                    title = Messages("main.payment.viewTransactions"),
+                    icon = routes.Assets.at("images/icons/32/transactions.png")
+                )
+
+                <div class="clearfix"><p>&nbsp;</p></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @backButton(wedding.uid)
+
+}

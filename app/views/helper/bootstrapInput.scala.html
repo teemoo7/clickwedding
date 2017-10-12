@@ -1,0 +1,36 @@
+@(elements: helper.FieldElements)
+
+@*****************************************************
+* Generate input according to Twitter Bootsrap rules *
+******************************************************@
+
+@isVIP = @{
+    elements.args.get('_isVIP) match {
+        case Some(true) => true
+        case _ => false
+    }
+}
+@appendText = @{elements.args.get('_appendText)}
+
+@isMandatory = @{
+    elements.field.constraints.map(c => c._1).contains("constraint.required") && elements.label != null && elements.label.toString.length > 0
+}
+
+<div class="control-group @if(elements.hasErrors) {error}">
+    <label class="control-label" for="@elements.id">@elements.label @if(isMandatory) {*}</label>
+    <div class="controls @if(appendText.isDefined) {input-append}">
+        @elements.input
+        @if(appendText.isDefined) {
+            <span class="add-on">%</span>
+        }
+        @if(!elements.infos.isEmpty) {
+            <a href="#" onclick="return false;" title="@elements.infos(elements.lang).mkString(", ")" class="help-link"><img src="@routes.Assets.at("images/icons/16/idea.png")" alt="@elements.label" /></a>
+        }
+        @if(isVIP) {
+            @vipArea()
+        }
+        @if(!elements.errors.isEmpty) {
+            <span class="help-inline alert alert-error">@elements.errors(elements.lang).mkString(", ")</span>
+        }
+    </div>
+</div>

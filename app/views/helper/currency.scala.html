@@ -1,0 +1,13 @@
+@**
+* Format a double money amount to a pretty print string of the form 2.30, 5.55 or 7.00
+*
+* Example:
+* {{{
+*   @currency(amount = payment.totalCost)
+* }}}
+*
+* @param amount The double amount
+*@
+@(amount: Double)(implicit lang: Lang)
+@f = @{ "%.2f" }
+@f.format(amount)

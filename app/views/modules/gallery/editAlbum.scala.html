@@ -1,0 +1,192 @@
+@(wedding: models.wedding.Wedding, gallery: models.modules.Gallery, album: models.modules.Album, editAlbumForm: Form[models.modules.Album])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@isTab2Active = @{ editAlbumForm.hasErrors || editAlbumForm.globalError.isDefined }
+
+@main(title = Messages("main.modules.gallery.album"), wedding = Some(wedding)){
+    @views.html.modules.gallery.head()
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/vendor/jquery.ui.widget.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.iframe-transport.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.fileupload.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/load-image.min.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/canvas-to-blob.min.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.fileupload-fp.js")"></script>
+    <script type="text/javascript" src='@controllers.modules.gallery.routes.Gallery.javascriptRoutes'></script>
+    <script type="text/javascript">
+        // Delete the picture
+        function deletePicture(id) {
+            if (confirm('@Messages("main.modules.gallery.confirmDeletePicture")')) {
+                // Data are sent to the server
+                jsRoutes.controllers.modules.gallery.Gallery.deletePictureAjax('@wedding.uid', id).ajax({
+                    success : function() {
+                        $('.picture_'+id+'-line').remove();
+                    },
+                    error : function(data) {
+                        showWarningDialog('@Messages("main.modules.gallery.error.couldNotDeletePicture")')
+                    }
+                });
+            }
+        }
+
+        $(function () {
+            $('#fileUpload').fileupload({
+                dataType: 'html',
+                dropZone: $('#dropZone'),
+                process:
+                    [
+                        {
+                            action: 'load',
+                            fileTypes: /^image\/(gif|jpeg|png)$/,
+                            maxFileSize: 20000000 // 20MB
+                        },
+                        {
+                            action: 'resize',
+                            maxWidth: @models.modules.Gallery.PICTURE_WIDTH.toString,
+                            maxHeight: @models.modules.Gallery.PICTURE_HEIGHT.toString
+                        },
+                        {
+                            action: 'save'
+                        }
+                    ],
+                progressall: function (e, data) {
+                    $('#successUploadNotification').hide();
+                    $('#uploadManagement').slideUp();
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#progress .bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                },
+                done: function (e, data) {
+                    $('#pictures').append(data.result);
+                    $('#successUploadNotification').show();
+                    $('#uploadManagement').slideDown();
+                    $('#progress .bar').css(
+                        'width', '0%'
+                    );
+                },
+                fail: function (e, data) {
+                    $('#uploadManagement').slideDown();
+                    showWarningDialog(data.errorThrown);
+                    $('#progress .bar').css(
+                        'width', '0%'
+                    );
+                }
+            });
+
+            $(document).bind('dragover', function (e) {
+                var dropZone = $('#dropZone'),
+                    timeout = window.dropZoneTimeout;
+                if (!timeout) {
+                    dropZone.addClass('in');
+                } else {
+                    clearTimeout(timeout);
+                }
+                if (e.target === dropZone[0]) {
+                    dropZone.addClass('hover');
+                } else {
+                    dropZone.removeClass('hover');
+                }
+                window.dropZoneTimeout = setTimeout(function () {
+                    window.dropZoneTimeout = null;
+                    dropZone.removeClass('in hover');
+                }, 100);
+            });
+
+            $(document).bind('drop dragover', function (e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+}{
+    <div class="tabbable"> <!-- Only required for left/right tabs -->
+        <ul class="nav nav-tabs">
+            <li @if( !isTab2Active ) { class="active" }><a href="#tab1" data-toggle="tab">@Messages("main.modules.gallery.pictures")</a></li>
+            <li @if( isTab2Active ) { class="active" }><a href="#tab2" data-toggle="tab">@Messages("main.modules.gallery.editAlbum")</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane @if( !isTab2Active ) { active }" id="tab1">
+
+                <h3>@Messages("main.modules.gallery.uploadPictures")</h3>
+
+                <div id="successUploadNotification" style="display: none;" class="alert alert-success">@Messages("main.modules.gallery.transferSuccessful")</div>
+
+                <div id="uploadManagement">
+                    <div style="text-align: left;">@Messages("main.modules.gallery.picturesResized", models.modules.Gallery.PICTURE_WIDTH.toString, models.modules.Gallery.PICTURE_HEIGHT.toString)</div>
+                    <div style="margin-top: 40px; margin-bottom: 20px; text-align:left;">@Messages("main.modules.gallery.severalPictures")</div>
+                    <div id="explanationsUpload" class="block">
+                        <div class="well">
+                            <fieldset>
+                                <input id="fileUpload" type="file" name="files" data-url="@controllers.modules.gallery.routes.Gallery.addPictureAjax(wedding.uid, album.id.get)" multiple>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div style="text-align: left">@Messages("main.modules.gallery.orDropFilesHere")</div>
+                    <div id="dropZone" class="fade well block">
+                        @Messages("main.modules.gallery.dropFilesHere")
+                    </div>
+                </div>
+
+                <div id="transferInfo" class="clearfix">
+                    <p style="font-weight: bold;">@Messages("main.modules.gallery.transferStart")</p>
+                    <div class="progress progress-striped active" id="progress">
+                        <div class="bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <h3>@Messages("main.modules.gallery.pictures")</h3>
+                <table class="table table-striped table-hover">
+                    <tbody id="pictures">
+                        @album.pictures.map{ picture =>
+                            @views.html.modules.gallery.pictureEdit(picture, album.id.get, wedding.uid)
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="tab-pane @if( isTab2Active ) { active }" id="tab2">
+
+                <h3>@Messages("main.modules.gallery.editAlbum")</h3>
+                @form(action = controllers.modules.gallery.routes.Gallery.doEditAlbum(wedding.uid), 'class -> "form-horizontal") {
+                    <fieldset>
+                        @inputText(
+                            field = editAlbumForm("title"),
+                            args =  '_label -> Messages("main.modules.gallery.title"),
+                                    '_showConstraints -> false
+                        )
+                        @select(
+                            field = editAlbumForm("visibility"),
+                            options = ModuleHelper.getGalleryVisibilityValues.map{case(k,v) => (k.toString, v)}.toSeq,
+                            args =  '_label -> Messages("main.modules.gallery.visibility"),
+                                    '_showConstraints -> false,
+                                    '_isVIP -> true
+                        )
+                        @inputHidden(
+                            field = editAlbumForm("id")
+                        )
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.modules.gallery.save")" class="btn btn-primary">
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+        @button(
+            href = controllers.modules.gallery.routes.Gallery.editGallery(wedding.uid),
+            title = Messages("main.wedding.back"),
+            icon = routes.Assets.at("images/icons/32/back.png")
+        )
+
+    </div>
+
+}

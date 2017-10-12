@@ -1,0 +1,14 @@
+@(logoPicture: models.providers.ProviderLogoPicture)(implicit lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<div>
+    <div id="providerLogoPicture">
+        <img src="@models.providers.Provider.getProviderLogoPictureLink(logoPicture).getOrElse("#")" alt="@logoPicture.filename" />
+    </div>
+    <div id="providerLogoPictureDelete">
+        <a href="#" onclick="deleteLogoPicture(); return false;" class="btn btn-danger">@Messages("main.providers.deleteLogoPicture")</a>
+    </div>
+</div>

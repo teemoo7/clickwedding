@@ -1,0 +1,252 @@
+@(editProviderForm: Form[models.providers.Provider], provider: models.providers.Provider)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = Messages("main.providers.editService")){
+    @views.html.providers.editHead(provider)
+}{
+
+    <div class="tabbable"> <!-- Only required for left/right tabs -->
+
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab1" data-toggle="tab">@Messages("main.providers.editServiceInfo")</a></li>
+            <li><a href="#tab2" data-toggle="tab">@Messages("main.providers.editServiceLogo")</a></li>
+            <li><a href="#tab3" data-toggle="tab">@Messages("main.providers.editServiceShowRoom")</a></li>
+            <li><a href="#tab4" data-toggle="tab">@Messages("main.providers.editServicePack")</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+                <h3>@Messages("main.providers.editServiceInfo")</h3>
+
+                @form(action = controllers.providers.routes.Provider.doEdit(editProviderForm("id").value.get.toLong), 'class -> "form-horizontal") {
+                    @inputHidden(field = editProviderForm("id"))
+                    <fieldset>
+                        @if(AuthenticationHelper.isUserAdmin) {
+                            <div class="control-group ">
+                                <label for="status" class="control-label">@Messages("main.providers.status")</label>
+                                <div class="controls">
+                                    <div class="well" id="status">
+                                        @if(provider.isValid) {
+                                            @Messages("main.providers.approved") <a href="@controllers.providers.routes.Provider.invalidate(editProviderForm("id").value.get.toLong)" class="btn btn-danger">@Messages("main.providers.invalidate")</a>
+                                        } else {
+                                            @Messages("main.providers.pending") <a href="@controllers.providers.routes.Provider.validate(editProviderForm("id").value.get.toLong)" class="btn btn-success">@Messages("main.providers.validate")</a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @select(
+                            field = editProviderForm("categoryId"),
+                            options = controllers.providers.Provider.getCategories,
+                            args =  '_label -> Messages("main.providers.category"),
+                                    'class -> "input-xlarge",
+                                    '_showConstraints -> false
+                        )
+
+                        @inputText(
+                            field = editProviderForm("title"),
+                            args =  '_label -> Messages("main.providers.title"),
+                                    'class -> "input-xlarge",
+                                    'placeholder -> Messages("main.providers.titleHelp")
+                        )
+
+                        @inputText(
+                            field = editProviderForm("slogan"),
+                            args =  '_label -> Messages("main.providers.slogan"),
+                                    'class -> "input-xlarge",
+                                    'placeholder -> Messages("main.providers.sloganHelp")
+                        )
+                        @textarea(
+                            field = editProviderForm("description"),
+                            args =  '_label -> Messages("main.providers.description"),
+                                    'class -> "input-xlarge",
+                                    'placeholder -> Messages("main.providers.descriptionHelp", 300)
+                        )
+                        @inputText(
+                            field = editProviderForm("email"),
+                            args =  '_label -> Messages("main.providers.email"),
+                                    'class -> "input-xlarge",
+                                    '_showConstraints -> false
+                        )
+
+                        @inputText(
+                            field = editProviderForm("website"),
+                            args =  '_label -> Messages("main.providers.website"),
+                                    'class -> "input-xlarge",
+                                    '_showConstraints -> false
+                        )
+
+                        @inputText(
+                            field = editProviderForm("name"),
+                            args =  '_label -> Messages("main.providers.name"),
+                                    'class -> "input-xlarge",
+                                    '_showConstraints -> false
+                        )
+
+                        <div class="control-group ">
+                            <label for="street" class="control-label">@Messages("main.providers.street") *</label>
+                            <div class="controls">
+                                <input type="text" placeholder="@Messages("main.providers.streetHelp")" class="input-large locationInfo" value="@editProviderForm("street").value.getOrElse("")" name="street" id="street">
+                                <input type="text" placeholder="@Messages("main.providers.streetNbHelp")" class="input-mini locationInfo" value="@editProviderForm("streetNb").value.getOrElse("")" name="streetNb" id="streetNb">
+                            </div>
+                        </div>
+
+                        @inputText(
+                            field = editProviderForm("place"),
+                            args =  '_label -> Messages("main.providers.place"),
+                                    'class -> "input-xlarge locationInfo",
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = editProviderForm("zip"),
+                            args =  '_label -> Messages("main.providers.zip"),
+                                    'class -> "input-xlarge locationInfo",
+                                    '_showConstraints -> false
+                        )
+                        @select(
+                            field = editProviderForm("country"),
+                            options = controllers.providers.Provider.COUNTRIES.map{ c =>
+                                c -> Messages("main.providers.countries."+c)
+                            },
+                            args =  '_label -> Messages("main.providers.country"),
+                                    'class -> "input-xlarge locationInfo",
+                                    '_showConstraints -> false
+                        )
+
+                        @inputText(
+                            field = editProviderForm("phone"),
+                            args =  '_label -> Messages("main.providers.phone"),
+                                    'class -> "input-xlarge",
+                                    '_showConstraints -> false
+                        )
+
+                        @inputHidden(
+                            field = editProviderForm("latitude")
+                        )
+                        @inputHidden(
+                            field = editProviderForm("longitude")
+                        )
+
+                        <div id="mapCanvasProvider" style="width: 400px; height: 300px; margin: auto; border: 1px solid #CCCCCC; display: none;"></div>
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.providers.send")" class="btn btn-primary" id="sendBtn">
+                    </div>
+                }
+            </div>
+
+            <div class="tab-pane" id="tab2">
+                <h3>@Messages("main.providers.editServiceLogo")</h3>
+                <div>
+                    <div id="providerLogoPictureContainer">
+                        @if(provider.hasLogo) {
+                            @views.html.providers.logoPictureEdit(provider.logo.get)
+                        }
+                    </div>
+
+                    <h3>@Messages("main.providers.uploadLogoPicture")</h3>
+
+                    <div id="successUploadNotificationLogo" style="display: none;" class="alert alert-success">@Messages("main.providers.transferSuccessful")</div>
+
+                    <div id="uploadManagementLogo">
+                        <div style="text-align: left;">@Messages("main.providers.pictureResized", models.providers.Provider.LOGO_PICTURE_WIDTH.toString, models.providers.Provider.LOGO_PICTURE_HEIGHT.toString)</div>
+                        <div id="explanationsUploadLogo" class="block">
+                            <div style="margin-top: 40px; margin-bottom: 20px; text-align:left;">@Messages("main.providers.selectPicture")</div>
+                            <div class="well">
+                                <fieldset>
+                                    <input id="fileUploadLogo" type="file" name="files" data-url="@controllers.providers.routes.Provider.addLogo(provider.id.get)">
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div style="text-align: left">@Messages("main.providers.orDropFileHere")</div>
+                        <div id="dropZoneLogo" class="fade well block">
+                            @Messages("main.providers.dropFileHere")
+                        </div>
+                    </div>
+
+                    <div id="transferInfoLogo" class="clearfix">
+                        <p style="font-weight: bold;">@Messages("main.providers.transferStart")</p>
+                        <div class="progress progress-striped active" id="progressLogo">
+                            <div class="bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab3">
+                <h3>@Messages("main.providers.editServiceShowRoom")</h3>
+
+                @if(provider.getMaxPicturesShowroom > 0) {
+                    <div>
+                        <div id="providerShowroomPictureContainer">
+                            @if(provider.hasShowroom) {
+                                @provider.showroom.map { showroomPicture =>
+                                    @views.html.providers.showroomPictureEdit(showroomPicture)
+                                }
+                            }
+                        </div>
+
+                        <div>@Messages("main.providers.yourCanUploadAtMostPictures", provider.getMaxPicturesShowroom)</div>
+
+                        <h3>@Messages("main.providers.uploadShowroomPicture")</h3>
+
+                        <div id="successUploadNotificationShowroom" style="display: none;" class="alert alert-success">@Messages("main.providers.transferSuccessful")</div>
+
+                        <div id="uploadManagementShowroom">
+                            <div style="text-align: left;">@Messages("main.providers.pictureResized", models.providers.Provider.SHOWROOM_PICTURE_WIDTH.toString, models.providers.Provider.SHOWROOM_PICTURE_HEIGHT.toString)</div>
+                            <div id="explanationsUploadShowroom" class="block">
+                                <div style="margin-top: 40px; margin-bottom: 20px; text-align:left;">@Messages("main.providers.selectPicture")</div>
+                                <div class="well">
+                                    <fieldset>
+                                        <input id="fileUploadShowroom" type="file" name="files" data-url="@controllers.providers.routes.Provider.addPicture(provider.id.get)">
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div style="text-align: left">@Messages("main.providers.orDropFileHere")</div>
+                            <div id="dropZoneShowroom" class="fade well block">
+                                @Messages("main.providers.dropFileHere")
+                            </div>
+                        </div>
+
+                        <div id="transferInfoShowroom" class="clearfix">
+                            <p style="font-weight: bold;">@Messages("main.providers.transferStart")</p>
+                            <div class="progress progress-striped active" id="progressShowroom">
+                                <div class="bar" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                } else {
+                    <div>@Messages("main.providers.sorryNoPictureAllowed")</div>
+                }
+            </div>
+
+            <div class="tab-pane" id="tab4">
+                <h3>@Messages("main.providers.editServicePack")</h3>
+
+                @if(provider.currentPack.isDefined) {
+                    <div class="well" id="packBought">
+                        <p>
+                            @provider.currentPack.get.packType.name<br/>
+                            @provider.currentPack.get.packType.currency @currency(provider.currentPack.get.packType.price) (@Messages("main.providers.paid"):  @if(provider.currentPack.get.purchase.paid) {@Messages("main.providers.yes")} else {@Messages("main.providers.no")})<br/>
+                            @Messages("main.providers.validFromToNbMonths", UtilsHelper.dateToString(provider.currentPack.get.purchase.since), UtilsHelper.dateToString(provider.currentPack.get.purchase.until), provider.currentPack.get.packType.nbMonths)<br/>
+                        </p>
+                        <p>
+                            @if(provider.currentPack.get.packType.nbPicturesShowroom > 0) {
+                                @Messages("main.providers.showroomPicturesUploadAvailable", provider.currentPack.get.packType.nbPicturesShowroom)
+                            } else {
+                                @Messages("main.providers.showroomPicturesUploadNotAvailable")
+                            }
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <a href="@controllers.providers.routes.Provider.list" class="btn"><img src="@routes.Assets.at("images/icons/32/back.png")" alt="@Messages("main.providers.back")"/> @Messages("main.providers.back")</a>
+    </div>
+}

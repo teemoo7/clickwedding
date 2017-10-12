@@ -1,0 +1,27 @@
+@(wedding: models.wedding.Wedding)(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang, isOwnerOfWedding: Boolean, viewMode: models.wedding.ViewMode)
+
+@import helpers._
+@import helper._
+@import helpers.BootstrapHelper._
+
+
+<div id="widgetAdFree" class="widget nomove">
+    <div class="widget-header"></div>
+    <div class="widget-content">
+        <div class="widget-content-gradient">
+            <div class="widget-title">@Messages("main.modules.adFree.advertising")</div>
+            <div class="ad-portlet">
+                <a target="_blank" href="https://www.shareasale.com/r.cfm?b=304814&u=840150&m=32214&urllink=&afftrack="><img src="https://www.shareasale.com/image/32214/Wedding_destination_125x125.gif" alt="Destination Wedding Dresses" border="0"></a>
+            </div>
+            @if(false && AuthenticationHelper.isDisplayAsOwner) {
+                @button(
+                    href = controllers.modules.routes.Module.listAllModules(wedding.uid),
+                    title = Messages("main.modules.adFree.removeAd"),
+                    icon = routes.Assets.at("images/icons/32/disable.png"),
+                    align = "right"
+                )
+            }
+        </div>
+    </div>
+    <div class="widget-footer"></div>
+</div>

@@ -1,0 +1,122 @@
+@(provider: models.providers.Provider, purchase: models.providers.ProviderPurchase, packType: models.providers.ProviderPackType, transaction: Option[models.providers.ProviderTransaction])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@Messages("main.providers.invoiceNb", purchase.invoiceNumber)</title>
+        <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/providers/pdf.css")" />
+        <link rel="stylesheet" type="text/css" media="print" href="@routes.Assets.at("stylesheets/providers/pdf.css")" />
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("favicon.png")" />
+    </head>
+    <body>
+        <div class="invoiceWrapper">
+            <div class="invoiceHeader">@Messages("main.providers.invoiceNb", purchase.invoiceNumber)</div>
+            <div class="sellerAddress">
+                <p>
+                    @play.Play.application().configuration().getString("address.line1")<br/>
+                    @play.Play.application().configuration().getString("address.line2")<br/>
+                    @play.Play.application().configuration().getString("address.line3")<br/>
+                    @play.Play.application().configuration().getString("address.line4")
+                </p>
+                <p>
+                    @play.Play.application().configuration().getString("address.line5")
+                </p>
+            </div>
+            <div class="buyerAddress">
+                <p>
+                    @provider.name<br/>
+                    @provider.street @provider.streetNb.getOrElse("")<br/>
+                    @provider.zip @provider.place<br/>
+                    @Messages("main.providers.countries."+provider.country)
+                </p>
+                <p>
+                    @provider.email
+                    @if(provider.website.isDefined){<br/>@provider.website}
+                    @if(provider.phone.isDefined){<br/>@provider.phone}
+                </p>
+            </div>
+            <div class="invoiceInfo">
+                <table cellpadding="5" cellspacing="5" border="0">
+                    <tr>
+                        <td>@Messages("main.providers.invoice")</td>
+                        <td>@purchase.invoiceNumber</td>
+                    </tr>
+                    <tr>
+                        <td>@Messages("main.providers.invoiceDate")</td>
+                        <td>@purchase.since.format("dd.MM.yyyy")</td>
+                    </tr>
+                    @if(purchase.paid) {
+                        @if(purchase.paymentDate.isDefined) {
+                            <tr>
+                                <td>@Messages("main.providers.paidOn2")</td>
+                                <td>@purchase.paymentDate.get.format("dd.MM.yyyy")</td>
+                            </tr>
+                        }
+                        @if(purchase.paymentMethod.isDefined) {
+                            <tr>
+                                <td>@Messages("main.providers.method")</td>
+                                <td>@Messages("main.providers.paymentMethod."+purchase.paymentMethod.get)</td>
+                            </tr>
+                        }
+                        @if(transaction.isDefined && transaction.get.transactionId.isDefined) {
+                            <tr>
+                                <td>@Messages("main.providers.transaction")</td>
+                                <td>@transaction.get.transactionId.get</td>
+                            </tr>
+                            <tr>
+                                <td>@Messages("main.providers.payer")</td>
+                                <td>@transaction.get.payerId.getOrElse("")</td>
+                            </tr>
+                        }
+                    } else {
+                        <tr>
+                            <td>@Messages("main.providers.deadline2")</td>
+                            <td>@purchase.deadline.format("dd.MM.yyyy")</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <table class="table table-striped table-hover invoiceTable" cellpadding="5" cellspacing="0">
+                <thead>
+                <tr>
+                    <th>
+                        @Messages("main.providers.pack")
+                    </th>
+                    <th>
+                        @Messages("main.providers.amount")
+                    </th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td>@Messages("main.providers.total")</td>
+                    <td align="right">@purchase.currency @currency(purchase.amount)</td>
+                </tr>
+                </tfoot>
+                <tbody>
+                <tr>
+                    <td>
+                        <div>@packType.name - @provider.title</div>
+                        <div>@Messages("main.providers.validFromToNbMonths", UtilsHelper.dateToString(purchase.since), UtilsHelper.dateToString(purchase.until), packType.nbMonths)</div>
+                    </td>
+                    <td align="right">@purchase.currency @currency(purchase.amount)</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="invoicePaymentInfo">
+                <p>@Messages("main.payment.invoiceTerms")</p>
+            </div>
+            <div class="invoiceRegards">
+                <p>@Messages("main.payment.invoiceWithKindRegards")</p>
+            </div>
+            <div class="invoiceVATInfo">
+                <p>@Messages("main.payment.invoiceVATInfo")</p>
+            </div>
+        </div>
+    </body>
+</html>

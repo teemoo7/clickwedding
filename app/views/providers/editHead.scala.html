@@ -1,0 +1,193 @@
+@(provider: models.providers.Provider)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/providers/providers.css")">
+<script src="@routes.Assets.at("javascripts/jQuery-File-Upload/vendor/jquery.ui.widget.js")"></script>
+<script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.iframe-transport.js")"></script>
+<script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.fileupload.js")"></script>
+<script src="@routes.Assets.at("javascripts/jQuery-File-Upload/load-image.min.js")"></script>
+<script src="@routes.Assets.at("javascripts/jQuery-File-Upload/canvas-to-blob.min.js")"></script>
+<script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.fileupload-fp.js")"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/lightbox/lightbox.css")">
+<script type="text/javascript" src="@routes.Assets.at("javascripts/lightbox/lightbox.js")"></script>
+@views.html.providers.mapHead()
+<script type="text/javascript" src='@controllers.providers.routes.Provider.javascriptRoutes'></script>
+<script type="text/javascript">
+    // Delete the logo picture
+    function deleteLogoPicture() {
+        if (confirm('@Messages("main.providers.confirmDeletePicture")')) {
+            $('#successUploadNotificationLogo').hide();
+            // Data are sent to the server
+            jsRoutes.controllers.providers.Provider.deleteLogo(@provider.id.get).ajax({
+                success : function() {
+                    $('#providerLogoPicture').remove();
+                    $('#providerLogoPictureDelete').remove();
+                },
+                error : function(data) {
+                    showWarningDialog('@Messages("main.providers.error.couldNotDeletePicture")')
+                }
+            });
+        }
+    }
+
+    // Delete a showroom picture
+    function deleteShowroomPicture(pictureId) {
+        if (confirm('@Messages("main.providers.confirmDeletePicture")')) {
+            $('#successUploadNotificationShowroom').hide();
+            // Data are sent to the server
+            jsRoutes.controllers.providers.Provider.deletePicture(@provider.id.get, pictureId).ajax({
+                success : function() {
+                    $('#providerShowroomPicture_'+pictureId).remove();
+                },
+                error : function(data) {
+                    showWarningDialog('@Messages("main.providers.error.couldNotDeletePicture")')
+                }
+            });
+        }
+    }
+
+    $(function () {
+        $('#fileUploadLogo').fileupload({
+            dataType: 'html',
+            dropZone: $('#dropZoneLogo'),
+            process:
+                [
+                    {
+                        action: 'load',
+                        fileTypes: /^image\/(gif|jpeg|png)$/,
+                        maxFileSize: 20000000 // 20MB
+                    },
+                    {
+                        action: 'resize',
+                        maxWidth: @models.providers.Provider.LOGO_PICTURE_WIDTH.toString,
+                        maxHeight: @models.providers.Provider.LOGO_PICTURE_HEIGHT.toString
+                    },
+                    {
+                        action: 'save'
+                    }
+                ],
+            progressall: function (e, data) {
+                $('#successUploadNotificationLogo').hide();
+                $('#uploadManagementLogo').slideUp();
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progressLogo .bar').css(
+                    'width',
+                    progress + '%'
+                );
+            },
+            done: function (e, data) {
+                $('#providerLogoPicture').remove();
+                $('#providerLogoPictureDelete').remove();
+                $('#providerLogoPictureContainer').append(data.result);
+                $('#successUploadNotificationLogo').show();
+                $('#uploadManagementLogo').slideDown();
+                $('#progressLogo .bar').css(
+                    'width', '0%'
+                );
+            },
+            fail: function (e, data) {
+                $('#uploadManagementLogo').slideDown();
+                var text = data.errorThrown;
+                if (data.jqXHR != null && data.jqXHR.responseText != null && data.jqXHR.responseText.length > 0) {
+                    text = text + " : " + data.jqXHR.responseText;
+                }
+                showWarningDialog(text);
+                $('#progressLogo .bar').css(
+                    'width', '0%'
+                );
+            }
+        });
+
+        $('#fileUploadShowroom').fileupload({
+            dataType: 'html',
+            dropZone: $('#dropZoneShowroom'),
+            process:
+                [
+                    {
+                        action: 'load',
+                        fileTypes: /^image\/(gif|jpeg|png)$/,
+                        maxFileSize: 20000000 // 20MB
+                    },
+                    {
+                        action: 'resize',
+                        maxWidth: @models.providers.Provider.SHOWROOM_PICTURE_WIDTH.toString,
+                        maxHeight: @models.providers.Provider.SHOWROOM_PICTURE_HEIGHT.toString
+                    },
+                    {
+                        action: 'save'
+                    }
+                ],
+            progressall: function (e, data) {
+                $('#successUploadNotificationShowroom').hide();
+                $('#uploadManagementShowroom').slideUp();
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progressShowroom .bar').css(
+                    'width',
+                    progress + '%'
+                );
+            },
+            done: function (e, data) {
+                $('#providerShowroomPictureContainer').append(data.result);
+                $('#successUploadNotificationShowroom').show();
+                $('#uploadManagementShowroom').slideDown();
+                $('#progressShowroom .bar').css(
+                    'width', '0%'
+                );
+            },
+            fail: function (e, data) {
+                $('#uploadManagementShowroom').slideDown();
+                var text = data.errorThrown;
+                if (data.jqXHR != null && data.jqXHR.responseText != null && data.jqXHR.responseText.length > 0) {
+                    text = text + " : " + data.jqXHR.responseText;
+                }
+                showWarningDialog(text);
+                $('#progressShowroom .bar').css(
+                    'width', '0%'
+                );
+            }
+        });
+
+        $(document).bind('dragover', function (e) {
+            var dropZone = $('#dropZoneLogo'),
+            timeout = window.dropZoneTimeout;
+            if (!timeout) {
+                dropZone.addClass('in');
+            } else {
+                clearTimeout(timeout);
+            }
+            if (e.target === dropZone[0]) {
+                dropZone.addClass('hover');
+            } else {
+                dropZone.removeClass('hover');
+            }
+            window.dropZoneTimeout = setTimeout(function () {
+                window.dropZoneTimeout = null;
+                dropZone.removeClass('in hover');
+            }, 100);
+
+            var dropZoneShowroom = $('#dropZoneShowroom'),
+            timeout = window.dropZoneTimeout;
+            if (!timeout) {
+                dropZoneShowroom.addClass('in');
+            } else {
+                clearTimeout(timeout);
+            }
+            if (e.target === dropZoneShowroom[0]) {
+                dropZoneShowroom.addClass('hover');
+            } else {
+                dropZoneShowroom.removeClass('hover');
+            }
+            window.dropZoneTimeout = setTimeout(function () {
+                window.dropZoneTimeout = null;
+                dropZoneShowroom.removeClass('in hover');
+            }, 100);
+        });
+
+        $(document).bind('drop dragover', function (e) {
+            e.preventDefault();
+        });
+    });
+</script>

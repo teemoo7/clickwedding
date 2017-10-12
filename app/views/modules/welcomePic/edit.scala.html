@@ -1,0 +1,208 @@
+@(wedding: models.wedding.Wedding, welcomePicture: models.modules.WelcomePicture, optionsForm: Form[(Boolean, Option[String])])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = Messages("main.modules.welcomePic.welcomePic"), wedding = Some(wedding)){
+    @views.html.modules.welcomePic.head()
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/vendor/jquery.ui.widget.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.iframe-transport.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.fileupload.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/load-image.min.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/canvas-to-blob.min.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.fileupload-fp.js")"></script>
+    <script type="text/javascript" src='@controllers.modules.welcomePic.routes.WelcomePic.javascriptRoutes'></script>
+    <script type="text/javascript">
+        // Delete the welcome picture
+        function deleteWelcomePicture() {
+            if (confirm('@Messages("main.modules.welcomePic.confirmDeletePicture")')) {
+                // Data are sent to the server
+                jsRoutes.controllers.modules.welcomePic.WelcomePic.deleteWelcomePictureAjax('@wedding.uid').ajax({
+                    success : function() {
+                        $('#welcomePicture').remove();
+                        $('#welcomePictureDelete').remove();
+                    },
+                    error : function(data) {
+                        showWarningDialog('@Messages("main.modules.welcomePic.error.couldNotDeletePicture")')
+                    }
+                });
+            }
+        }
+
+        $(function () {
+            $('#fileUpload').fileupload({
+                dataType: 'html',
+                dropZone: $('#dropZone'),
+                process:
+                    [
+                        {
+                            action: 'load',
+                            fileTypes: /^image\/(gif|jpeg|png)$/,
+                            maxFileSize: 20000000 // 20MB
+                        },
+                        {
+                            action: 'resize',
+                            maxWidth: @models.modules.WelcomePic.PICTURE_WIDTH.toString,
+                            maxHeight: @models.modules.WelcomePic.PICTURE_HEIGHT.toString
+                        },
+                        {
+                            action: 'save'
+                        }
+                    ],
+                progressall: function (e, data) {
+                    $('#successUploadNotification').hide();
+                    showWaitInfo();
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#progress .bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                },
+                done: function (e, data) {
+                    $('#welcomePicture').remove();
+                    $('#welcomePictureDelete').remove();
+                    $('#welcomePictureContainer').append(data.result);
+                    $('#successUploadNotification').show();
+                    hideWaitInfo();
+                    $('#progress .bar').css(
+                        'width', '0%'
+                    );
+                },
+                fail: function (e, data) {
+                    hideWaitInfo();
+                    showWarningDialog(data.errorThrown);
+                    $('#progress .bar').css(
+                        'width', '0%'
+                    );
+                }
+            });
+
+            $(document).bind('dragover', function (e) {
+                var dropZone = $('#dropZone'),
+                    timeout = window.dropZoneTimeout;
+                if (!timeout) {
+                    dropZone.addClass('in');
+                    console.log('in');
+                } else {
+                    clearTimeout(timeout);
+                }
+                if (e.target === dropZone[0]) {
+                    dropZone.addClass('hover');
+                } else {
+                    dropZone.removeClass('hover');
+                }
+                window.dropZoneTimeout = setTimeout(function () {
+                    window.dropZoneTimeout = null;
+                    dropZone.removeClass('in hover');
+                }, 100);
+            });
+
+            $(document).bind('drop dragover', function (e) {
+                e.preventDefault();
+            });
+        });
+
+        function showWaitInfo() {
+            $('#uploadManagement').slideUp(function() {
+                $('#waitInfo').slideDown();
+            });
+        }
+        function hideWaitInfo() {
+            $('#waitInfo').slideUp(function() {
+                $('#uploadManagement').slideDown();
+            });
+        }
+
+        $(document).ready( function() {
+            $('#fileUploadBtn').click(function(){
+                $("#fileUpload").click();
+                return false;
+            });
+        });
+    </script>
+}{
+    <div>
+        <!--<div id="welcomePictureContainer">-->
+            <!--@views.html.modules.welcomePic.welcomePictureEdit(wedding, welcomePicture)-->
+        <!--</div>-->
+        <!--<h3>@Messages("main.modules.welcomePic.uploadPicture")</h3>-->
+
+        <!--<div id="successUploadNotification" style="display: none;" class="alert alert-success">@Messages("main.modules.welcomePic.transferSuccessful")</div>-->
+
+        <!--<div id="uploadManagement">-->
+            <!--<div style="text-align: left;">@Messages("main.modules.welcomePic.pictureResized", models.modules.WelcomePic.PICTURE_WIDTH.toString, models.modules.WelcomePic.PICTURE_HEIGHT.toString)</div>-->
+            <!--<div id="explanationsUpload" class="block">-->
+                <!--<div style="margin-top: 40px; margin-bottom: 20px; text-align:left;">@Messages("main.modules.welcomePic.selectPicture")</div>-->
+                <!--<div class="well">-->
+                    <!--<fieldset>-->
+                        <!--<input id="fileUpload" type="file" name="files" data-url="@controllers.modules.welcomePic.routes.WelcomePic.addWelcomePictureAjax(wedding.uid)">-->
+                    <!--</fieldset>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div style="text-align: left">@Messages("main.modules.welcomePic.orDropFileHere")</div>-->
+            <!--<div id="dropZone" class="fade well block">-->
+                <!--@Messages("main.modules.welcomePic.dropFileHere")-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <!--<div id="transferInfo" class="clearfix">-->
+            <!--<p style="font-weight: bold;">@Messages("main.modules.welcomePic.transferStart")</p>-->
+            <!--<div class="progress progress-striped active" id="progress">-->
+                <!--<div class="bar" style="width: 0%;"></div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div id="welcomePictureContainer">
+            @if(welcomePicture.defined) {
+                @views.html.modules.welcomePic.welcomePictureEdit(wedding, welcomePicture)
+            }
+        </div>
+
+        @form(action = controllers.modules.welcomePic.routes.WelcomePic.doEditWelcomePic(wedding.uid), 'class -> "form-horizontal") {
+            <fieldset>
+                <div class="control-group ">
+                    <label for="fileUpload" class="control-label">@Messages("main.modules.welcomePic.uploadPicture") </label>
+                    <div class="controls ">
+                        <div class="upload-picture">
+
+                            <div class="uploadManagement">
+                                <div id="dropZone" class="fade well block dropZone">
+                                    <input style="display: none;" id="fileUpload" type="file" name="files" data-url="@controllers.modules.welcomePic.routes.WelcomePic.addWelcomePictureAjax(wedding.uid)">
+                                        <div id="uploadManagement">
+                                            <span><a href="#" id="fileUploadBtn" class="btn">@Messages("main.modules.welcomePic.selectPicture")</a><br/>
+                                            @Messages("main.modules.welcomePic.orDropFileHere")</span>
+                                        </div>
+                                        <div id="waitInfo" style="display: none;">
+                                            <span>@Messages("main.modules.welcomePic.pleaseWait")</span>
+                                        </div>
+                                    <div id="transferInfo" class="clearfix transferInfo">
+                                        <div class="progress progress-striped active" id="progress">
+                                            <div class="bar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="recommendationUpload alert alert-info">
+                                <div class="recommendationIcon"><img src="@routes.Assets.at("images/icons/32/warning.png")" alt="Info" /></div>
+                                <div class="recommendationText">@Messages("main.modules.welcomePic.pictureResized", models.modules.WelcomePic.PICTURE_WIDTH.toString, models.modules.WelcomePic.PICTURE_HEIGHT.toString)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @checkbox(
+                    field = optionsForm("showName"),
+                    args =  '_label -> Messages("main.modules.welcomePic.showName"),
+                            '_showConstraints -> false
+                )
+            </fieldset>
+            <div class="form-actions">
+                <input type="submit" value="@Messages("main.modules.welcomePic.save")" class="btn btn-primary">
+            </div>
+        }
+
+        @backButton(wedding.uid)
+
+    </div>
+}

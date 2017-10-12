@@ -1,0 +1,19 @@
+@()(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+
+@main(Messages("main.admin.termsAndConditionsProvider"))() {
+
+    <div class="terms-conditions">
+        <pre>
+@TermsConditionsHelper.getTermsAndConditionsProvider(lang)
+        </pre>
+    </div>
+
+    <div style="text-align: center; margin: 30px;">
+        <a href="@controllers.admin.routes.HelpCenter.terms">@Messages("main.admin.termsAndConditions")</a>
+    </div>
+}

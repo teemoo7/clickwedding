@@ -1,0 +1,19 @@
+@**
+* Generate a hidden HTML input text with name and id "uid".
+*
+* Example:
+* {{{
+*   @uidHidden(uid = wedding.uid, args = 'data-ref -> 0)
+* }}}
+*
+* @param uid The wedding UID
+* @param args Set of extra attributes.
+*@
+@(uid: String, args: (Symbol,Any)*)(implicit lang: Lang)
+
+@id = @{ args.toMap.get('id).map(_.toString).getOrElse("uid") }
+@name = @{ "uid" }
+@inputType = @{ args.toMap.get('type).map(_.toString).getOrElse("hidden") }
+@htmlArgs = @{ args.filter(arg => !arg._1.name.startsWith("_") && arg._1 != 'id).toMap.filter(_._1 != 'type) }
+
+<input type="@inputType" id="@id" name="@name" value="@uid" @toHtmlArgs(htmlArgs)>

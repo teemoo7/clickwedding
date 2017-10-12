@@ -1,0 +1,173 @@
+@(wedding: models.wedding.Wedding, registerOptionsForm: Form[models.modules.RegisterInfo], registerInstructionsForm: Form[Option[String]])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@isTab2Active = @{ registerInstructionsForm.hasErrors || registerInstructionsForm.globalError.isDefined }
+
+@main(Messages("main.modules.register.editRegisterInfo"), wedding = Some(wedding)){
+    <script type="text/javascript">
+        $(function() {
+            $('#isDinner').change(function() {
+                if (!this.checked) {
+                    $('#isDinnerPrivate').removeAttr('checked');
+                }
+            });
+            $('#isDinnerPrivate').change(function() {
+                var checked = $('#isDinner').attr('checked');
+                if (!checked) {
+                    $(this).removeAttr('checked');
+                }
+            });
+
+            $('#isNotification').change(function() {
+                if (this.checked) {
+                    $('#mailNotification').removeAttr('readonly');
+                } else {
+                    $('#mailNotification').attr('readonly', 'readonly');
+                    $('#mailNotification').val('');
+                }
+            });
+
+            if (!$('#isNotification').attr('checked')) {
+                $('#mailNotification').attr('readonly', 'readonly');
+                $('#mailNotification').val('');
+            };
+
+            $('#textUsePerso').change(function() {
+                if (this.checked) {
+                    $('#instructions').removeAttr('disabled');
+                } else {
+                    $('#instructions').attr('disabled', 'disabled');
+                    $('#instructions').val('');
+                }
+            });
+            $('#textUseDefault').change(function() {
+                if (!this.checked) {
+                    $('#instructions').removeAttr('disabled');
+                } else {
+                    $('#instructions').attr('disabled', 'disabled');
+                    $('#instructions').val('');
+                }
+            });
+
+            $( "#mailNotification" ).autocomplete({
+                source: @Html(ModuleHelper.getAvailableEmailAddresses(wedding))
+            });
+        });
+    </script>
+}{
+
+    <div class="tabbable"> <!-- Only required for left/right tabs -->
+        <ul class="nav nav-tabs">
+            <li @if( !isTab2Active ) {class="active"}><a href="#tab1" data-toggle="tab">@Messages("main.modules.register.editRegisterInfoSettings")</a></li>
+            <li @if( isTab2Active ) {class="active"}><a href="#tab2" data-toggle="tab">@Messages("main.modules.register.editRegisterInfoInstructions")</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane @if( !isTab2Active ) {active}" id="tab1">
+
+                <h3>@Messages("main.modules.register.editRegisterInfoSettings")</h3>
+
+                @registerOptionsForm.globalError.map { error =>
+                    <div class="alert alert-error">
+                        <a href="#" class="close" data-dismiss="alert">×</a>
+                        <strong>@Messages("main.error")!</strong> @error.message
+                    </div>
+                }
+
+                @form(action = controllers.modules.routes.Register.doEdit(wedding.uid), 'class -> "form-horizontal") {
+                    <fieldset>
+                        <p>@Messages("main.modules.register.askRegistrationFor")</p>
+                        @checkbox2(
+                            field = registerOptionsForm("isReception"),
+                            args =  '_label -> None,
+                                    '_text -> Messages("main.modules.register.reception"),
+                                    '_showConstraints -> false
+                        )
+                        @checkbox2(
+                            field = registerOptionsForm("isDinner"),
+                            args =  '_label -> None,
+                                    '_text -> Messages("main.modules.register.dinner"),
+                                    '_showConstraints -> false
+                        )
+                        @if(AuthenticationHelper.isRestrictedAreaDefined(wedding)) {
+                            <div class="inner">
+                                @checkbox2(
+                                    field = registerOptionsForm("isDinnerPrivate"),
+                                    args =  '_label -> None,
+                                            '_text -> Messages("main.modules.register.onlyForRestrictedAreaGuests"),
+                                            '_showConstraints -> false,
+                                            '_isVIP -> true
+                                )
+                            </div>
+                        }
+                        <p>&nbsp;</p>
+                        @checkbox2(
+                            field = registerOptionsForm("isNotification"),
+                            args =  '_label -> None,
+                                    '_text -> Messages("main.modules.register.sendNotificationMail"),
+                                    '_showConstraints -> false
+                        )
+                        <div class="inner">
+                            @inputText(
+                                field = registerOptionsForm("mailNotification"),
+                                args =  '_label -> "",
+                                        '_showConstraints -> false,
+                                        'placeholder -> "name@domain.com"
+                            )
+                        </div>
+
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.modules.register.save")" class="btn btn-primary">
+                        <a href="@routes.Wedding.display(wedding.uid)" class="btn">@Messages("main.modules.register.cancel")</a>
+                    </div>
+                }
+
+            </div>
+            <div class="tab-pane @if( isTab2Active ) {active}" id="tab2">
+
+                <h3>@Messages("main.modules.register.editRegisterInfoInstructions")</h3>
+
+                <p>@Messages("main.modules.register.editRegisterInfoInstructionsExplanation")</p>
+
+                @defining(if (registerInstructionsForm("instructions").value.isEmpty) Seq('disabled -> "disabled") else Seq()) { disabledSeq =>
+                    @form(action = controllers.modules.routes.Register.doEditInstructions(wedding.uid), 'class -> "form-horizontal") {
+                        <fieldset>
+                            <div class="control-group ">
+                                <label for="textUse" class="control-label">@Messages("main.modules.register.textUse")</label>
+                                <div class="controls">
+                                    <span id="textUse" class="buttonset">
+                                        <label class="radio" for="textUseDefault"><input type="radio" name="textUse" value="default" id="textUseDefault" @if(registerInstructionsForm("instructions").value.isEmpty){ checked="checked" }>@Messages("main.modules.register.textUseDefault")</label>
+                                        <div class="well inner">
+                                            @Messages("main.modules.register.explanation")
+                                        </div>
+
+                                        <label class="radio" for="textUsePerso"><input type="radio" name="textUse" value="perso" id="textUsePerso" @if(registerInstructionsForm("instructions").value.isDefined){ checked="checked" }>@Messages("main.modules.register.textUsePerso")</label>
+                                        <div class="inner">
+                                            @textarea(
+                                                field = registerInstructionsForm("instructions"),
+                                                args =  (Seq(
+                                                        '_label -> "",
+                                                        'placeholder -> Messages("main.modules.register.textUseYourTextHere"),
+                                                        'class -> "input-xlarge",
+                                                        'rows -> 3)++disabledSeq):_*
+                                            )(handler = views.html.helper.basicInput.f, lang)
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="form-actions">
+                            <input type="submit" value="@Messages("main.modules.register.save")" class="btn btn-primary">
+                            <a href="@routes.Wedding.display(wedding.uid)" class="btn">@Messages("main.modules.register.cancel")</a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}

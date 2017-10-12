@@ -1,0 +1,10 @@
+@(cartItem: models.modules.CartItem, purchaseCurrency: String)(implicit lang: Lang)
+
+@import helper._
+
+<tr id="cartItem_@cartItem.item.id" data-ref="@cartItem.item.id" class="cart-item">
+    <td>@cartItem.item.description</td>
+    <td align="right">@purchaseCurrency @currency(cartItem.item.unitPrice)</td>
+    <td align="right" id="cartItemNumber_@cartItem.item.id">@cartItem.number</td>
+    <td align="right"><span id="cartItemTotal_@cartItem.item.id">@purchaseCurrency @currency(cartItem.number*cartItem.item.unitPrice)</span></td>
+</tr>

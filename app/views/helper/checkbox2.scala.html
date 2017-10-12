@@ -1,0 +1,17 @@
+@**
+* Generate an HTML input checkbox compatible with Twitter Bootstrap.
+*
+* Example:
+* {{{
+* @checkbox2(field = myForm("done"))
+* }}}
+*
+* @param field The form field.
+* @param args Set of extra HTML attributes ('''id''' and '''label''' are 2 special arguments).
+* @param handler The field constructor.
+*@
+@(field: play.api.data.Field, args: (Symbol,Any)*)(implicit handler: FieldConstructor, lang: Lang)
+
+<label class="checkbox">
+    @checkbox(field, args:_*)
+</label>

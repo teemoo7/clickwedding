@@ -1,0 +1,79 @@
+#globalContainer {
+	background-color: #FFFFFF;
+	background-image: url('images/background.png');
+	background-repeat: no-repeat;
+}
+
+.navbar-inner {
+	background-color: #F96692;
+}
+
+a {
+    color: #F96692;
+}
+
+a:visited {
+    color: #F96692;
+}
+
+a:hover {
+    color: #F96692;
+}
+
+a.question {
+    color: #F96692;
+    border-bottom: 1px dashed #F96692;
+}
+
+.btn {
+    color: #F96692;
+}
+
+.btn:hover {
+    color: #F96692;
+}
+
+.btn-danger {
+    color: #FFFFFF;
+}
+
+.btn-danger:hover {
+    color: #FFFFFF;
+}
+
+.navbar .nav li.dropdown.open > .dropdown-toggle, .navbar .nav li.dropdown.active > .dropdown-toggle, .navbar .nav li.dropdown.open.active > .dropdown-toggle {
+    background-color:#F96692;
+}
+
+.dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a, .dropdown-menu .active > a, .dropdown-menu .active > a:hover, .navbar .nav > li > a:focus, .navbar .nav > li > a:hover {
+    color: #F96692;
+    background-color:#FFFFFF;
+}
+
+.btn-primary, .btn-primary:hover {
+    background-color:#F96692;
+    color: #FFFFFF;
+}
+
+#footer {
+    background-color: #F96692;
+    background-image: none;
+    color: #000000;
+    padding: 5px;
+}
+
+#footer a {
+    color: #FFFFFF;
+}
+
+#footer a:visited {
+    color: #FFFFFF;
+}
+
+#footer a:hover {
+    color: #FFFFFF;
+}
+
+.welcomePicLabel {
+    color: #F96692;
+}

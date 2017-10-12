@@ -1,0 +1,102 @@
+body {
+	background-color: transparent;
+    background-image:none;
+}
+
+#globalContainer {
+    background: #1a1a1a;
+/*
+	background-image: url('images/movie.png');
+	background-repeat: repeat-y;
+	background-color: transparent;
+    */
+}
+
+#globalContainerInner {
+/*    background: rgba(0,0,0,0);*/
+	background-color: transparent;
+    background-image:none;
+}
+
+img.superbg {
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:-1;
+}
+
+.navbar-inner {
+    background: #1a1a1a;
+    border-radius: 5px;
+}
+
+a {
+    color: #000;
+}
+
+a:visited {
+    color: #000;
+}
+
+a:hover {
+    color: #000;
+}
+
+a.question {
+    color: #000;
+    border-bottom: 1px dashed #000;
+}
+
+.btn {
+    color: #000;
+}
+
+.btn:hover {
+    color: #000;
+}
+
+.btn-danger {
+    color: #FFFFFF;
+}
+
+.btn-danger:hover {
+    color: #FFFFFF;
+}
+
+.navbar .nav li.dropdown.open > .dropdown-toggle, .navbar .nav li.dropdown.active > .dropdown-toggle, .navbar .nav li.dropdown.open.active > .dropdown-toggle {
+    background-color:#000;
+}
+
+.dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a, .dropdown-menu .active > a, .dropdown-menu .active > a:hover, .navbar .nav > li > a:focus, .navbar .nav > li > a:hover {
+    color: #000;
+    background-color:#FFFFFF;
+}
+
+.btn-primary, .btn-primary:hover {
+    background-color:#000;
+    color: #FFFFFF;
+}
+
+#footer {
+    background: #1a1a1a;
+    color: #CCCCCC;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#footer a {
+    color: #FFF;
+}
+
+#footer a:visited {
+    color: #FFF;
+}
+
+#footer a:hover {
+    color: #FFF;
+}
+
+.welcomePicLabel {
+    color: #FFF;
+}
+

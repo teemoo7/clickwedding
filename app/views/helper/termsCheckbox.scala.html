@@ -1,0 +1,24 @@
+@**
+* Generate an HTML input checkbox compatible with Twitter Bootstrap.
+*
+* Example:
+* {{{
+* @termsCheckbox(field = myForm("done"))
+* }}}
+*
+* @param field The form field.
+* @param args Set of extra HTML attributes ('''id''' and '''label''' are 2 special arguments).
+* @param handler The field constructor.
+*@
+@(field: play.api.data.Field, args: (Symbol,Any)*)(implicit handler: FieldConstructor, lang: Lang)
+
+<label class="checkbox">
+    @boxValue = @{ args.toMap.get('value).getOrElse("true") }
+
+    @args2 = @{ Seq(('_showConstraints -> false), '_label -> None)++(args) }
+
+    @input(field, args2:_*) { (id, name, value, htmlArgs) =>
+        <input type="checkbox" id="@id" name="@name" value="@boxValue" @(if(value == Some(boxValue)) "checked" else "") @toHtmlArgs(htmlArgs.filterKeys(_ != 'value))>
+        <span>@Messages("main.wedding.acceptTermsAndConditionsLinkStart") <a href="@controllers.admin.routes.HelpCenter.terms" target="_blank">@Messages("main.wedding.acceptTermsAndConditionsLinkEnd")</a></span>
+    }
+</label>

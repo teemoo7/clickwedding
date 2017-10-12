@@ -1,0 +1,55 @@
+@(wedding: models.wedding.Wedding)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = Messages("main.modules.geoLocal.geoLocalization"), wedding = Some(wedding)){
+    @views.html.modules.geoLocal.editHead(wedding)
+} {
+
+    <div id="geoLocalizationWrapper">
+
+        <div id="mapColumn">
+            <p>@Messages("main.modules.geoLocal.address") <input type="text" name="address" id="address" value="" placeholder="@Messages("main.modules.geoLocal.addressExample")" />
+                <a href="#" onclick="goToEnteredAddress(); return false;" class="btn">@Messages("main.modules.geoLocal.search")</a>
+            </p>
+            <div id="mapCanvas" class="map-edit"></div>
+        </div>
+        <div id="instructions">
+            &nbsp;
+            <div id="instructionsMarkerIcon">
+                <select name="markerIcon" id="markerIcon">
+                    @for((index, path) <- ModuleHelper.getGeoLocalMarkerIcons) {
+                        <option value="@index" data-imagesrc="@routes.Assets.at(path)"></option>
+                    })
+                </select>
+            </div>
+            <div id="instructionsMarkerName">
+                @Messages("main.modules.geoLocal.name") <input type="text" name="markerName" id="markerName" value="" placeholder="@Messages("main.modules.geoLocal.markerNameExample")" />
+            </div>
+            <div id="instructionsMarkerActions">
+                <a id="actionAddMarker" href="#" onclick="addMarker(); return false;" class="btn btn-primary">@Messages("main.modules.geoLocal.addMarker")</a>
+                <a id="actionUpdateMarker" href="#" onclick="updateMarker(); return false;" class="btn btn-primary" style="display: none;">@Messages("main.modules.geoLocal.updateMarker")</a>
+                <a id="actionCancelUpdateMarker" href="#" onclick="cancelUpdateMarker(); return false;" class="btn" style="display: none;">@Messages("main.modules.geoLocal.cancelUpdate")</a>
+            </div>
+            <div class="clearfix">&nbsp;</div>
+        </div>
+        <div id="markerList">
+            <script type="text/javascript">
+                @ModuleHelper.getGeoLocal(wedding).get.moduleContent.markers.map { marker =>
+                addMarkerToDraw(@marker.id, @marker.latitude, @marker.longitude, '@marker.name', '@routes.Assets.at(ModuleHelper.getGeoLocalMarkerIcons.get(marker.markerType).getOrElse(""))');
+                }
+            </script>
+            @ModuleHelper.getGeoLocal(wedding).get.moduleContent.markers.map { marker =>
+            @views.html.modules.geoLocal.marker(marker)
+            }
+        </div>
+    </div>
+
+    @button(
+        href = routes.Wedding.display(wedding.uid),
+        title = Messages("main.modules.geoLocal.done"),
+        icon = routes.Assets.at("images/icons/32/save.png")
+    )
+}

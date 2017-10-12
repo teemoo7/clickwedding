@@ -1,0 +1,28 @@
+@(wedding: models.wedding.Wedding, registerInfo: models.modules.RegisterInfo, guests: List[models.modules.RegisterGuest])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@nbForReception = @{ registerInfo.isReception match { case true => Some(guests.map(_.nbForReception).sum) case false => None } }
+@nbForDinner = @{ registerInfo.isDinner match { case true => Some(guests.map(_.nbForDinner).sum) case false => None } }
+@nbGuests = @{ (nbForReception, nbForDinner) match {
+    case (Some(r), Some(d)) => "("+r+" / "+d+")"
+    case (Some(r), None) => "("+r+")"
+    case (None, Some(d)) => "("+d+")"
+    case _ => ""
+} }
+
+<div>
+    <p>@ModuleHelper.getInstructions(wedding, models.modules.Register.ID)</p>
+    @button(
+        href = controllers.modules.routes.Register.register(wedding.uid),
+        title = Messages("main.modules.register.registration"),
+        icon = routes.Assets.at("images/icons/32/register.png")
+    )
+    @if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+        <div style="text-align: center;">
+            <a href="@controllers.modules.routes.Register.list(wedding.uid)" class="btn"><img src="@routes.Assets.at("images/icons/32/guests.png")"/> @Messages("main.modules.register.registeredGuests") @nbGuests</a>
+        </div>
+    }
+</div>

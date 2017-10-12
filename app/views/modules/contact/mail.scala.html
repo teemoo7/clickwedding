@@ -1,0 +1,73 @@
+@(wedding: models.wedding.Wedding, contact: models.modules.Contact, mailForm: Form[(Int, String, String, String, String, String, Boolean, String, String)], captchaUuid: String = helpers.CaptchaHelper.generateCaptcha)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.modules.contact.sendMail"), wedding = Some(wedding))(
+    CaptchaHelper.getHeadInsert(captchaUuid)
+){
+
+    @if(UtilsHelper.isNotEmpty(contact.moduleContent.coupleMail) || UtilsHelper.isNotEmpty(contact.moduleContent.organizerMail)) {
+
+        @form(action = controllers.modules.routes.Contact.doMail(wedding.uid), 'class -> "form-horizontal") {
+
+            <fieldset>
+                @{
+                    select(
+                        field = mailForm("recipient"),
+                        options = ModuleHelper.getOptionsAuthorizedRecipients(contact),
+                        args =  '_label -> Messages("main.modules.contact.recipient"),
+                                'class -> "input-xlarge",
+                                '_showConstraints -> false
+                    )
+                }
+                @inputText(
+                    field = mailForm("firstName"),
+                    args =  '_label -> Messages("main.modules.contact.firstName"),
+                            'class -> "input-xlarge",
+                            '_showConstraints -> false
+                )
+                @inputText(
+                    field = mailForm("lastName"),
+                    args =  '_label -> Messages("main.modules.contact.lastName"),
+                            'class -> "input-xlarge",
+                            '_showConstraints -> false
+                )
+                @inputText(
+                    field = mailForm("mailAddress"),
+                    args =  '_label -> Messages("main.modules.contact.mailAddress"),
+                            '_showConstraints -> false,
+                            'class -> "input-xlarge",
+                            'placeholder -> "yourname@domain.com"
+                )
+                @inputText(
+                    field = mailForm("subject"),
+                    args =  '_label -> Messages("main.modules.contact.subject"),
+                            'class -> "input-xlarge",
+                            '_showConstraints -> false
+                )
+                @textarea(
+                    field = mailForm("message"),
+                    args =  '_label -> Messages("main.modules.contact.message"),
+                            'rows -> 10,
+                            'class -> "input-xlarge",
+                            '_showConstraints -> true
+                )
+                @checkbox2(
+                    field = mailForm("copy"),
+                    args =  '_label -> None,
+                            '_text -> Messages("main.modules.contact.sendMeACopy"),
+                            '_showConstraints -> false
+                )
+
+                @CaptchaHelper.displayCaptcha(captchaUuid, mailForm("captchaValue"))
+            </fieldset>
+
+            <div class="form-actions">
+                <input type="submit" value="@Messages("main.modules.contact.sendMail")" class="btn btn-primary">
+                <a href="@routes.Wedding.display(wedding.uid)" class="btn">@Messages("main.modules.contact.cancel")</a>
+            </div>
+        }
+    }
+}

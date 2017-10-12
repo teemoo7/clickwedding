@@ -1,0 +1,23 @@
+@(wedding: models.wedding.Wedding, contact: models.modules.Contact)(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helpers._
+@import helper._
+@import helpers.BootstrapHelper._
+
+<div>
+    @if(UtilsHelper.isNotEmpty(contact.moduleContent.couplePhone) || UtilsHelper.isNotEmpty(contact.moduleContent.organizerPhone)) {
+    <table cellpadding="5" cellspacing="5">
+        <tbody>
+        <tr>
+            <td colspan="2"><h2>@Messages("main.modules.contact.contact")</h2></td>
+        </tr>
+        @if(UtilsHelper.isNotEmpty(contact.moduleContent.organizerPhone)) {
+        <tr>
+            <td>@Messages("main.modules.contact.organizer")</td>
+            <td>@contact.moduleContent.organizerPhone</td>
+        </tr>
+        }
+        </tbody>
+    </table>
+    }
+</div>

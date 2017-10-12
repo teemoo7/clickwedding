@@ -1,0 +1,24 @@
+@(wedding: models.wedding.Wedding, purchase: models.modules.GiftListPurchase)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = Messages("main.modules.giftList.thankYou"), wedding = Some(wedding))(){
+
+    <div>
+        <p>@Messages("main.modules.giftList.paymentSuccessful")</p>
+        <p>@Messages("main.modules.giftList.toPrintInvoice")</p>
+    </div>
+
+    @button(
+        href = controllers.modules.routes.GiftList.displayInvoice(wedding.uid, purchase.id.get, purchase.transactionId.getOrElse("")),
+        title = Messages("main.modules.giftList.invoice"),
+        icon = routes.Assets.at("images/icons/32/transactions.png"),
+        target = "_bank"
+    )
+
+    <hr/>
+
+    @backButton(wedding.uid)
+}

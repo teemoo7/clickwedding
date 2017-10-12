@@ -1,0 +1,42 @@
+@(stats: models.admin.stats.Stats)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.admin.console.siteStatistics")){
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        google.load("visualization", "1", {packages:["corechart"]});
+        google.setOnLoadCallback(drawCharts);
+
+        function drawCharts() {
+            drawGeneralCharts();
+        }
+    </script>
+
+    @views.html.admin.console.statsGeneralHead(stats.generalStats)
+
+}{
+
+    <div class="tabbable"> <!-- Only required for left/right tabs -->
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab1" data-toggle="tab">@Messages("main.admin.console.generalStats")</a></li>
+            <li><a href="#tab2" data-toggle="tab">@Messages("main.admin.console.dbStats")</a></li>
+            <li><a href="#tab3" data-toggle="tab">@Messages("main.admin.console.budgetStats")</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+                @views.html.admin.console.statsGeneral(stats.generalStats)
+            </div>
+
+            <div class="tab-pane" id="tab2">
+                @views.html.admin.console.statsDB(stats.dbStats)
+            </div>
+
+            <div class="tab-pane" id="tab3">
+                @views.html.admin.console.statsBudget(stats.budgetStats)
+            </div>
+        </div>
+    </div>
+}

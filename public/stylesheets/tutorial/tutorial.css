@@ -1,0 +1,45 @@
+#tutorialDialog {
+    font-family: 'Open Sans',sans-serif;
+    font-size: 0.8em;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+#tutorialDialogMessage .important {
+    font-weight: bold;
+}
+
+#tutorialDialogMessage .interest {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    line-height: 40px;
+    cursor: pointer;
+}
+
+#tutorialDialogMessage .menu-link {
+    border: 1px solid #FF1988;
+    background-color: #FF1988;
+    color: #FFFFFF;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+#tutorialDialogMessage .bottom-link {
+    border: 1px solid #000000;
+    background-color: #000000;
+    color: #FF1988;
+}
+
+.highlight {
+    outline: 1px dotted #FF1988;
+}
+
+.mark {
+    background-image: url('../../themes/default/images/mark.png');
+    background-repeat: no-repeat;
+    width: 159px;
+    height: 74px;
+    z-index: 999;
+    position: absolute;
+}

@@ -1,0 +1,51 @@
+@(searchPublicWeddingForm: Form[(String, Option[String])], captchaUuid: String = helpers.CaptchaHelper.generateCaptcha)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.wedding.searchWedding"))(CaptchaHelper.getHeadInsert(captchaUuid)) {
+
+    @searchPublicWeddingForm.globalError.map { error =>
+        <div class="alert alert-error">
+            <a href="#" class="close" data-dismiss="alert">×</a>
+            <strong>@Messages("main.error")!</strong> @error.message
+        </div>
+    }
+    @searchPublicWeddingForm("captchaValue").errors.map { error =>
+        <div class="alert alert-error">
+            <a href="#" class="close" data-dismiss="alert">×</a>
+            <strong>@Messages("main.error")!</strong> @Messages("main.captcha.captchaDoesNotMatch")
+        </div>
+    }
+
+    @form(action = routes.Wedding.doSearch, 'class -> "form-horizontal") {
+        <div style="margin-top: 30px;">
+            <p>@Messages("main.wedding.weddingSearchExplanationID")</p>
+        </div>
+
+        @inputText(
+            field = searchPublicWeddingForm("uid"),
+            args =  '_label -> Messages("main.wedding.weddingIdentifier"),
+                    '_showConstraints -> false,
+                    '_help -> Messages("main.wedding.identifierHelp")
+        )
+
+        <div style="margin-top: 30px;">
+            <p>@Messages("main.wedding.weddingSearchExplanationCode")</p>
+        </div>
+
+        @inputText(
+            field = searchPublicWeddingForm("code"),
+            args =  '_label -> Messages("main.wedding.code").concat(" (").concat(Messages("main.wedding.optional")).concat(")"),
+                    '_help -> Messages("main.wedding.codeHelp")
+        )
+
+        <!--@CaptchaHelper.displayCaptcha(captchaUuid, searchPublicWeddingForm("captchaValue"))-->
+
+        <div class="form-actions">
+            <input type="submit" id="submit" class="btn btn-primary" value="@Messages("main.wedding.send")">
+        </div>
+    }
+
+}

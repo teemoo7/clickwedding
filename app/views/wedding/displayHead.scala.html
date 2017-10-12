@@ -1,0 +1,86 @@
+@(wedding: models.wedding.Wedding)(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helpers._
+
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/portlet.css")">
+@if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+    <script type="text/javascript" src='@controllers.modules.routes.Portlet.javascriptRoutes'></script>
+    <script type="text/javascript">
+        $(function() {
+            $( ".portlet-column").sortable({
+                items: ".portlet",
+                forcePlaceholderSize: true,
+                placeholder: 'ui-state-highlight',
+                connectWith: ".portlet-column",
+                receive: function( event, ui ) {
+                    if (
+                        ($(this).hasClass('column-small') && $(ui.item).hasClass('portlet-large-only'))
+                        || ($(this).hasClass('column-large') && $(ui.item).hasClass('portlet-small-only'))
+                        || ($(this).hasClass('column-display-link') && !$(ui.item).hasClass('portlet-has-display-link'))
+                    ) {
+                        $(ui.sender).sortable('cancel');
+                        $(this).sortable('cancel');
+                        showWarningDialog('@Messages("main.modules.errorPortletWrongSize")');
+                    } else {
+                        if ($(this).hasClass('column-large')){
+                            $(ui.item).addClass('widget-expand');
+                            $(ui.item).removeClass('widget');
+                            $(ui.item).removeClass('widget-menu');
+                        }
+                        if ($(this).hasClass('column-small')){
+                            $(ui.item).addClass('widget');
+                            $(ui.item).removeClass('widget-expand');
+                            $(ui.item).removeClass('widget-menu');
+                        }
+                        if ($(this).hasClass('column-menu')){
+                            $(ui.item).addClass('widget-menu');
+                            $(ui.item).removeClass('widget-expand');
+                            $(ui.item).removeClass('widget');
+                        }
+                        sendColumn($(this));
+                        sendColumn($(ui.sender));
+                    }
+                },
+                update: function( event, ui ) {
+                    var array = $(this).sortable("toArray");
+                    if (!ui.sender && jQuery.inArray($(ui.item).attr('id'), array) > -1) {
+                        sendColumn($(this));
+                    }
+                }
+            });
+
+            $( ".widget-header" ).disableSelection();
+
+            $(".with-edit-button").each(function() {
+                $(this).append('<div class="editButton floating-edit-button" style="display: hidden;"><a href="'+$(this).attr('data-url')+'" class="btn"><img src="@routes.Assets.at("images/icons/32/edit.png")"/> @Messages("main.wedding.edit")</a></div>');
+            });
+            $(".with-edit-button").mouseover(function() {
+                var pos = $(this).position();
+                var width = $(this).width();
+                var leftEdit = (pos.left+width);
+                var topEdit = (pos.top);
+                if ($(this).hasClass('widget')) {
+                    topEdit += 30;
+                    leftEdit += 0;
+                } else {
+                    topEdit -= 0;
+                }
+                $(this).find(".floating-edit-button").css({top: topEdit, left: leftEdit});
+                $(this).find(".floating-edit-button").show();
+            }).mouseout(function(){
+                $(".floating-edit-button").hide();
+            });
+
+            $(".floating-edit-button").hide();
+        });
+
+        function sendColumn(columnElement) {
+            jsRoutes.controllers.modules.Portlet.editPortlets('@wedding.uid').ajax({
+                data : "columnId="+columnElement.attr('data-column-id')+"&"+columnElement.sortable( "serialize", { attribute : "data-ref" } ),
+                error : function(data) {
+                    showWarningDialog('@Messages("main.modules.errorPortletNotSaved")')
+                }
+            });
+        }
+    </script>
+}

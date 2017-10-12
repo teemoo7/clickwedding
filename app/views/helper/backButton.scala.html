@@ -1,0 +1,23 @@
+@**
+* Generate a button with an icon.
+*
+* Example:
+* {{{
+*   @backButton(uid)
+*   @backButton(wedding.uid, align = "center")
+* }}}
+*
+* @param uid The wedding UID
+* @param align The alignment of the button ("center", "left", "right")
+*@
+@(uid: String, align: String = "center")(implicit lang: Lang)
+
+@href = @{ routes.Wedding.display(uid) }
+@icon = @{ routes.Assets.at("images/icons/32/back.png") }
+@title = @{ Messages("main.wedding.back") }
+
+<div class="button" style="text-align: @align;">
+    <hr/>
+    <a href="@href" class="btn"><img src="@icon"/> @title</a>
+</div>
+

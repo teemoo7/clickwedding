@@ -1,0 +1,11 @@
+@(wedding: models.wedding.Wedding)(implicit lang: Lang)
+
+@import helper._
+@import helpers._
+
+@button(
+    href = controllers.payment.routes.Money.display(wedding.uid),
+    title = wedding.money.toString.concat(" ").concat(Messages("main.payment.remainingMoney")),
+    icon = routes.Assets.at("themes/default/images/diamond_icon_32.png"),
+    id = TutorialHelper.diamondsLinkId
+)

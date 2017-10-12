@@ -1,0 +1,29 @@
+@(wedding: models.wedding.Wedding, richTextForm: Form[models.modules.RichText])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.modules.richText.editWelcomeText"), wedding = Some(wedding)){
+    @views.html.modules.richText.editHead(wedding)
+} {
+
+    @form(action = controllers.modules.routes.RichText.doEdit(wedding.uid)) {
+        <fieldset>
+            @textarea(
+                field = richTextForm("content"),
+                args =  'id -> "richtext",
+                        'rows -> 15,
+                        'style -> "width: 300px",
+                        '_label -> "",
+                        '_showConstraints -> false
+            )
+        </fieldset>
+
+        <div class="form-actions">
+            <input type="submit" value="@Messages("main.modules.richText.save")" class="btn btn-primary">
+            <a href="@routes.Wedding.display(wedding.uid)" class="btn">@Messages("main.modules.richText.cancel")</a>
+        </div>
+    }
+
+}

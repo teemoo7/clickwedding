@@ -1,0 +1,25 @@
+@(wedding: models.wedding.Wedding)(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helpers._
+
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/tutorial/tutorial.css")">
+<script type="text/javascript" src="@routes.Assets.at("javascripts/scrollTo/jquery.scrollTo-min.js")"></script>
+<script type="text/javascript">
+    var step1 =
+        '@views.html.tutorial.step_1()';
+    var step2 =
+        '@views.html.tutorial.step_2()';
+    var step3 =
+        '@views.html.tutorial.step_3()';
+    var step4 =
+        '@views.html.tutorial.step_4()';
+    var step5 =
+        '@views.html.tutorial.step_5()';
+
+    var steps = [step1, step2, step3, step4, step5];
+    var title = '@Messages("main.tutorial.tutorial")';
+    var closeButton = '@Messages("main.tutorial.close")';
+    var nextButton = '@Messages("main.tutorial.next")';
+    var previousButton = '@Messages("main.tutorial.previous")';
+</script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/tutorial/tutorial.js")"></script>

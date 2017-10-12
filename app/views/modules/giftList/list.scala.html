@@ -1,0 +1,39 @@
+@(wedding: models.wedding.Wedding, giftList: models.modules.GiftList, purchases: List[models.modules.GiftListPurchase])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = Messages("main.modules.giftList.receivedGifts"), wedding = Some(wedding)){
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/modules/giftList.css")">
+}{
+
+    <table class="table table-striped table-hover" style="font-size: 0.9em">
+        <thead>
+            <tr>
+                @header("")
+                @header(Messages("main.modules.giftList.id"))
+                @header(Messages("main.modules.giftList.date"))
+                @header(Messages("main.modules.giftList.name"))
+                @header(Messages("main.modules.giftList.transactionId"))
+                @headerPrice(Messages("main.modules.giftList.total"))
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td colspan="4">@Messages("main.modules.giftList.total")</td>
+                @price(giftList.moduleContent.currency, purchases.map(_.totalCost).sum)
+            </tr>
+        </tfoot>
+        <tbody>
+            @purchases.map { purchase =>
+                @views.html.modules.giftList.listPurchase(purchase)
+            }
+        </tbody>
+    </table>
+
+    <hr/>
+
+    @backButton(wedding.uid)
+}

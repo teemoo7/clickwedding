@@ -1,0 +1,234 @@
+GET     /not-authorized             securesocial.controllers.ProviderController.notAuthorized
+
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Wedding.index
+
+# Robots
+GET     /robots.txt                 controllers.Assets.at(path="/public", file="robots.txt")
+GET     /sitemap.xml                controllers.admin.NotificationCenter.generateSitemap
+# Fav Icon #
+GET     /favicon.png                controllers.Assets.at(path="/public", file="favicon.png")
+GET     /favicon.ico                controllers.Assets.at(path="/public", file="favicon.ico")
+# iPhone Icon #
+GET     /icon-iphone.png            controllers.Assets.at(path="/public", file="icon-iphone.png")
+GET     /icon-ipad.png.png          controllers.Assets.at(path="/public", file="icon-ipad.png")
+GET     /icon-iphone4.png           controllers.Assets.at(path="/public", file="icon-iphone4.png")
+
+# Admin
+GET     /admin/contact              controllers.admin.NotificationCenter.contact
+POST    /admin/contact              controllers.admin.NotificationCenter.doContactMail
+GET     /admin/bug                  controllers.admin.NotificationCenter.reportBug
+POST    /admin/bug                  controllers.admin.NotificationCenter.doReportBug
+GET     /admin/terms                controllers.admin.HelpCenter.terms
+GET     /admin/termsProvider        controllers.admin.HelpCenter.termsProvider
+GET     /admin/privacy              controllers.admin.HelpCenter.privacy
+GET     /admin/faq                  controllers.admin.HelpCenter.faq
+GET     /admin/console              controllers.admin.Console.display
+GET     /admin/listAll              controllers.Wedding.listAll
+GET     /admin/stats                controllers.admin.Console.stats
+
+# Locale
+GET     /locale/:locale             controllers.Wedding.changeLocale(locale: String)
+
+# View mode
+GET     /view/guest                 controllers.Wedding.viewAsGuest
+GET     /view/owner                 controllers.Wedding.viewAsOwner
+
+### WEDDINGS ###
+GET     /:uid                       controllers.Wedding.display(uid: String)
+GET     /wedding/welcome            controllers.Wedding.welcome
+GET     /wedding/example            controllers.Wedding.example
+GET     /wedding/new                controllers.Wedding.create
+POST    /wedding/new                controllers.Wedding.doCreate
+GET     /wedding/list               controllers.Wedding.list
+GET     /wedding/search             controllers.Wedding.search
+POST    /wedding/search             controllers.Wedding.doSearch
+GET     /wedding/:uid               controllers.Wedding.edit(uid: String)
+POST    /wedding/:uid               controllers.Wedding.doEdit(uid: String)
+GET     /wedding/:uid/vip           controllers.Wedding.code(uid: String)
+POST    /wedding/:uid/code          controllers.Wedding.doEditCode(uid: String)
+POST    /wedding/:uid/changeUid     controllers.Wedding.doChangeUid(uid: String)
+GET     /wedding/:uid/delete        controllers.Wedding.doDelete(uid: String)
+GET     /wedding/:uid/print         controllers.Wedding.print(uid: String)
+GET     /wedding/:uid/share         controllers.Wedding.share(uid: String)
+
+### SERVICE PROVIDERS ###
+GET     /providers/javascriptRoutes controllers.providers.Provider.javascriptRoutes
+GET     /providers/list             controllers.providers.Provider.list
+GET     /providers/search/:cid      controllers.providers.Provider.search(cid: Long)
+GET     /providers/contact/:id      controllers.providers.Provider.contactMail(id: Long)
+POST    /providers/contact/:id      controllers.providers.Provider.doContactMail(id: Long)
+GET     /providers/print/:id        controllers.providers.Provider.print(id: Long)
+GET     /providers/website/:id      controllers.providers.Provider.website(id: Long)
+GET     /providers/info             controllers.providers.Provider.info
+GET     /providers/new              controllers.providers.Provider.create
+POST    /providers/new              controllers.providers.Provider.doCreate
+GET     /providers/:id              controllers.providers.Provider.detail(id: Long)
+GET     /providers/invoice/:pid     controllers.providers.Provider.invoice(pid: Long)
+GET     /providers/pdf/:pid         controllers.providers.Provider.invoicePDF(pid: Long)
+GET     /providers/pay/:pid         controllers.providers.Provider.payInvoice(pid: Long)
+GET     /providers/checkout/:pid    controllers.providers.Provider.checkoutInvoice(pid: Long)
+GET     /providers/doPay/:pid       controllers.providers.Provider.doPayInvoice(pid: Long)
+GET     /providers/edit/:id         controllers.providers.Provider.edit(id: Long)
+POST    /providers/edit/:id         controllers.providers.Provider.doEdit(id: Long)
+POST    /providers/edit/:id/addLogo             controllers.providers.Provider.addLogo(id: Long)
+POST    /providers/edit/:id/deleteLogo          controllers.providers.Provider.deleteLogo(id: Long)
+POST    /providers/edit/:id/addPicture          controllers.providers.Provider.addPicture(id: Long)
+POST    /providers/edit/:id/deletePicture/:pid  controllers.providers.Provider.deletePicture(id: Long, pid: Long)
+GET     /providers/validate/:id     controllers.providers.Provider.validate(id: Long)
+GET     /providers/invalidate/:id   controllers.providers.Provider.invalidate(id: Long)
+
+### MODULES ###
+
+GET     /modules/javascriptRoutes   controllers.modules.Module.javascriptRoutes
+GET     /modules/:uid               controllers.modules.Module.listAllModules(uid: String)
+POST    /modules/:uid               controllers.modules.Module.saveAllModules(uid: String)
+GET     /modules/:uid/delete/:id    controllers.modules.Module.removeModule(uid: String, id: Long)
+GET     /modules/:uid/add/:id       controllers.modules.Module.addModule(uid: String, id: Long)
+GET     /modules/:uid/buy/:id       controllers.modules.Module.buyModule(uid: String, id: Long)
+GET     /modules/:uid/update        controllers.modules.Module.updateModule(uid: String)
+
+### PORTLETS ###
+GET     /portlets/javascriptRoutes  controllers.modules.Portlet.javascriptRoutes
+POST    /portlets/:uid/edit         controllers.modules.Portlet.editPortlets(uid: String)
+
+# RichText
+GET     /richText/:uid              controllers.modules.RichText.edit(uid: String)
+POST    /richText/:uid              controllers.modules.RichText.doEdit(uid: String)
+
+#Contact
+GET     /contact/:uid/info          controllers.modules.Contact.display(uid: String)
+GET     /contact/:uid               controllers.modules.Contact.mail(uid: String)
+POST    /contact/:uid               controllers.modules.Contact.doMail(uid: String)
+GET     /contact/:uid/edit          controllers.modules.Contact.edit(uid: String)
+POST    /contact/:uid/edit          controllers.modules.Contact.doEdit(uid: String)
+POST    /contact/:uid/instructions  controllers.modules.Contact.doEditInstructions(uid: String)
+
+#Register
+GET     /register/:uid              controllers.modules.Register.register(uid: String)
+POST    /register/:uid              controllers.modules.Register.doRegister(uid: String)
+GET     /register/:uid/edit         controllers.modules.Register.edit(uid: String)
+POST    /register/:uid/edit         controllers.modules.Register.doEdit(uid: String)
+POST    /register/:uid/instructions controllers.modules.Register.doEditInstructions(uid: String)
+GET     /register/:uid/list         controllers.modules.Register.list(uid: String)
+GET     /register/:uid/export       controllers.modules.Register.exportToExcel(uid: String)
+
+#GeoLocal
+GET     /geolocal/javascriptRoutes  controllers.modules.GeoLocal.javascriptRoutes
+GET     /geolocal/:uid              controllers.modules.GeoLocal.display(uid: String)
+GET     /geolocal/:uid/edit         controllers.modules.GeoLocal.edit(uid: String)
+POST    /geolocal/:uid/save         controllers.modules.GeoLocal.editGeoLocalInfo(uid: String)
+POST    /geolocal/:uid/add          controllers.modules.GeoLocal.addMarker(uid: String)
+POST    /geolocal/:uid/edit         controllers.modules.GeoLocal.editMarker(uid: String)
+GET     /geolocal/:uid/delete/:id   controllers.modules.GeoLocal.deleteMarker(uid: String, id: Long)
+
+#GiftList
+GET     /giftlist/javascriptRoutes  controllers.modules.GiftList.javascriptRoutes
+GET     /giftlist/:uid/edit         controllers.modules.GiftList.edit(uid: String)
+POST    /giftlist/:uid/edit         controllers.modules.GiftList.doEdit(uid: String)
+POST    /giftlist/:uid/instructions controllers.modules.GiftList.doEditInstructions(uid: String)
+POST    /giftlist/:uid/add          controllers.modules.GiftList.addItem(uid: String)
+POST    /giftlist/:uid/update       controllers.modules.GiftList.editItem(uid: String)
+POST    /giftlist/:uid/delete/:id   controllers.modules.GiftList.deleteItem(uid: String, id: Long)
+GET     /giftlist/:uid              controllers.modules.GiftList.display(uid: String)
+POST    /giftlist/:uid/cart/:id     controllers.modules.GiftList.addToCart(uid: String, id: Long)
+DELETE  /giftlist/:uid/cart/:id     controllers.modules.GiftList.removeFromCart(uid: String, id: Long)
+GET     /giftlist/:uid/pay          controllers.modules.GiftList.pay(uid: String)
+GET     /giftlist/:uid/checkout     controllers.modules.GiftList.checkout(uid: String)
+POST    /giftlist/:uid/confirm      controllers.modules.GiftList.doPay(uid: String)
+GET     /giftlist/:uid/invoice/:pid/:tid    controllers.modules.GiftList.displayInvoice(uid: String, pid: Long, tid: String)
+GET     /giftlist/:uid/list         controllers.modules.GiftList.list(uid: String, tab: Int ?= 0)
+GET     /giftlist/:uid/grant        controllers.modules.GiftList.grantPermissions(uid: String)
+GET     /giftlist/:uid/doGrant      controllers.modules.GiftList.doGrantPermissions(uid: String)
+GET     /giftlist/:uid/verify       controllers.modules.GiftList.verifyPermissions(uid: String)
+GET     /giftlist/:uid/cancel       controllers.modules.GiftList.cancelPermissions(uid: String)
+GET     /giftlist/:uid/check        controllers.modules.GiftList.checkPayPal(uid: String)
+
+#Budget
+GET     /budget/javascriptRoutes    controllers.modules.Budget.javascriptRoutes
+GET     /budget/:uid/edit           controllers.modules.Budget.edit(uid: String)
+POST    /budget/:uid/edit           controllers.modules.Budget.doEdit(uid: String)
+POST    /budget/:uid/expense/add    controllers.modules.Budget.addExpense(uid: String)
+POST    /budget/:uid/expense/update controllers.modules.Budget.editExpense(uid: String)
+POST    /budget/:uid/expense/delete/:id     controllers.modules.Budget.deleteExpense(uid: String, id: Long)
+GET     /budget/:uid/expense/export controllers.modules.Budget.exportToExcel(uid: String)
+GET     /budget/:uid/expense/sort   controllers.modules.Budget.sortExpenses(uid: String)
+POST    /budget/:uid/income/add    controllers.modules.Budget.addIncome(uid: String)
+POST    /budget/:uid/income/update controllers.modules.Budget.editIncome(uid: String)
+POST    /budget/:uid/income/delete/:id     controllers.modules.Budget.deleteIncome(uid: String, id: Long)
+GET     /budget/:uid/income/sort   controllers.modules.Budget.sortIncomes(uid: String)
+
+#Gallery
+GET     /gallery/javascriptRoutes   controllers.modules.gallery.Gallery.javascriptRoutes
+GET     /gallery/:uid               controllers.modules.gallery.Gallery.display(uid: String)
+GET     /gallery/:uid/edit          controllers.modules.gallery.Gallery.editGallery(uid: String)
+POST    /gallery/:uid/album/add     controllers.modules.gallery.Gallery.addAlbum(uid: String)
+GET     /gallery/:uid/album/:id     controllers.modules.gallery.Gallery.editAlbum(uid: String, id: Long)
+POST    /gallery/:uid/album         controllers.modules.gallery.Gallery.doEditAlbum(uid: String)
+POST    /gallery/:uid/album/:id     controllers.modules.gallery.Gallery.deleteAlbumAjax(uid: String, id: Long)
+POST    /gallery/:uid/picture/add/:id  controllers.modules.gallery.Gallery.addPictureAjax(uid: String, id: Long)
+POST    /gallery/:uid/picture/:id   controllers.modules.gallery.Gallery.deletePictureAjax(uid: String, id: Long)
+
+#WelcomePic
+GET     /welcomepic/javascriptRoutes   controllers.modules.welcomePic.WelcomePic.javascriptRoutes
+GET     /welcomepic/:uid/edit          controllers.modules.welcomePic.WelcomePic.editWelcomePic(uid: String)
+POST    /welcomepic/:uid/edit          controllers.modules.welcomePic.WelcomePic.doEditWelcomePic(uid: String)
+POST    /welcomepic/:uid/picture/add   controllers.modules.welcomePic.WelcomePic.addWelcomePictureAjax(uid: String)
+POST    /welcomepic/:uid/picture       controllers.modules.welcomePic.WelcomePic.deleteWelcomePictureAjax(uid: String)
+
+#Customize
+GET     /customize/javascriptRoutes controllers.modules.customize.Customize.javascriptRoutes
+GET     /customize/:uid             controllers.modules.customize.Customize.edit(uid: String)
+POST    /customize/:uid             controllers.modules.customize.Customize.doEdit(uid: String)
+POST    /customize/:uid/picture/add/:picType       controllers.modules.customize.Customize.addPictureAjax(uid: String, picType: Int)
+POST    /customize/:uid/picture/delete/:picType    controllers.modules.customize.Customize.deletePictureAjax(uid: String, picType: Int)
+
+#QRCode
+GET     /qrcode/:uid/event          controllers.modules.QRCode.generateCalendarEvent(uid: String)
+GET     /qrcode/:uid/eventimg       controllers.modules.QRCode.getCalendarQRCode(uid: String)
+GET     /qrcode/:uid/urlimg         controllers.modules.QRCode.getURLQRCode(uid: String)
+
+### PAYMENT ###
+GET     /money/:uid                 controllers.payment.Money.display(uid: String)
+POST    /money/:uid/buy             controllers.payment.Money.buy(uid: String)
+POST    /money/:uid/check           controllers.payment.Money.check(uid: String)
+GET     /money/:uid/list            controllers.payment.Money.listTransactions(uid: String)
+GET     /money/:uid/checkout        controllers.payment.Money.checkout(uid: String)
+GET     /money/:uid/doPay           controllers.payment.Money.doPay(uid: String)
+GET     /money/:uid/invoice/:id     controllers.payment.Money.invoice(uid: String, id: Long)
+GET     /money/:uid/invoicepdf/:id  controllers.payment.Money.invoicePDF(uid: String, id: Long)
+GET     /money/admin/display        controllers.payment.Money.listPromotion
+GET     /money/admin/edit           controllers.payment.Money.editPromotion(id: Long)
+POST    /money/admin/edit           controllers.payment.Money.doEditPromotion
+
+### AUTHENTICATION ###
+
+# Login page
+GET     /authentication/login                      securesocial.controllers.LoginPage.login
+GET     /authentication/logout                     securesocial.controllers.LoginPage.logout
+
+# User Registration and password handling (only needed if you are using UsernamePasswordProvider)
+GET     /authentication/signup                     securesocial.controllers.Registration.startSignUp
+POST    /authentication/signup                     securesocial.controllers.Registration.handleStartSignUp
+GET     /authentication/signup/:token              securesocial.controllers.Registration.signUp(token)
+POST    /authentication/signup/:token              securesocial.controllers.Registration.handleSignUp(token)
+GET     /authentication/reset                      securesocial.controllers.Registration.startResetPassword
+POST    /authentication/reset                      securesocial.controllers.Registration.handleStartResetPassword
+GET     /authentication/reset/:token               securesocial.controllers.Registration.resetPassword(token)
+POST    /authentication/reset/:token               securesocial.controllers.Registration.handleResetPassword(token)
+GET     /authentication/password                   securesocial.controllers.PasswordChange.page
+POST    /authentication/password                   securesocial.controllers.PasswordChange.handlePasswordChange
+GET     /authentication/profile                    controllers.authentication.Authentication.edit
+POST    /authentication/profile                    controllers.authentication.Authentication.doEdit
+
+# Providers entry points
+GET     /authenticate/:provider     securesocial.controllers.ProviderController.authenticate(provider)
+POST    /authenticate/:provider     securesocial.controllers.ProviderController.authenticateByPost(provider)
+
+### RESOURCES ###
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

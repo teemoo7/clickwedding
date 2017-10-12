@@ -1,0 +1,27 @@
+@**
+* Format a size (in Bytes) to display 1 KB instead of 1024 B for example
+*
+* Examples:
+* {{{
+*   @sizeBytes(size = 254661)
+* }}}
+*
+* @param size The size to format
+*@
+@(size: Int)(implicit handler: FieldConstructor, lang: Lang)
+@b = @{ size }
+@kb = @{ BigDecimal(b.toDouble / 1024.toDouble).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble }
+@mb = @{ BigDecimal(kb.toDouble / 1024.toDouble).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble }
+@gb = @{ BigDecimal(mb.toDouble / 1024.toDouble).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble }
+@if(gb >= 1) {
+    @gb @Messages("main.modules.gallery.sizeGB")
+}
+@if(mb >= 1 && gb < 1){
+    @mb @Messages("main.modules.gallery.sizeMB")
+}
+@if(kb >= 1 && mb < 1) {
+    @kb @Messages("main.modules.gallery.sizeKB")
+}
+@if(kb < 1) {
+    @b @Messages("main.modules.gallery.sizeB")
+}

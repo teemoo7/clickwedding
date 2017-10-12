@@ -1,0 +1,189 @@
+@(wedding: models.wedding.Wedding, giftList: models.modules.GiftList)(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helpers._
+
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/modules/giftList.css")">
+<script type="text/javascript" src='@controllers.modules.routes.GiftList.javascriptRoutes'></script>
+<script type="text/javascript">
+    // Add a gift item to the list
+    function addItem() {
+        var description = $('#description').val();
+        var unitPrice = $('#unitPrice').val();
+        if (description.length > 0 && unitPrice.length > 0 && !isNaN(unitPrice) && unitPrice > 0) {
+            // Data are sent to the server
+            jsRoutes.controllers.modules.GiftList.addItem('@wedding.uid').ajax({
+                data : {
+                    id: "",
+                    weddingId: "",
+                    description: description,
+                    unitPrice: unitPrice
+                },
+                success : function(data) {
+                    $('#itemList').append(data);
+                    resetFields();
+                },
+                error : function(data) {
+                    showWarningDialog('@Messages("main.modules.giftList.errorCouldNotSaveInfo") '+data)
+                }
+            });
+        } else {
+            showWarningDialog('@Messages("main.modules.giftList.enterValidDescriptionAndPrice")');
+        }
+    }
+
+    // Edit the item
+    function editItem(id) {
+        if ($('#actionUpdateItem').is(":visible")) {
+            cancelUpdateItem();
+        }
+        $('#item_'+id).addClass('edit-item');
+        $('#description').val($('#itemDescription_'+id).text());
+        $('#unitPrice').val($('#itemUnitPrice_'+id).text());
+        $('#actionAddItem').hide();
+        $('#actionUpdateItem').attr('data-ref', id);
+        $('#actionUpdateItem').show();
+        $('#actionCancelUpdateItem').show();
+        $('#formTitle').text('@Messages("main.modules.giftList.updateGift")');
+    }
+
+    // Update the item data on the server
+    function updateItem() {
+        var id = $('#actionUpdateItem').attr('data-ref');
+        var description = $('#description').val();
+        var unitPrice = $('#unitPrice').val();
+        if (description.length > 0 && unitPrice.length > 0 && !isNaN(unitPrice) && unitPrice > 0) {
+            // Data are sent to the server
+            jsRoutes.controllers.modules.GiftList.editItem('@wedding.uid').ajax({
+                data : {
+                    id: id,
+                    weddingId: "",
+                    description: description,
+                    unitPrice: unitPrice
+                },
+                success : function(data) {
+                    $('#item_'+id).replaceWith(data);
+                    resetFields();
+                },
+                error : function(data) {
+                    showWarningDialog('@Messages("main.modules.giftList.errorCouldNotSaveInfo") '+data)
+                }
+            });
+        } else {
+            showWarningDialog('@Messages("main.modules.giftList.enterValidDescriptionAndPrice")');
+        }
+    }
+
+    // Update the item data on the server
+    function deleteItem(id) {
+        if (confirm('@Messages("main.modules.giftList.confirmDeleteItem")')) {
+            // Data are sent to the server
+            jsRoutes.controllers.modules.GiftList.deleteItem('@wedding.uid', id).ajax({
+                success : function(data) {
+                    $('#item_'+id).remove();
+                    resetFields();
+                },
+                error : function(data) {
+                    showWarningDialog('@Messages("main.modules.giftList.errorCouldNotSaveInfo") '+data)
+                }
+            });
+        }
+    }
+
+    // Cancel the edition of an item
+    function cancelUpdateItem() {
+        var id = $('#actionUpdateItem').attr('data-ref');
+        $('#item_'+id).removeClass('edit-item');
+        resetFields();
+    }
+
+    // Reset all fields, empty values
+    function resetFields() {
+        $('#actionUpdateItem').hide();
+        $('#actionCancelUpdateItem').hide();
+        $('#actionAddItem').show();
+
+        $('#description').val('');
+        $('#unitPrice').val('');
+
+        $('#formTitle').text('@Messages("main.modules.giftList.addGift")');
+    }
+
+    /*
+    // Update the PayPal account balance
+    function getPayPalBalance() {
+        jsRoutes.controllers.modules.GiftList.getBalance('@wedding.uid').ajax({
+            dataType: "json",
+            success : function(data) {
+                var amount = data.amount;
+                var currency = data.currency;
+                $('#paypalBalance').text('@Messages("main.modules.giftList.paypal.balance"): '+currency+' '+amount)
+            },
+            error : function(data) {
+                showWarningDialog('@Messages("main.modules.giftList.paypal.error.getBalance")')
+            }
+        });
+    }
+    */
+
+    // Update the PayPal account balance
+    function checkPayPal() {
+        jsRoutes.controllers.modules.GiftList.checkPayPal('@wedding.uid').ajax({
+            success : function() {
+                $('#paypalCheckResult').text('@Messages("main.modules.giftList.paypal.checkOk")');
+                $('#paypalCheckResult').addClass('alert-success');
+            },
+            error : function(error) {
+                $('#paypalCheckResult').text('@Messages("main.modules.giftList.paypal.checkError")'+' ('+error.responseText+')')
+                $('#paypalCheckResult').addClass('alert-error');
+            }
+        });
+    }
+
+    // When page is loaded, calls the initialization of the map
+    $(function() {
+        $('#unitPrice').keypress(function(event) {
+            if ( event.keyCode === 13 ) {
+                if ($('#actionUpdateItem').is(":visible")) {
+                    updateItem();
+                } else {
+                    addItem();
+                }
+                event.preventDefault();
+            }
+        });
+
+        // If user press ESC, cancel current marker edition
+        $(document).keypress(function(event) {
+            if ( event.keyCode === 27 ) {
+                if ($('#actionUpdateItem').is(":visible")) {
+                    cancelUpdateItem();
+                    event.preventDefault();
+                }
+            }
+        });
+
+        @if(giftList.moduleContent.paypalInfo.status == models.modules.GiftList.PAYPAL_PERMISSIONS_STATUS_VERIFIED) {
+            checkPayPal();
+        }
+
+        $('#textUsePerso').change(function() {
+            if (this.checked) {
+                $('#instructions').removeAttr('disabled');
+            } else {
+                $('#instructions').attr('disabled', 'disabled');
+                $('#instructions').val('');
+            }
+        });
+        $('#textUseDefault').change(function() {
+            if (!this.checked) {
+                $('#instructions').removeAttr('disabled');
+            } else {
+                $('#instructions').attr('disabled', 'disabled');
+                $('#instructions').val('');
+            }
+        });
+        $( "#email" ).autocomplete({
+            source: @Html(ModuleHelper.getAvailableEmailAddresses(wedding))
+        });
+    });
+</script>

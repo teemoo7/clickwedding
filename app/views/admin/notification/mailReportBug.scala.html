@@ -1,0 +1,31 @@
+@(name: Option[String], email: Option[String], title: String, description: String, referrer: Option[String], date: java.util.Date)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@mail("Bug report mail") {
+    <h2>Bug report mail</h2>
+    <table cellpadding="5" cellspacing="5" style="font-family: arial, helvetica, sans-serif; font-size: 14px; line-height: 20px; background-color: #ffffff; font-color: black;">
+        <tr>
+            <td>Name</td>
+            <td>@name.getOrElse("")</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>@email.getOrElse("")</td>
+        </tr>
+        <tr>
+            <td>Date</td>
+            <td>@date.format("dd.MM.yyyy HH:mm:ss")</td>
+        </tr>
+        <tr>
+            <td>Referrer</td>
+            <td>@referrer.getOrElse("")</td>
+        </tr>
+        <tr>
+            <td>Subject</td>
+            <td>@title</td>
+        </tr>
+        <tr>
+            <td>Message</td>
+            <td>@description</td>
+        </tr>
+    </table>
+}

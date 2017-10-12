@@ -1,0 +1,156 @@
+@(uid: String, weddingForm: Form[models.wedding.Wedding], weddingUidForm: Form[(String, String)], weddingCodeForm: Form[Option[String]], wedding: models.wedding.Wedding)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@isTab2Active = @{ weddingUidForm.hasGlobalErrors || weddingUidForm.hasErrors }
+@isTab3Active = @{ weddingCodeForm.hasGlobalErrors || weddingCodeForm.hasErrors }
+@isTab1Active = @{ weddingForm.hasGlobalErrors || weddingForm.hasErrors || (!isTab2Active && !isTab3Active) }
+
+@main(Messages("main.wedding.editWedding"), wedding = Some(wedding))() {
+
+    <div class="tabbable">
+
+        <ul class="nav nav-tabs">
+            <li @if(isTab1Active) { class="active" }><a href="#tab1" data-toggle="tab">@Messages("main.wedding.weddingInformations")</a></li>
+            <li @if(isTab2Active) { class="active" }><a href="#tab2" data-toggle="tab">@Messages("main.wedding.weddingIdentifier")</a></li>
+            <li @if(isTab3Active) { class="active" }><a href="#tab3" data-toggle="tab">@vipArea() @Messages("main.wedding.vipArea") @vipArea()</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane  @if(isTab1Active) { active }" id="tab1">
+
+                <h3>@Messages("main.wedding.weddingInformations")</h3>
+
+                @weddingForm.globalError.map { error =>
+                    <div class="alert alert-error">
+                        <a href="#" class="close" data-dismiss="alert">×</a>
+                        <strong>@Messages("main.error")!</strong> @error.message
+                    </div>
+                }
+                @form(action = routes.Wedding.doEdit(uid), 'class -> "form-horizontal") {
+                    <fieldset>
+                        @inputText(
+                            field = weddingForm("place"),
+                            args =  '_label -> Messages("main.wedding.place"),
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = weddingForm("date"),
+                            args =  '_label -> Messages("main.wedding.date"),
+                                    '_showConstraints -> false,
+                                    'placeholder -> "dd.mm.yyyy"
+                        )
+                        @inputText(
+                            field = weddingForm("person1"),
+                            args =  '_label -> Messages("main.wedding.couple"),
+                                    '_showConstraints -> false,
+                                    'placeholder -> Messages("main.wedding.namePerson1")
+                        )
+                        @inputText(
+                            field = weddingForm("person2"),
+                            args =  '_label -> "",
+                                    '_showConstraints -> false,
+                                    'placeholder -> Messages("main.wedding.namePerson2")
+                        )
+                        @uidHidden(uid)
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.wedding.save")" class="btn btn-primary">
+                        @if(AuthenticationHelper.isUserAdmin) {
+                            <a href="@routes.Wedding.doDelete(uid)" class="btn btn-danger" onclick="return confirm('@Messages("main.wedding.confirmDeleteMessage")');">@Messages("main.wedding.delete")</a>
+                        }
+                    </div>
+                }
+
+            </div>
+
+            <div class="tab-pane  @if(isTab2Active) { active }" id="tab2">
+
+                <h3>@Messages("main.wedding.weddingIdentifier")</h3>
+
+                @weddingUidForm.globalError.map { error =>
+                    <div class="alert alert-error">
+                        <a href="#" class="close" data-dismiss="alert">×</a>
+                        <strong>@Messages("main.error")!</strong> @error.message
+                    </div>
+                }
+
+                @form(action = routes.Wedding.doChangeUid(uid), 'class -> "form-horizontal") {
+                    <div>
+                        <p>@Messages("main.wedding.identifierExplanation")</p>
+                        <p>@Messages("main.wedding.identifierCurrentAddress")</p>
+                        <div class="well">@routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection)</div>
+                        <p>@Messages("main.wedding.identifierConstraints")</p>
+                    </div>
+                    <fieldset>
+                        @uidHidden(uid, args = 'id -> "oldUid")
+                        @inputText(
+                            field = weddingUidForm("newUid"),
+                            args =  '_label -> Messages("main.wedding.identifier")
+                        )
+                    </fieldset>
+                    <div>
+                    </div>
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.wedding.save")" class="btn btn-primary">
+                    </div>
+                }
+
+            </div>
+
+            <div class="tab-pane  @if(isTab3Active) { active }" id="tab3">
+
+                <h3>@vipArea() @Messages("main.wedding.vipArea") @vipArea()</h3>
+
+                <div class="well">
+                    @if(wedding.code.isEmpty) {
+                        @Messages("main.wedding.noVIPAreaYet")
+                    } else {
+                        @Messages("main.wedding.VIPAreaCreated") <span class="important">@wedding.code.get</span>
+                    }
+                </div>
+                <div>
+                    <p>@Messages("main.wedding.codeExplanationVIPArea")</p>
+                    <ul>
+                        <li>@Messages("main.wedding.codeExplanationVIPAreaGallery")</li>
+                        <li>@Messages("main.wedding.codeExplanationVIPAreaRegistration")</li>
+                    </ul>
+                    <p>@Messages("main.wedding.codeExplanationVIPAreaGuests")</p>
+                </div>
+
+                @weddingCodeForm.globalError.map { error =>
+                    <div class="alert alert-error">
+                        <a href="#" class="close" data-dismiss="alert">×</a>
+                        <strong>@Messages("main.error")!</strong> @error.message
+                    </div>
+                }
+
+                @form(action = routes.Wedding.doEditCode(uid), 'class -> "form-horizontal") {
+                    <fieldset>
+                        @inputText(
+                            field = weddingCodeForm("code"),
+                            args =  '_label -> Messages("main.wedding.code")
+                        )
+                    </fieldset>
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.wedding.save")" class="btn btn-primary">
+                    </div>
+                }
+
+                <div>
+                    <div>
+                        @Messages("main.wedding.codeExplanation")
+                    </div>
+                    <div class="well" style="width: 30px; text-align: center; margin: auto;">@vipArea()</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    @backButton(uid)
+}

@@ -1,0 +1,14 @@
+@**
+* Create a merged table header tag with the given title inside
+*
+* Example:
+* {{{
+*   @headerPrice("ID")
+* }}}
+*
+* @param title The title of the header
+*@
+@(title: String = "")
+<th style="font-weight: bold;" colspan="2">
+    @title
+</th>

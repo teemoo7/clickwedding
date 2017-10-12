@@ -1,0 +1,155 @@
+@(wedding: models.wedding.Wedding, contactForm: Form[models.modules.Contact], contactInstructionsForm: Form[Option[String]])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@isTab2Active = @{ contactInstructionsForm.hasErrors || contactInstructionsForm.globalError.isDefined }
+
+@main(Messages("main.modules.contact.editContactInfo"), wedding = Some(wedding)){
+    <script type="text/javascript">
+        $(function() {
+            $('#textUsePerso').change(function() {
+                if (this.checked) {
+                    $('#instructions').removeAttr('disabled');
+                } else {
+                    $('#instructions').attr('disabled', 'disabled');
+                    $('#instructions').val('');
+                }
+            });
+            $('#textUseDefault').change(function() {
+                if (!this.checked) {
+                    $('#instructions').removeAttr('disabled');
+                } else {
+                    $('#instructions').attr('disabled', 'disabled');
+                    $('#instructions').val('');
+                }
+            });
+            $( "#contactInfo_coupleMail" ).autocomplete({
+                source: @Html(ModuleHelper.getAvailableEmailAddresses(wedding))
+            });
+            $( "#contactInfo_organizerMail" ).autocomplete({
+                source: @Html(ModuleHelper.getAvailableEmailAddresses(wedding))
+            });
+        });
+    </script>
+}{
+
+    <div class="tabbable"> <!-- Only required for left/right tabs -->
+        <ul class="nav nav-tabs">
+            <li @if( !isTab2Active ) {class="active"}><a href="#tab1" data-toggle="tab">@Messages("main.modules.contact.editInfo")</a></li>
+            <li @if( isTab2Active ) {class="active"}><a href="#tab2" data-toggle="tab">@Messages("main.modules.contact.editInstructions")</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane @if( !isTab2Active ) {active}" id="tab1">
+
+                <h3>@Messages("main.modules.contact.editInfo")</h3>
+
+                @form(action = controllers.modules.routes.Contact.doEdit(wedding.uid), 'class -> "form-horizontal") {
+                    <h4>@Messages("main.modules.contact.coupleInfo")</h4>
+                    <p>@Messages("main.modules.contact.coupleInfoText")</p>
+                    <fieldset>
+                        @inputText(
+                            field = contactForm("contactInfo")("coupleMail"),
+                            args =  '_label -> Messages("main.modules.contact.coupleMail"),
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = contactForm("contactInfo")("couplePhone"),
+                            args =  '_label -> Messages("main.modules.contact.couplePhone"),
+                                    '_showConstraints -> false
+                        )
+                        <br/>
+                        <h4>@Messages("main.modules.contact.postalAddress")</h4>
+                        @inputText(
+                            field = contactForm("contactInfo")("coupleAddressName"),
+                            args =  '_label -> Messages("main.modules.contact.coupleAddressName"),
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = contactForm("contactInfo")("coupleAddressStreet"),
+                            args =  '_label -> Messages("main.modules.contact.coupleAddressStreet"),
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = contactForm("contactInfo")("coupleAddressZip"),
+                            args =  '_label -> Messages("main.modules.contact.coupleAddressZip"),
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = contactForm("contactInfo")("coupleAddressPlace"),
+                            args =  '_label -> Messages("main.modules.contact.coupleAddressPlace"),
+                                    '_showConstraints -> false
+                        )
+                    </fieldset>
+
+                    <h4>@Messages("main.modules.contact.organizerInfo")</h4>
+                    <p>@Messages("main.modules.contact.organizerInfoText")</p>
+                    <fieldset>
+                        @inputText(
+                            field = contactForm("contactInfo")("organizerName"),
+                            args =  '_label -> Messages("main.modules.contact.organizerName"),
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = contactForm("contactInfo")("organizerMail"),
+                            args =  '_label -> Messages("main.modules.contact.organizerMail"),
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = contactForm("contactInfo")("organizerPhone"),
+                            args =  '_label -> Messages("main.modules.contact.organizerPhone"),
+                                    '_showConstraints -> false
+                        )
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.modules.contact.save")" class="btn btn-primary">
+                        <a href="@routes.Wedding.display(wedding.uid)" class="btn">@Messages("main.modules.contact.cancel")</a>
+                    </div>
+                }
+            </div>
+            <div class="tab-pane @if( isTab2Active ) {active}" id="tab2">
+                <h3>@Messages("main.modules.contact.editInstructions")</h3>
+
+                <p>@Messages("main.modules.contact.editContactInfoInstructionsExplanation")</p>
+
+                @defining(if (contactInstructionsForm("instructions").value.isEmpty) Seq('disabled -> "disabled") else Seq()) { disabledSeq =>
+                    @form(action = controllers.modules.routes.Contact.doEditInstructions(wedding.uid), 'class -> "form-horizontal") {
+                        <fieldset>
+                            <div class="control-group ">
+                                <label for="textUse" class="control-label">@Messages("main.modules.contact.textUse")</label>
+                                <div class="controls">
+                                    <span id="textUse" class="buttonset">
+                                        <label class="radio" for="textUseDefault"><input type="radio" name="textUse" value="default" id="textUseDefault" @if(contactInstructionsForm("instructions").value.isEmpty){ checked="checked" }>@Messages("main.modules.contact.textUseDefault")</label>
+                                        <div class="well inner">
+                                            @Messages("main.modules.contact.explanation")
+                                        </div>
+
+                                        <label class="radio" for="textUsePerso"><input type="radio" name="textUse" value="perso" id="textUsePerso" @if(contactInstructionsForm("instructions").value.isDefined){ checked="checked" }>@Messages("main.modules.contact.textUsePerso")</label>
+                                        <div class="inner">
+                                            @textarea(
+                                                field = contactInstructionsForm("instructions"),
+                                                args =  (Seq(
+                                                        '_label -> "",
+                                                        'placeholder -> Messages("main.modules.contact.textUseYourTextHere"),
+                                                        'class -> "input-xlarge",
+                                                        'rows -> 3)++disabledSeq):_*
+                                            )(handler = views.html.helper.basicInput.f, lang)
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="form-actions">
+                            <input type="submit" value="@Messages("main.modules.contact.save")" class="btn btn-primary">
+                            <a href="@routes.Wedding.display(wedding.uid)" class="btn">@Messages("main.modules.contact.cancel")</a>
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
+}

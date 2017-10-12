@@ -1,0 +1,14 @@
+@(wedding: models.wedding.Wedding)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<div>
+    <p>@Messages("main.modules.budget.explanation")</p>
+    @button(
+        href = controllers.modules.routes.Budget.edit(wedding.uid),
+        title = Messages("main.modules.budget.budget"),
+        icon = routes.Assets.at("images/icons/32/money.png")
+    )
+</div>

@@ -1,0 +1,143 @@
+@(loginForm: Form[(String,String)])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helpers._
+@import helpers.BootstrapHelper._
+@import helper._
+
+@main(title = Messages("main.wedding.welcome.title")+" "+Messages("main.application.name"), isWelcome = true){
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/welcome.css")">
+    <script src="@routes.Assets.at("javascripts/prettyPhoto/jquery.prettyPhoto.js")" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/prettyPhoto/prettyPhoto.css")">
+    <script type="text/javascript">
+        $(function() {
+            $("div.welcome-action").click(function(e) {
+                window.location = $(this).attr("data-url");
+                e.preventDefault();
+            });
+        });
+    </script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            $("a[rel^='prettyPhoto']").prettyPhoto({
+                default_width: 960,
+                default_height: 720,
+                play_hd: true
+            });
+        });
+    </script>
+} {
+
+<!-- Start Facebook -->
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=438304339583716";
+    fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+<!-- End Facebook -->
+<div id="arrowCreate">
+    <img src="@routes.Assets.at("themes/default/images/arrow_info.png")" alt="@Messages("main.wedding.welcome.createAWeddingTitle")" />
+</div>
+
+<div id="welcomeWrapper">
+
+        <div class="welcome-action-choice">
+            <div id="createAWedding" class="welcome-action" data-url="@routes.Wedding.create">
+                <div class="welcome-action-ribbon">@Messages("main.wedding.welcome.freeAndFast")</div>
+                <div class="welcome-action-content">
+                    <div class="welcome-action-title">@Messages("main.wedding.welcome.createAWeddingTitle")</div>
+                    <div class="welcome-action-subtitle">@Messages("main.wedding.welcome.createAWeddingSubTitle")</div>
+                </div>
+            </div>
+            <div id="findAWedding" class="welcome-action" data-url="@routes.Wedding.search">
+                <div class="welcome-action-content">
+                    <div class="welcome-action-title">@Messages("main.wedding.welcome.findAWeddingTitle")</div>
+                    <div class="welcome-action-subtitle">@Messages("main.wedding.welcome.findAWeddingSubTitle")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="welcome-steps-container" style="display: none;">
+            <div class="welcome-steps-take-tour">@Messages("main.wedding.welcome.takeATour")</div>
+            <div class="welcome-steps-title">@Messages("main.wedding.welcome.howDoesItWork")</div>
+            <div>
+                <div class="welcome-step">
+                    <h2 class="welcome-step-title">1/ @Messages("main.wedding.welcome.stepCreateTitle")</h2>
+                    <div class="welcome-step-explanation">@Messages("main.wedding.welcome.stepCreateExplanation")</div>
+                </div>
+                <div class="welcome-step">
+                    <h2 class="welcome-step-title">2/ @Messages("main.wedding.welcome.stepManageTitle")</h2>
+                    <div class="welcome-step-explanation">@Messages("main.wedding.welcome.stepManageExplanation")</div>
+                </div>
+                <div class="welcome-step">
+                    <h2 class="welcome-step-title">3/ @Messages("main.wedding.welcome.stepShareTitle")</h2>
+                    <div class="welcome-step-explanation">@Messages("main.wedding.welcome.stepShareExplanation")</div>
+                </div>
+            </div>
+            <div class="welcome-steps-give-a-try">
+                <a href="@routes.Wedding.create">@Messages("main.wedding.welcome.giveATryNow")</a>
+            </div>
+        </div>
+
+        <div class="welcome-steps-container">
+            <div class="welcome-steps-take-tour">@Messages("main.wedding.welcome.takeATour")</div>
+            <div class="welcome-steps-title">@Messages("main.wedding.welcome.howDoesItWork")</div>
+            <div style="margin-top: 5px;">
+                <div class="welcome-steps-tabs-container">
+                    <div class="tabbable"> <!-- Only required for left/right tabs -->
+                        <ul class="nav nav-tabs no-bottom-margin">
+                            <li class="active"><a href="#tab1" data-toggle="tab">@Messages("main.wedding.welcome.stepCreateTitle")</a></li>
+                            <li><a href="#tab2" data-toggle="tab">@Messages("main.wedding.welcome.stepManageTitle")</a></li>
+                            <li><a href="#tab3" data-toggle="tab">@Messages("main.wedding.welcome.stepShareTitle")</a></li>
+                        </ul>
+                    </div>
+                    <div class="tab-content lower-bordered">
+                        <div class="tab-pane active welcome-step-explanation" id="tab1">
+                            @Messages("main.wedding.welcome.stepCreateExplanation")
+                        </div>
+                        <div class="tab-pane welcome-step-explanation" id="tab2">
+                            @Messages("main.wedding.welcome.stepManageExplanation")
+                        </div>
+                        <div class="tab-pane welcome-step-explanation" id="tab3">
+                            @Messages("main.wedding.welcome.stepShareExplanation")
+                        </div>
+                    </div>
+                </div>
+                <div class="welcome-movie-demo-container">
+                    <div class="movie-preview-wrapper">
+                        <a rel="prettyPhoto" href="https://www.youtube.com/watch?v=E9Y_XdtCawg"><img alt="@Messages("main.wedding.welcome.takeATour")" src="https://img.youtube.com/vi/E9Y_XdtCawg/default.jpg" class="border movie-preview-image">
+                        <img title="Lire" alt="Lire" src="/assets/images/movie/play-arrow.png" class="movie-play-arrow"></a>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="welcome-steps-give-a-try">
+                <a href="@routes.Wedding.example">@Messages("main.wedding.welcome.showMeAnExample") <img alt="@Messages("main.wedding.welcome.showMeAnExample")" src="@routes.Assets.at("themes/default/images/arrow-follow.png")"></a>
+            </div>
+        </div>
+
+    </div>
+    <div id="socialButtons">
+        <!-- Facebook start -->
+        <div class="fb-like" data-href="https://www.facebook.com/clickweddingwebsite" data-width="450" data-colorscheme="dark" data-layout="button_count" data-show-faces="false" data-send="false"></div>
+        <!-- Facebook end -->
+        <!-- Twitter start -->
+        <a href="https://twitter.com/clickwedding" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow</a>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+        <!-- Twitter end -->
+        <!-- Google plus start -->
+        <div class="g-plusone"></div>
+        <script type="text/javascript">
+            window.___gcfg = {lang: 'fr'};
+
+            (function() {
+            var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+            po.src = 'https://apis.google.com/js/plusone.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+            })();
+        </script>
+        <!-- Google plus end -->
+    </div>
+}

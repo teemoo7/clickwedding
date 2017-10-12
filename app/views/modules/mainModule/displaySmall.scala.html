@@ -1,0 +1,56 @@
+@(wedding: models.wedding.Wedding)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<div>
+    @if(wedding.person1.isDefined && wedding.person2.isDefined) {
+    <div class="widget-inner-column">
+        <div>
+            <div class="line-icon"><img src="@routes.Assets.at("images/icons/32/love.png")" class="icon"/></div>
+            <div class="line-value force-wrap">@wedding.person1 & @wedding.person2</div>
+        </div>
+    </div>
+    }
+    @if(AuthenticationHelper.isRestrictedAreaDefined(wedding) && AuthenticationHelper.isGuestWithRestrictedArea(wedding.uid)) {
+        <div class="widget-inner-column">
+            <div>
+                <div class="line-icon"><img src="@routes.Assets.at("images/icons/32/star.png")" alt="@Messages("main.wedding.vipGuest")" class="icon"/></div>
+                <div class="line-value force-wrap">@Messages("main.wedding.vipGuest")</div>
+            </div>
+        </div>
+    }
+
+    @if(wedding.date.isDefined) {
+        <div class="widget-inner-column">
+            <div>
+                <div class="line-icon"><img src="@routes.Assets.at("images/icons/32/calendar.png")" class="icon"/></div>
+                <div class="line-value force-wrap">@wedding.date.map(_.format("dd.MM.yyyy")).get</div>
+            </div>
+        </div>
+    }
+    @if(wedding.place.isDefined) {
+        <div class="widget-inner-column">
+            <div>
+                <div class="line-icon"><img src="@routes.Assets.at("images/icons/32/place.png")" class="icon"/></div>
+                <div class="line-value force-wrap">@wedding.place.get</div>
+            </div>
+        </div>
+    }
+    <div>
+        <div>
+            <div class="line-icon"><img src="@routes.Assets.at("images/icons/32/internet.png")" class="icon"/></div>
+            <div class="line-value force-wrap small-content"><a href="@routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection)">@UtilsHelper.removeMethodToUrl(routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection))</a></div>
+        </div>
+    </div>
+
+    <div>
+        @button(
+            href = routes.Wedding.print(wedding.uid),
+            title = Messages("main.modules.main.print"),
+            icon = routes.Assets.at("images/icons/32/print.png"),
+            target = "_blank"
+        )
+    </div>
+</div>

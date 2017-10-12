@@ -1,0 +1,16 @@
+@(wedding: models.wedding.Wedding, richText: models.modules.RichText)(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@if(!richText.moduleContent.isEmpty) {
+    <div class="richText">
+        @Html(richText.moduleContent)
+    </div>
+} else {
+    @if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+        <div class="addButtonZone">
+            <div class="editButton"><a href="@ModuleHelper.getEditLink(wedding, models.modules.RichText.ID).getOrElse("")" class="btn"><img src="@routes.Assets.at("images/icons/32/add.png")"/> @Messages("main.modules.richText.addWelcomeText")</a></div>
+        </div>
+    }
+}

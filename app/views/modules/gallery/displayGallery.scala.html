@@ -1,0 +1,55 @@
+@(wedding: models.wedding.Wedding, galleryInfo: models.modules.GalleryInfo, albumView: Int = 0, galleryMode: Int = 0)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@if(!galleryInfo.albums.isEmpty) {
+    <div class="gallery">
+        @albumView match {
+            case 0 => {
+                @galleryInfo.albums.filter(a => a.pictures.nonEmpty).map{ album =>
+                    <div class="gallery-album" onclick="$('#linkGalleryPicture_@album.pictures.head.id.get').click(); return false;">
+                        <div>
+                            <img src="@models.modules.Gallery.getPictureThumbnailLink(album.pictures.head).getOrElse("#")" alt="@album.pictures.head.filename" class="gallery-album-preview" />
+                        </div>
+                        <div>
+                            @album.title
+                            <br/>
+                            @Messages("main.modules.gallery.nbPictures", album.pictures.length)
+                        </div>
+                    </div>
+                }
+            }
+            case 1 => {
+                @galleryInfo.albums.filter(a => a.pictures.nonEmpty).map{ album =>
+                    <div class="gallery-album gallery-album-stack" onclick="$('#linkGalleryPicture_@album.pictures.head.id.get').click(); return false;">
+                        @album.pictures.take(3).reverse.map{ picture =>
+                            <img src="@models.modules.Gallery.getPictureThumbnailLink(picture).getOrElse("#")" alt="@picture.filename" class="gallery-album-preview gallery-album-stack-preview" />
+                        }
+                    </div>
+                }
+            }
+        }
+
+        @galleryMode match {
+            case 0 => {
+                @galleryInfo.albums.filter(a => a.pictures.nonEmpty).map{ album =>
+                    <div class="gallery-album-content" style="display: none;" data-ref="@album.id.get" id="albumContent_@album.id.get">
+                        @album.pictures.map{ picture =>
+                            <a href="@models.modules.Gallery.getPictureLink(picture).getOrElse("#")" rel="lightbox[@album.id.get]" id="linkGalleryPicture_@picture.id.get"><img src="@models.modules.Gallery.getPictureThumbnailLink(picture).getOrElse("#")" alt="@picture.filename" class="gallery-thumbnail" /></a>
+                        }
+                    </div>
+                }
+            }
+        }
+
+    </div>
+
+} else {
+    @if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+        <div class="addButtonZone">
+            <div class="editButton"><a href="@ModuleHelper.getEditLink(wedding, models.modules.Gallery.ID).getOrElse("")" class="btn"><img src="@routes.Assets.at("images/icons/32/add.png")"/> @Messages("main.modules.gallery.addGallery")</a></div>
+        </div>
+    }
+}

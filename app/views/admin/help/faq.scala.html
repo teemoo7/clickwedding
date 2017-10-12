@@ -1,0 +1,55 @@
+@(questionsByCategory: Map[String, models.admin.QuestionList])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+
+@main(Messages("main.admin.faqTitle")){
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/admin/faq.css")">
+}{
+    <!--<div class="btn-group">-->
+        <!--<button class="btn" onclick="$('.tab-pane').show();">@Messages("main.admin.faqAll")</button>-->
+        <!--@for((category, questionList) <- questionsByCategory){-->
+            <!--<button class="btn" onclick="$('.tab-pane').hide(); $('#tab_@category').show();">@questionList.category.text</button>-->
+        <!--}-->
+    <!--</div>-->
+
+    <div class="tabbable">
+        <ul class="nav nav-tabs">
+            @for((category, questionList) <- questionsByCategory){
+                <li @if(category.equals(models.admin.Question.GENERAL_KEY_CATEGORY)){class="active"}><a href="#tab_@category" data-toggle="tab">@questionList.category.text</a></li>
+            }
+        </ul>
+
+        <div class="tab-content">
+            @for((category, questionList) <- questionsByCategory){
+            <div class="tab-pane @if(category.equals(models.admin.Question.GENERAL_KEY_CATEGORY)){active}" id="tab_@category">
+                <!--<hr/>-->
+                <h2>@questionList.category.text</h2>
+
+                <div class="faq-summary">
+                    <ul>
+                        @for((nb, question) <- questionList.questions){
+                        <li><a href="#question_@{category}_@nb">@question.question</a></li>
+                        }
+                    </ul>
+                </div>
+
+                <hr/>
+
+                <div class="faq">
+                    @for((nb, question) <- questionList.questions){
+                    <div id="question_@{category}_@nb" class="faq-question">
+                        @question.question
+                    </div>
+                    <div class="faq-answer">
+                        @prettyPrint(question.answer)
+                    </div>
+                    }
+                </div>
+            </div>
+        }
+        </div>
+    </div>
+}

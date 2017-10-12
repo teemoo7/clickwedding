@@ -1,0 +1,7 @@
+@(wedding: models.wedding.Wedding)(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helpers._
+
+<div id="tutorialDialog" style="display: none;">
+    <div id="tutorialDialogMessage"></div>
+</div>

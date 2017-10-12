@@ -1,0 +1,310 @@
+@(title: String, isWelcome: Boolean = false, isFixedContent: Boolean = true, wedding: Option[models.wedding.Wedding] = None)(headInsert: Html = Html.empty)(content: Html)(implicit flash: play.api.mvc.Flash, request: RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<!DOCTYPE html>
+
+<html lang="@lang.code">
+    <head>
+        <title>click-wedding | @title</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="robots" content="index" />
+        <meta name="robots" content="follow" />
+        <meta name="msvalidate.01" content="4A1834AEB9EDDF95AC11824D3EE03B43" />
+        <meta name="blitz" content="mu-a1a66ac6-e10a6522-504d6f64-6cd56af5">
+        <!-- loadstorm-46383 -->
+        <meta name="description" content="@Messages("main.application.description")" />
+        <meta name="keywords" content="click, wedding, click-wedding, online, space, guests, pictures, registration, free, modules, creation, create, single, bride, groom, switzerland, suisse, créer, mariage, ligne, gratuit, facile, afidis, internet" />
+        <meta name="author" content="afidis Sàrl" />
+        <meta name="title" content="@title" />
+        <meta name="application-name" content="click-wedding" />
+        <meta charset="UTF-8" />
+        <link href='https://fonts.googleapis.com/css?family=Economica:700,400' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/bootstrap/bootstrap.css")">
+        <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/smoothness/jquery-ui-1.10.3.custom.css")">
+        <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/main3.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("favicon.png")" />
+        <link rel="apple-touch-icon" href="@routes.Assets.at("icon-iphone.png")" />
+        <link rel="apple-touch-icon" sizes="72x72" href="@routes.Assets.at("icon-ipad.png")" />
+        <link rel="apple-touch-icon" sizes="114x114" href="@routes.Assets.at("icon-iphone4.png")" />
+        <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/bootstrap/bootstrap.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/jquery-ui-1.10.3.custom.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/bootbox.min.js")" type="text/javascript"></script>
+        <script type="text/javascript">
+            function showWaitDialog() {
+                $("#dialogModal").attr('title', '@Messages("main.wait")');
+                $("#dialogModalMessage").text('@Messages("main.waitThisMayTakeAFewSeconds")');
+                $("#dialogModalIcon").attr('src', '@routes.Assets.at("images/icons/32/wait.png")');
+                $("#dialogModal").dialog({
+                    modal: true,
+                    dialogClass: "no-close"
+                });
+            }
+            function showWarningDialog(content) {
+                $("#dialogModal").attr('title', '@Messages("main.warning")');
+                $("#dialogModalMessage").text(content);
+                $("#dialogModalIcon").attr('src', '@routes.Assets.at("images/icons/32/warning.png")');
+                $("#dialogModal").dialog({
+                    modal: true,
+                    buttons: {
+                        Ok: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    },
+                    dialogClass: "no-close"
+                });
+            }
+
+            function showServiceProviderHelp() {
+                var target = $("#serviceProviderMenuLink");
+                var $div = $("#serviceProviderFloatingArrow");
+                var pos = $(target).offset();
+                var width = $(target).width();
+                var height = $(target).height();
+                var leftEdit = (pos.left+(width-150)/2+20);
+                var topEdit = (pos.top+(height-50)/2-60);
+                $div.css({top: topEdit, left: leftEdit});
+                $div.show();
+            }
+
+            $(function() {
+                $( "a.help-link" ).tooltip();
+
+                @if(isWelcome){
+                    showServiceProviderHelp();
+                }
+            });
+
+        </script>
+        <script type="text/javascript">
+
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-43205904-1']);
+            _gaq.push(['_setDomainName', 'click-wedding.ch']);
+            _gaq.push(['_setAllowLinker', true]);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+
+        </script>
+
+        @headInsert
+        @{
+            wedding match {
+                case Some(w) => {
+                    if(ModuleHelper.isCustomization(w)){
+                        ModuleHelper.getCustomizationHead(w)
+                    }
+                }
+                case _ =>
+            }
+        }
+
+    </head>
+    <body>
+    @{
+        wedding match {
+            case Some(w) => {
+                if(ModuleHelper.isCustomization(w)){
+                    ModuleHelper.getCustomizationBody(w)
+                }
+            }
+            case _ =>
+        }
+    }
+
+    <div id="globalContainer">
+        <div id="globalContainerInner">
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <div class="container pull-right">
+                        <a class="brand" href="@routes.Wedding.welcome">@Messages("main.application.name")</a>
+                        <ul class="nav">
+                            @user match {
+                                case Some(authorizedUser) => {
+                                    @authorizedUser.admin match {
+                                        case true => {
+                                            <li><a href="@controllers.admin.routes.Console.display">@Messages("main.admin.console.console")</a></li>
+                                        }
+                                        case false => {
+                                            <li><a href="@routes.Wedding.list" id="@TutorialHelper.myWeddingLinkId">@Messages("main.menu.myWedding")</a></li>
+                                        }
+                                    }
+                                }
+                                case _ => {
+                                }
+                            }
+                            @user match {
+                                case Some(authorizedUser) => {
+                                    <li class="dropdown pull-right"><a href="#view; return false;" class="dropdown-toggle" data-toggle="dropdown" id="@TutorialHelper.viewAsLinkId">@Messages("main.menu.viewAs") <b class="caret"></b></a>
+                                        <ul class="dropdown-menu pull-right">
+                                            <li @if(AuthenticationHelper.isViewModeGuest){class="disabled"}><a href="@routes.Wedding.viewAsGuest">@Messages("main.menu.guest")</a></li>
+                                            <li @if(!AuthenticationHelper.isViewModeGuest){class="disabled"}><a href="@routes.Wedding.viewAsOwner">@Messages("main.menu.owner")</a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="dropdown pull-right"><a href="#user; return false;" class="dropdown-toggle" data-toggle="dropdown">@authorizedUser.avatarUrl.map { avatar => <img src="@avatar" class="menu-avatar" alt="@Messages("main.menu.avatar")" /> }@authorizedUser.fullName <b class="caret"></b></a>
+                                        <ul class="dropdown-menu pull-right">
+                                            @authorizedUser.passwordInfo.map { info =>
+                                                <li><a href="@controllers.authentication.routes.Authentication.edit">@Messages("main.menu.profile")</a></li>
+                                                <li>
+                                                    <a href="@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(securesocial.core.IdentityProvider.sslEnabled)">
+                                                        @Messages("main.menu.changePassword")
+                                                    </a>
+                                                </li>
+                                            }
+                                            <li><a href="@securesocial.core.providers.utils.RoutesHelper.logout">@Messages("main.menu.logout")</a></li>
+                                        </ul>
+                                    </li>
+                                }
+                                case None => {
+                                    <li class="pull-right"><a href="@securesocial.core.providers.utils.RoutesHelper.login">@Messages("main.menu.login")</a></li>
+                                }
+                            }
+                            <!--<li><a href="@controllers.admin.routes.NotificationCenter.reportBug" target="_blank">@Messages("main.admin.reportBug")</a></li>-->
+                            <li>
+                                <a href="@routes.Wedding.changeLocale("fr")">
+                                FR</a>
+                            </li>
+                            <li>
+                                <a href="@routes.Wedding.changeLocale("en")">
+                                EN</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            @if(isWelcome){
+                <div id="welcomeContainer">
+                    <div id="welcomeHeader">
+                        <div id="welcomeLogo">
+                            <h2 class="application-title">@Messages("main.wedding.welcome.title")</h2>
+                            <h1 class="application-title">@Messages("main.application.name")</h1>
+                        </div>
+                    </div>
+                    <div id="welcome-content">
+                        <div id="messages-box">
+                            @flash.get("success").map { message =>
+                            <div class="alert alert-success">
+                                <a href="#" class="close" data-dismiss="alert">×</a>
+                                @message
+                            </div>
+                            }
+                            @flash.get("warning").map { message =>
+                            <div class="alert">
+                                <a href="#" class="close" data-dismiss="alert">×</a>
+                                @message
+                            </div>
+                            }
+                            @flash.get("info").map { message =>
+                            <div class="alert alert-info">
+                                <a href="#" class="close" data-dismiss="alert">×</a>
+                                @message
+                            </div>
+                            }
+                            @flash.get("error").map { message =>
+                            <div class="alert alert-error">
+                                <a href="#" class="close" data-dismiss="alert">×</a>
+                                <strong>@Messages("main.error")!</strong> @message
+                            </div>
+                            }
+                        </div>
+
+                        @content
+                    </div>
+                </div>
+            } else {
+                <div id="mainContentLogo">
+                    <a href="@routes.Wedding.welcome">
+                        <img src="@routes.Assets.at("themes/default/images/logo.png")" alt="logo click-wedding" />
+                    </a>
+                </div>
+                <div id="mainContentContainer">
+                    <div id="mainContentTop"></div>
+                    <div id="mainContentBody">
+                        @if(isFixedContent){
+                            <div id="main-content" class="main-content-fixed">
+                        } else {
+                            <div id="main-content" class="main-content-columns">
+                        }
+
+                                <div id="messages-box">
+                                    @flash.get("success").map { message =>
+                                    <div class="alert alert-success">
+                                        <a href="#" class="close" data-dismiss="alert">×</a>
+                                        @message
+                                    </div>
+                                    }
+                                    @flash.get("warning").map { message =>
+                                    <div class="alert">
+                                        <a href="#" class="close" data-dismiss="alert">×</a>
+                                        @message
+                                    </div>
+                                    }
+                                    @flash.get("info").map { message =>
+                                    <div class="alert alert-info">
+                                        <a href="#" class="close" data-dismiss="alert">×</a>
+                                        @message
+                                    </div>
+                                    }
+                                    @flash.get("error").map { message =>
+                                    <div class="alert alert-error">
+                                        <a href="#" class="close" data-dismiss="alert">×</a>
+                                        <strong>@Messages("main.error")!</strong> @message
+                                    </div>
+                                    }
+                                </div>
+                                @if(isFixedContent) {
+                                    <h1>@title</h1>
+                                    <div class="page-content">
+                                        @content
+                                    </div>
+                                } else {
+                                    @content
+                                }
+                            </div>
+                    </div>
+                    <div id="mainContentBottom"></div>
+                </div>
+            }
+
+            <div id="footer">
+                <div id="serviceProviderFloatingArrow" style="display: none;"><a href="@controllers.providers.routes.Provider.list" class="white-link">@Messages("main.providers.lookingForAServiceProvider")</a></div>
+                <div>
+                    <p>Copyright © 2013 <a href="https://www.afidis.ch" target="_blank">afidis Sàrl</a></p>
+                    <p>
+                        <a href="@controllers.admin.routes.HelpCenter.terms">@Messages("main.admin.termsAndConditions")</a>
+                        <span class="footer-menu-separator">&nbsp;</span>
+                        <a href="@controllers.admin.routes.HelpCenter.privacy">@Messages("main.admin.privacyPolicy")</a>
+                        <span class="footer-menu-separator">&nbsp;</span>
+                        <a href="@controllers.admin.routes.NotificationCenter.contact">@Messages("main.admin.contact")</a>
+                        <span class="footer-menu-separator">&nbsp;</span>
+                        <a href="@controllers.admin.routes.NotificationCenter.reportBug" target="_blank">@Messages("main.admin.reportBug")</a>
+                        <span class="footer-menu-separator">&nbsp;</span>
+                        <a href="@controllers.admin.routes.HelpCenter.faq">@Messages("main.admin.faq")</a>
+                        @if(!isWelcome && wedding.isDefined && AuthenticationHelper.isOwnerOfWedding(wedding.get.uid)) {
+                            <span class="footer-menu-separator">&nbsp;</span>
+                            <a name="tutorial" id="@TutorialHelper.tutorialLinkId" href="@routes.Wedding.display(wedding.get.uid)?@TutorialHelper.forceTutorialParameter">@Messages("main.tutorial.tutorial")</a>
+                        }
+                        <span class="footer-menu-separator">&nbsp;</span>
+                        <a href="@controllers.providers.routes.Provider.list" id="serviceProviderMenuLink">@Messages("main.providers.serviceProviders")</a>
+                    </p>
+                </div>
+            </div>
+
+            <div id="dialogModal" style="display: none;">
+                <div><img id="dialogModalIcon" src="@routes.Assets.at("images/icons/32/wait.png")" alt="wait" /></div>
+                <div id="dialogModalMessage"></div>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>

@@ -1,0 +1,60 @@
+@(wedding: models.wedding.Wedding, purchase: models.modules.GiftListPurchase, checkoutForm: Form[(String, String, Option[String], Boolean)])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = Messages("main.modules.giftList.checkout"), wedding = Some(wedding))(){
+
+    @form(action = controllers.modules.routes.GiftList.doPay(wedding.uid), 'class -> "form-horizontal") {
+        <fieldset>
+            @inputText(
+                field = checkoutForm("name"),
+                args =  '_label -> Messages("main.modules.giftList.yourName"),
+                    '_showConstraints -> false
+            )
+            @inputText(
+                field = checkoutForm("email"),
+                args =  '_label -> Messages("main.modules.giftList.yourEmail"),
+                    '_showConstraints -> false,
+                    'placeholder -> "yourname@domain.com"
+            )
+            @textarea(
+                field = checkoutForm("message"),
+                args =  '_label -> Messages("main.modules.giftList.yourMessage"),
+                    'rows -> 5,
+                    'cols -> 50
+            )
+            @termsCheckbox(
+                field = checkoutForm("conditions")
+            )
+        </fieldset>
+
+        <hr/>
+
+        <table class="table table-striped table-hover" id="checkout">
+            <thead>
+                <tr>
+                    @header(Messages("main.modules.giftList.gift"))
+                    @header(Messages("main.modules.giftList.price"))
+                    @header(Messages("main.modules.giftList.number"))
+                    @header(Messages("main.modules.giftList.total"))
+                </tr>
+            </thead>
+            <tfoot>
+                <td colspan="3">@Messages("main.modules.giftList.total")</td>
+                <td align="right">@purchase.currency @currency(purchase.cart.items.values.map(_.total).sum)</td>
+            </tfoot>
+            <tbody id="cartItemList">
+                @purchase.cart.items.values.map { item =>
+                    @views.html.modules.giftList.checkoutItem(item, purchase.currency)
+                }
+            </tbody>
+        </table>
+
+        <div class="form-actions">
+            <input type="submit" value="@Messages("main.modules.giftList.payWithPaypal")" class="btn btn-primary">
+            <a href="@controllers.modules.routes.GiftList.display(wedding.uid)" class="btn">@Messages("main.modules.giftList.back")</a>
+        </div>
+    }
+}

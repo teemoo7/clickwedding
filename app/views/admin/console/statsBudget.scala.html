@@ -1,0 +1,20 @@
+@(budgetStats: models.admin.stats.BudgetStats)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<h2>@Messages("main.admin.console.budgetStats")</h2>
+
+<table class="table table-striped">
+    <tbody>
+    <tr>
+        <td>@Messages("main.admin.console.budgetAverageTotalAmount")</td>
+        <td>@budgetStats.averageBudgetTotalAmount</td>
+    </tr>
+    <tr>
+        <td>@Messages("main.admin.console.budgetAverageExpensesNumber")</td>
+        <td>@budgetStats.averageBudgetExpensesNumber</td>
+    </tr>
+    </tbody>
+</table>

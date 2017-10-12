@@ -1,0 +1,27 @@
+@(name: String, email: String, title: String, message: String)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@mail(title) {
+    <div style="font-family: arial, helvetica, sans-serif; font-size: 14px; line-height: 20px; background-color: #ffffff; font-color: black;">
+        <span style="font-weight: bold;">@name</span> (@email) @Messages("main.providers.contact.justSentYouThisMessage"):
+    </div>
+
+    <table style="background-color: #FFFFFF; margin: 20px;" cellspacing="10" cellpadding="10" align="center">
+        <tbody>
+        <tr>
+            <td>
+                <div style="font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 20px; background-color: #FCFCFC; font-color: black; font-style: italic;">
+                    @prettyPrint(message)
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div style="font-family: arial, helvetica, sans-serif; font-size: 14px; line-height: 20px; background-color: #ffffff; font-color: black;">
+        <span style="font-weight: bold;">@Messages("main.providers.contact.note"):</span> @Messages("main.providers.contact.replyingToThisMail") @name.
+    </div>
+}

@@ -1,0 +1,14 @@
+@()(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+
+@main(Messages("main.admin.privacyPolicy"))() {
+    <div class="terms-conditions">
+        <pre>
+@TermsConditionsHelper.getPrivacyPolicy(lang)
+        </pre>
+    </div>
+}

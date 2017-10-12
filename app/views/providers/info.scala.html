@@ -1,0 +1,61 @@
+@(availablePacks: List[models.providers.ProviderPackType])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+
+@main(title = Messages("main.providers.subscribeAsServiceProviders")){
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/providers/providers.css")">
+}{
+    <h3>@Messages("main.providers.whySubscribeAsServiceProviderQ")</h3>
+    <div>
+        <p>@Messages("main.providers.whySubscribeAsServiceProviderA1")</p>
+        <p>@Messages("main.providers.whySubscribeAsServiceProviderA2")</p>
+    </div>
+
+    <h3>@Messages("main.providers.whatPricesQ")</h3>
+    <div>
+        <p>@Messages("main.providers.whatPricesA")</p>
+        <div id="packs">
+            @availablePacks.map{ pack =>
+                <div class="pack noclick" data-packid="@pack.id.get.toString">
+                    <div class="pack-content" id="packContent_@pack.id.get.toString">
+                        <div class="pack-name">@pack.name</div>
+                        <div class="pack-price">@pack.currency @currency(pack.price)</div>
+                        <div class="pack-months">@Messages("main.providers.months", pack.nbMonths)</div>
+                        @if(pack.nbUsage.isDefined && pack.nbUsage.get <= 1) {
+                        <div class="pack-usage">@Messages("main.providers.uniqueUsage")</div>
+                        } else {
+                        <div class="pack-usage">@Messages("main.providers.renewable")</div>
+                        }
+                        <div class="pack-logo">@Messages("main.providers.logoUploadAvailable")</div>
+                        @if(pack.nbPicturesShowroom > 0) {
+                        <div class="pack-showroom">@Messages("main.providers.showroomPicturesUploadAvailable", pack.nbPicturesShowroom)</div>
+                        } else {
+                        <div class="pack-showroom pack-cons">@Messages("main.providers.showroomPicturesUploadNotAvailable")</div>
+                        }
+                    </div>
+                    <div class="pack-slogan">@Messages("main.providers.packs."+pack.id.get.toString+".slogan")</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <h3>@Messages("main.providers.howDoesItWorkQ")</h3>
+    <div>
+        <ol>
+            <li class="spaced">@Messages("main.providers.howDoesItWorkA1")</li>
+            <li class="spaced">@Messages("main.providers.howDoesItWorkA2")</li>
+            <li class="spaced">@Messages("main.providers.howDoesItWorkA3")</li>
+            <li class="spaced">@Messages("main.providers.howDoesItWorkA4")</li>
+            <li class="spaced">@Messages("main.providers.howDoesItWorkA5")</li>
+        </ol>
+    </div>
+
+    <h3>@Messages("main.providers.soLetUsGo")</h3>
+    <div class="form-actions">
+        <a href="@controllers.providers.routes.Provider.create" class="btn btn-primary">@Messages("main.providers.becomeServiceProvider")</a>
+        <a href="@controllers.providers.routes.Provider.list" class="btn">@Messages("main.providers.cancel")</a>
+    </div>
+}

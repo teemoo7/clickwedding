@@ -1,0 +1,384 @@
+@(wedding: models.wedding.Wedding)(implicit request: play.api.mvc.RequestHeader, lang: Lang)
+
+@import helpers._
+
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/modules/geoLocal.css")">
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=@play.Play.application().configuration().getString("geoLocal.apiKey")&sensor=false"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/ddslick/jquery.ddslick.min.js")"></script>
+<script type="text/javascript" src="@controllers.modules.routes.GeoLocal.javascriptRoutes"></script>
+<script type="text/javascript">
+    var map = null;
+    var geocoder = null;
+    var allMarkers = {};
+    var allInfoWindows = {};
+    var markersToDraw = {};
+    var lausanneCoordinates = new google.maps.LatLng(46.5199617, 6.6335970999999745);
+    var initCoordinates = lausanneCoordinates;
+
+    // Initialization of the geo localisation map and markers
+    function initialize() {
+        // The geocoder is used to convert an address to a location coordinates (and reverse it)
+        geocoder = new google.maps.Geocoder();
+
+        // Map definition
+        var mapOptions = {
+            center: initCoordinates,
+            zoom: 8,
+            mapTypeId: '@ModuleHelper.getGeoLocal(wedding).get.moduleContent.mapType'
+        };
+        map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
+        google.maps.event.addListener(map, 'maptypeid_changed', function(){
+            // Data are sent to the server
+            jsRoutes.controllers.modules.GeoLocal.editGeoLocalInfo('@wedding.uid').ajax({
+                data : {
+                    mapType: map.getMapTypeId()
+                },
+                error : function(data) {
+                    showWarningDialog('@Messages("main.modules.geoLocal.errorCouldNotSaveInfo") [Init] '+data)
+                }
+            });
+        });
+
+        @if(wedding.place.isDefined) {
+            // If a wedding place is defined, try to use it to center the map
+            findAddress('@wedding.place.get', centerMap);
+        }
+
+        // Drawing of markers to be drawn
+        for (var id in markersToDraw) {
+            drawMarker(id, markersToDraw[id]);
+        }
+        autoZoomMap();
+
+    }
+
+    // Add a marker on the map and resets the address and name fields
+    function addMarker() {
+        var name = $('#markerName').val();
+        if (name.length > 0) {
+            var position = map.getCenter();
+            var iconInfo = $('#markerIcon').data('ddslick');
+            var iconIndex = iconInfo.selectedIndex;
+            var image = iconInfo.selectedData.imageSrc;
+            var iconValue = iconInfo.selectedData.value;
+
+            // Data are sent to the server
+            jsRoutes.controllers.modules.GeoLocal.addMarker('@wedding.uid').ajax({
+                data : {
+                    id: "",
+                    weddingId: "",
+                    latitude: position.lat(),
+                    longitude: position.lng(),
+                    zoom: map.getZoom(),
+                    name: name,
+                    markerType: iconValue,
+                    address: "",
+                    isPrivate: "false"
+                },
+                success : function(data) {
+                    $('#markerList').append(data);
+                    var marker = new google.maps.Marker({
+                        position: position,
+                        map: null,
+                        draggable: false,
+                        icon: image,
+                        title: name
+                    });
+                    var id = $(data).filter(".marker").attr('data-ref');
+                    drawMarker(id, marker);
+                    resetFields();
+                },
+                error : function(data) {
+                    showWarningDialog('@Messages("main.modules.geoLocal.errorCouldNotSaveInfo") [Add marker] '+data)
+                }
+            });
+        } else {
+            showWarningDialog('@Messages("main.modules.geoLocal.nameCannotBeEmpty")');
+            $('#markerName').focus();
+        }
+    }
+
+    // Add a new marker to be drawn when everything is loaded
+    function addMarkerToDraw(id, latitude, longitude, name, image) {
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(latitude, longitude, false),
+            map: null,
+            draggable: false,
+            icon: image,
+            title: name
+        });
+        markersToDraw[id] = marker;
+    }
+
+    // Draw the current marker on the map and update address info
+    function drawMarker(id, marker) {
+        var markerNew = new google.maps.Marker({
+            position: marker.getPosition(),
+            map: map,
+            draggable: false,
+            icon: marker.getIcon(),
+            title: marker.getTitle()
+        });
+        allMarkers[id] = markerNew;
+        //retrieveAddress(marker.getPosition(), updateMarkerAddress, id);
+
+        var infowindow = new google.maps.InfoWindow({
+            content: marker.getTitle()
+        });
+
+        infowindow.open(markerNew.get('map'), markerNew);
+        google.maps.event.addListener(markerNew, 'click', function() {
+            infowindow.open(markerNew.get('map'), markerNew);
+        });
+        allInfoWindows[id] = infowindow;
+
+        google.maps.event.addListener(markerNew, 'click', function(){
+            editMarker($('#marker_'+id));
+        });
+    }
+
+    // Create and draw a new marker corresponding to the arguments
+    function createMarker(id, latitude, longitude, name, image) {
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(latitude, longitude, false),
+            map: null,
+            draggable: false,
+            icon: image,
+            title: name
+        });
+        drawMarker(id, marker);
+    }
+
+    // Edit the marker (move the map to it and edit name and icon)
+    function editMarker(markerElement) {
+        if ($('#actionUpdateMarker').is(":visible")) {
+            cancelUpdateMarker();
+        }
+        var id = $(markerElement).attr('data-ref');
+        $('#marker_'+id).addClass('edit-marker');
+        panToMarker(id);
+        var marker = allMarkers[id];
+        marker.setDraggable(true);
+        $('#markerName').val($('#markerName_'+id).text());
+        $('#markerIcon').ddslick('select', {index: $('#markerImage_'+id).attr('data-index') });
+        $('#actionAddMarker').hide();
+        $('#actionUpdateMarker').attr('data-ref', id);
+        $('#actionUpdateMarker').show();
+        $('#actionCancelUpdateMarker').show();
+    }
+
+    function updateMarker() {
+        var id = $('#actionUpdateMarker').attr('data-ref');
+        var name = $('#markerName').val();
+        if (name.length > 0) {
+
+            var iconInfo = $('#markerIcon').data('ddslick');
+            var iconIndex = iconInfo.selectedIndex;
+            var image = iconInfo.selectedData.imageSrc;
+            var iconValue = iconInfo.selectedData.value;
+
+            var marker = allMarkers[id];
+
+            // Data are sent to the server
+            jsRoutes.controllers.modules.GeoLocal.editMarker('@wedding.uid').ajax({
+                data : {
+                    id: id,
+                    weddingId: "",
+                    latitude: marker.getPosition().lat(),
+                    longitude: marker.getPosition().lng(),
+                    zoom: map.getZoom(),
+                    name: name,
+                    markerType: iconValue,
+                    address: "",
+                    isPrivate: "false"
+                },
+                success : function(data) {
+                    $('#marker_'+id).replaceWith(data);
+                    updateDrawnMarker(id, name, image);
+                    //retrieveAddress(marker.getPosition(), updateMarkerAddress, id);
+                    resetFields();
+                },
+                error : function(data) {
+                    showWarningDialog('@Messages("main.modules.geoLocal.errorCouldNotSaveInfo") [Update marker] '+data)
+                }
+            });
+        } else {
+            showWarningDialog('@Messages("main.modules.geoLocal.nameCannotBeEmpty")');
+            $('#markerName').focus();
+        }
+    }
+
+    // Update and refresh the marker on the map
+    function updateDrawnMarker(id, name, image) {
+        var marker = allMarkers[id];
+        marker.setTitle(name);
+        marker.setIcon(image);
+
+        var infowindow = new google.maps.InfoWindow({
+            content: name
+        });
+
+        infowindow.open(marker.get('map'), marker);
+        google.maps.event.addListener(marker, 'click', function() {
+            infowindow.open(marker.get('map'), marker);
+        });
+
+        allInfoWindows[id].setMap(null);
+        delete allInfoWindows[id];
+    }
+
+    // Cancel the edition of a marker
+    function cancelUpdateMarker() {
+        var id = $('#actionUpdateMarker').attr('data-ref');
+        var marker = allMarkers[id];
+        marker.setDraggable(false);
+        $('#marker_'+id).removeClass('edit-marker');
+        var latitude = $('#markerLatitude_'+id).text();
+        var longitude = $('#markerLongitude_'+id).text();
+        var position = new google.maps.LatLng(latitude, longitude, false)
+        marker.setPosition(position);
+        resetFields();
+    }
+
+    // Reset all fields, empty values
+    function resetFields() {
+        $('#actionUpdateMarker').hide();
+        $('#actionCancelUpdateMarker').hide();
+        $('#actionAddMarker').show();
+
+        $('#markerIcon').ddslick('select', {index: '0' });
+        $('#markerName').val('');
+        $('#address').val('');
+        }
+
+    // Move the map to the given marker
+    function panToMarker(markerId) {
+        var marker = allMarkers[markerId];
+        if (marker != null) {
+            map.panTo(marker.getPosition());
+        }
+    }
+
+    // Remove the given marker
+    function removeMarker(markerRemoveElement) {
+        if (confirm('@Messages("main.modules.geoLocal.confirmRemoveMarker")')) {
+            var markerElement = $(markerRemoveElement).parent()
+            var id = markerElement.attr('data-ref');
+
+            jsRoutes.controllers.modules.GeoLocal.deleteMarker('@wedding.uid', id).ajax({
+                success : function(data) {
+                    allMarkers[id].setMap(null);
+                    delete allMarkers[id];
+                    markerElement.remove();
+                    resetFields();
+                },
+                error : function(data) {
+                    showWarningDialog('@Messages("main.modules.geoLocal.errorCouldNotSaveInfo") [Remove marker] '+data)
+                }
+            });
+        }
+    }
+
+    // Retrieve the given address and then calls the callback method with the geocoded location
+    function findAddress(address, callback) {
+        geocoder.geocode({'address': address}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                callback(results[0].geometry.location);
+            } else {
+                showWarningDialog('@Messages("main.modules.geoLocal.errorGeocodeNotSuccessfulReason") [Find address "' + address + '" ] ' + status);
+            }
+        });
+    }
+
+    function retrieveAddress(location, callback, id) {
+        geocoder.geocode({'latLng': location}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                if (results[1]) {
+                    callback(results[1].formatted_address, id);
+                }
+            } else {
+                showWarningDialog('@Messages("main.modules.geoLocal.errorGeocodeFailed") [Retrieve address] ' + status);
+            }
+        });
+    }
+
+    function updateMarkerAddress(address, id) {
+        $('#markerAddress_'+id).text(address);
+    }
+
+    // Try to move the map to the value of the address field
+    function goToEnteredAddress() {
+        var address = $('#address').val();
+        var location = findAddress(address, panToLocation);
+        map.setZoom(16);
+    }
+
+    // Move the map to the given location
+    function panToLocation(location) {
+        map.panTo(location);
+    }
+
+    // Center the map to the given location (no move, contrary to panToLocation)
+    function centerMap(location) {
+        map.setCenter(location);
+    }
+
+    // Set map zoom and center in function of the markers
+    function autoZoomMap() {
+        var allBounds = new google.maps.LatLngBounds();
+        var nbMarkers = 0;
+        for (var id in allMarkers) {
+            allBounds.extend(allMarkers[id].getPosition())
+            nbMarkers++;
+        }
+        if (nbMarkers > 0) {
+            map.fitBounds(allBounds);
+            if (nbMarkers == 1) {
+                zoomChangeBoundsListener = google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {
+                    if (this.getZoom()){
+                        this.setZoom(16);
+                    }
+                });
+                setTimeout(function(){google.maps.event.removeListener(zoomChangeBoundsListener)}, 2000);
+            }
+        }
+    }
+
+    // When page is loaded, calls the initialization of the map
+    $(function() {
+        initialize();
+
+        $('#address').keypress(function(event) {
+            if ( event.which == 13 ) {
+                goToEnteredAddress();
+                event.preventDefault();
+            }
+        });
+        $('#markerName').keypress(function(event) {
+            if ( event.which == 13 ) {
+                if ($('#actionUpdateMarker').is(":visible")) {
+                    updateMarker();
+                } else {
+                    addMarker();
+                }
+                event.preventDefault();
+            }
+        });
+
+        $('#markerIcon').ddslick({
+            width: 70,
+            imagePosition: "left"
+        });
+
+        // If user press ESC, cancel current marker edition
+        $(document).keypress(function(event) {
+            if ( event.keyCode === 27 ) {
+                if ($('#actionUpdateMarker').is(":visible")) {
+                    cancelUpdateMarker();
+                    event.preventDefault();
+                }
+            }
+        });
+
+    });
+</script>

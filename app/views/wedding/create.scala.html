@@ -1,0 +1,58 @@
+@(createWeddingForm: Form[models.wedding.Wedding])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.wedding.createWedding")){
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/jqueryui-datepicker/jquery.ui.datepicker-"+lang.language+".js")"></script>
+    <script>
+        $(function() {
+            $.datepicker.setDefaults($.datepicker.regional['fr']);
+            $( "#date" ).datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "dd.mm.yy",
+                minDate: +0
+            });
+        });
+    </script>
+} {
+    @form(action = routes.Wedding.doCreate, 'class -> "form-horizontal") {
+
+        <fieldset>
+            @inputText(
+                field = createWeddingForm("place"),
+                args = '_label -> Messages("main.wedding.place"), 'placeholder -> Messages("main.wedding.place"), '_showConstraints -> false
+            )
+            @inputText(
+                field = createWeddingForm("date"),
+                args = '_label -> Messages("main.wedding.date"), 'placeholder -> "dd.mm.yyyy", '_showConstraints -> false
+            )
+            @inputText(
+                field = createWeddingForm("person1"),
+                args = '_label -> Messages("main.wedding.couple"), 'placeholder -> Messages("main.wedding.namePerson1"), '_showConstraints -> false
+            )
+            @inputText(
+                field = createWeddingForm("person2"),
+                args = '_label -> "", 'placeholder -> Messages("main.wedding.namePerson2"), '_showConstraints -> false
+            )
+            @checkbox2(
+                field = createWeddingForm("accept"),
+                args = '_label -> None, '_text -> Messages("main.wedding.acceptTermsAndConditions"), '_showConstraints -> false, '_error -> createWeddingForm.error("accept")
+            )
+            <div class="terms-conditions">
+                <pre class="short">
+@TermsConditionsHelper.getTermsAndConditions(lang)
+                </pre>
+                <p align="right"><a href="@controllers.admin.routes.HelpCenter.termsProvider" target="_blank">@Messages("main.wedding.expandTermsAndConditions")</a></p>
+            </div>
+        </fieldset>
+
+        <div class="form-actions">
+            <input type="submit" value="@Messages("main.wedding.create")" class="btn btn-primary">
+            <a href="@routes.Wedding.welcome" class="btn">@Messages("main.wedding.cancel")</a>
+        </div>
+    }
+
+}

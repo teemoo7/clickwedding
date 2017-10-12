@@ -1,0 +1,16 @@
+@(token: String)(implicit flash: play.api.mvc.Flash = play.api.mvc.Flash.emptyCookie, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+@import securesocial.core.IdentityProvider
+
+@import helpers._
+@import helpers.BootstrapHelper._
+@import helper._
+
+@mail(Messages("securesocial.mails.sendSignUpEmail.subject")) {
+    <p>@Messages("securesocial.mails.hello"), </p>
+
+    <p>@Messages("securesocial.mails.sendSignUpEmail.pleaseFollow")
+        <a href="@securesocial.core.providers.utils.RoutesHelper.signUp(token).absoluteURL(IdentityProvider.sslEnabled)">@Messages("securesocial.mails.sendSignUpEmail.link")</a>
+        @Messages("securesocial.mails.sendSignUpEmail.toCompleteRegistration")
+    </p>
+    <p align="right">@Messages("securesocial.mails.withKindRegards")</p>
+}

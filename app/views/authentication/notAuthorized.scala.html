@@ -1,0 +1,15 @@
+@()(implicit flash: play.api.mvc.Flash = play.api.mvc.Flash.emptyCookie, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helpers._
+@import helpers.BootstrapHelper._
+@import helper._
+
+@main(Messages("securesocial.notAuthorized.title"))(){
+    <div class="alert alert-error">
+        @Messages("securesocial.notAuthorized.message")
+    </div>
+
+    <div class="form-actions">
+        <a class="btn" href="@routes.Wedding.index">@Messages("securesocial.signup.cancel")</a>
+    </div>
+}

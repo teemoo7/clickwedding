@@ -1,0 +1,37 @@
+@(promotions: List[models.payment.Promotion])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.payment.promoCodes"))(){
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@Messages("main.payment.id")</th>
+                <th>@Messages("main.payment.code")</th>
+                <th>@Messages("main.payment.amount")</th>
+                <th>@Messages("main.payment.remaining")</th>
+                <th>@Messages("main.payment.deadline")</th>
+                <th>@Messages("main.payment.weddingId")</th>
+                <th>@Messages("main.payment.actions")</th>
+            </tr>
+        </thead>
+        <tbody>
+            @promotions.map { promotion =>
+                <tr class="@if( promotion.isValid ) {success} else {error}">
+                    <td>@promotion.id</td>
+                    <td>@promotion.code</td>
+                    <td>@promotion.amount <img src="@routes.Assets.at("images/diamond.png")" alt="@Messages("main.payment.amount")"/></td>
+                    <td>@promotion.remaining</td>
+                    <td>@promotion.deadline.map(_.format("dd.MM.yyyy"))</td>
+                    <td>@promotion.weddingId</td>
+                    <td>
+                        <a href="@controllers.payment.routes.Money.editPromotion(promotion.id.get)" class="btn">@Messages("main.payment.edit")</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}

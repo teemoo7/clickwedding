@@ -1,0 +1,333 @@
+/* Google Maps zoom display bug fix */
+.gmnoprint img { max-width: none; }
+
+
+/* Packs selection */
+
+#packs {
+    margin: auto;
+    text-align: center;
+}
+
+.pack {
+    width: 150px;
+    margin: 15px;
+    text-align: center;
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.noclick {
+    cursor: default;
+}
+
+#packBought {
+    width: 350px;
+    margin: auto;
+}
+
+.pack-content {
+    border: 1px solid #D4D4D4;
+    border-radius: 4px 4px 4px 4px;
+    background-color: #FAFAFA;
+    background-image: linear-gradient(to bottom, #F2F2F2, #CFCFCF);
+    background-repeat: repeat-x;
+    padding: 10px;
+}
+
+.pack-name {
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    font-size: 1.5em;
+}
+
+.pack-price {
+    margin: 5px;
+    font-size: 1.2em;
+}
+
+.pack-months {
+
+}
+
+.pack-usage {
+
+}
+
+.pack-logo, .pack-showroom {
+    border-top: 1px solid #CCC;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.pack-cons {
+    color: #AEAEAE;
+}
+
+.pack-slogan {
+    font-size: 0.8em;
+    text-align: left;
+}
+
+.pack-selected {
+    border: 1px solid #E52F86;
+    border-radius: 4px 4px 4px 4px;
+    background-color: #E52F86;
+    background-image: linear-gradient(to bottom, #F2F2F2, #E52F86);
+}
+
+ol li.spaced {
+    margin-top: 5px;
+}
+
+/* Payment / invoice */
+
+.invoice-status {
+    float: left;
+    width: 280px;
+}
+
+.invoice-print {
+    float: right;
+    width: 200px;
+}
+
+.payment-method-container {
+    margin: 10px;
+}
+
+.payment-method-title {
+    border: 1px solid #D4D4D4;
+    border-radius: 4px 4px 4px 4px;
+    background-color: #FAFAFA;
+    background-image: linear-gradient(to bottom, #F2F2F2, #CFCFCF);
+    background-repeat: repeat-x;
+    padding: 10px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.payment-method-instructions {
+    border: 1px solid #D4D4D4;
+    border-radius: 4px 4px 4px 4px;
+    padding: 10px;
+    background-color: #F9F9F9;
+}
+
+.money-transfer-info {
+    float: left;
+    width: 280px;
+}
+
+.money-transfer-bv {
+    float: right;
+    width: 202px;
+    padding: 1px;
+    border: 1px solid #D4D4D4;
+}
+
+/* Search results */
+
+#resultsSummary {
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+#resultsContainer {
+    text-align: left;
+    margin-top: 15px;
+}
+
+.search-provider {
+    margin-top: 5px;
+    border: 1px solid #D4D4D4;
+    padding: 5px;
+    border-radius: 4px 4px 4px 4px;
+    background-color: #F9F9F9;
+}
+
+.search-provider-column-1 {
+    float: left;
+    width: 30px;
+    margin-right: 5px;
+}
+
+.search-provider-column-2 {
+    float: left;
+    width: 210px;
+    margin-right: 10px;
+}
+
+.search-provider-column-3 {
+    float: left;
+    width: 210px;
+    margin-right: 10px;
+}
+
+.search-provider-column-4 {
+    float: left;
+    width: 60px;
+}
+
+.search-provider-marker {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.search-provider-title {
+    font-weight: bold;
+}
+
+.search-provider-slogan {
+    font-style: italic;
+}
+
+.search-provider-slogan, .search-provider-address, .search-provider-phone, .search-provider-showroom {
+    font-size: 0.8em;
+}
+
+.search-provider-showroom {
+    text-align: center;
+}
+
+.search-provider-footer {
+    text-align: center;
+}
+
+.search-provider-footer-content {
+    display: inline-block;
+    text-align: center;
+    font-size: 0.8em;
+    padding: 4px; 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+/* Provider details */
+
+#providerDetailsMainColumn {
+    width: 395px;
+    text-align: left;
+    float: left;
+}
+
+#providerDetailsLogoColumn {
+    width: 150px;
+    text-align: center;
+    float: right;
+}
+
+#providerDetailsLogo {
+    max-width: 150px;
+    max-height: 150px;
+    margin: auto;
+    text-align: center;
+}
+
+#providerDetailsInfo {
+    width: 230px;
+    float: left;
+}
+
+#providerDetailsPhone{
+    margin-top: 10px;
+}
+
+.provider-details-contact-info {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#providerDetailsMap {
+    width: 300px;
+    float: right;
+    height: 300px;
+    margin: auto;
+    border: 1px solid #CCCCCC;
+}
+
+#providerLogoPicture, .providerShowroomPicture {
+    text-align: center;
+    margin: auto;
+    max-width: 150px;
+    margin-bottom: 10px;
+}
+
+.providerLogoPictureEdit {
+    border: 1px solid #CCCCCC;
+    background-color: #FCFCFC;
+}
+
+#providerLogoPictureDelete, .providerShowroomPictureDelete {
+    text-align: center;
+    margin: 5px;
+}
+
+#providerLogoPictureLabel {
+    background:rgba(255,255,255,0.7);
+    padding: 10px;
+    position: relative;
+    top: -100px;
+    font-size: 1.5em;
+    margin-left: 50%;
+    color: #FF1988;
+}
+
+#uploadManagementLogo, #uploadManagementShowroom {
+    text-align: center;
+}
+
+#explanationsUploadLogo, #explanationsUploadShowroom {
+    width: 500px;
+}
+
+#dropZoneLogo, #dropZoneShowroom {
+    border: 1px dashed #CCCCCC;
+    background-color: #FCFCFC;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    font-weight: bold;
+    margin: 20px;
+}
+#dropZoneLogo.in, #dropZoneShowroom.in {
+    height: 200px;
+    line-height: 200px;
+    font-size: larger;
+}
+#dropZoneLogo.hover, #dropZoneShowroom.hover {
+    background: #DFF0D8;
+    border: 1px dashed #D6E9C6;
+    color: #468847;
+}
+#dropZoneLogo.fade, #dropZoneShowroom.fade {
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+    opacity: 1;
+}
+
+#transferInfoLogo, #transferInfoShowroom {
+    margin: 20px;
+}
+
+#providerShowroomPictureContainer {
+    text-align: center;
+    margin: auto;
+}
+
+.providerShowroomPictureWrapper {
+    display: inline-block;
+    margin: 5px;
+}
+
+.providerShowroomPicture {
+    padding: 5px;
+    border: 1px solid #CCCCCC;
+}

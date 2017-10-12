@@ -1,0 +1,19 @@
+@()(implicit flash: play.api.mvc.Flash = play.api.mvc.Flash.emptyCookie, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helpers._
+@import helpers.BootstrapHelper._
+@import helper._
+
+    <div class="security-features-wrapper">
+        <div class="security-features-logo">
+            <img src="@routes.Assets.at("images/login/security-icon.png")" alt="@Messages("main.authentication.security.whatSecurity")">
+        </div>
+        <div class="security-features-info">
+            <h4>@Messages("main.authentication.security.whatSecurity")</h4>
+            <ul>
+                <li class="security-features-point">@Messages("main.authentication.security.securedCommunication")</li>
+                <li class="security-features-point">@Messages("main.authentication.security.passwordHashed")</li>
+            </ul>
+        </div>
+        <div class="clearfix"></div>
+    </div>

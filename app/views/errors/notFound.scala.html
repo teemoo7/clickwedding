@@ -1,0 +1,10 @@
+@(path: String)(implicit flash: play.api.mvc.Flash = play.api.mvc.Flash.emptyCookie, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.error.404NotFound"))(){
+
+    @path
+}

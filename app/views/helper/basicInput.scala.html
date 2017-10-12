@@ -1,0 +1,15 @@
+@(elements: helper.FieldElements)
+
+@*************************************
+* Generate basic input without label *
+*************************************@
+
+<div class="@if(elements.hasErrors) {error}">
+    @elements.input
+    @if(!elements.infos.isEmpty) {
+        <a href="#" onclick="return false;" title="@elements.infos(elements.lang).mkString(", ")" class="help-link"><img src="@routes.Assets.at("images/icons/16/idea.png")" alt="@elements.label" /></a>
+    }
+    @if(!elements.errors.isEmpty) {
+        <span class="help-inline alert alert-error">@elements.errors(elements.lang).mkString(", ")</span>
+    }
+</div>

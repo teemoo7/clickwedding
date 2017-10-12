@@ -1,0 +1,35 @@
+@(provider: models.providers.Provider)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=@play.Play.application().configuration().getString("geoLocal.apiKey")&sensor=false"></script>
+<script type="text/javascript">
+    var map = null;
+    var marker = null;
+    var coordinates = new google.maps.LatLng(@provider.latitude, @provider.longitude);
+
+    // Initialization of the geo localisation map and markers
+    function initialize() {
+        // Map definition
+        var mapOptions = {
+            center: coordinates,
+            zoom: 16
+        };
+        map = new google.maps.Map(document.getElementById("providerDetailsMap"), mapOptions);
+        marker = new google.maps.Marker({
+            position: coordinates,
+            map: map,
+            draggable: false,
+            icon: 'https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=|E52F86|FFFFFF',
+            title: '@provider.title'
+        });
+    }
+
+    // When page is loaded, calls the initialization of the map
+    $(function() {
+        initialize();
+    });
+
+</script>

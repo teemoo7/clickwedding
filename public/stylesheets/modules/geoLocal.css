@@ -1,0 +1,111 @@
+#geoLocalizationWrapper {
+    margin: auto;
+    margin-bottom: 20px;
+    /**width: 904px;**/
+}
+
+#mapColumn {
+    width:500px;
+/**    float: left;**/
+    border: 1px solid #CCCCCC;
+    padding: 20px;
+    height: 400px;
+    overflow: auto;
+}
+
+#mapCanvas.map-edit {
+    height:350px;
+    margin: auto;
+    border: 1px solid #CCCCCC;
+}
+
+.widget-expand #mapCanvas.map-display, #displayMapWrapperNormal #mapCanvas.map-display {
+    height:350px;
+    margin: auto;
+    border: 1px solid #CCCCCC;
+}
+
+.widget #mapCanvas.map-display {
+    height:150px;
+    margin: auto;
+    border: 1px solid #CCCCCC;
+}
+
+.widget-expand #buttonWrapper, #displayMapWrapperNormal #buttonWrapper {
+    display: none;
+}
+
+.widget #buttonWrapper {
+    display: block;
+}
+
+#displayMapWrapperNormal {
+    margin-bottom: 20px;
+}
+
+#markerList {
+    /**float: left;**/
+    border: 1px solid #CCCCCC;
+    /**
+    width: 300px;
+    height: 400px;
+    margin-left: 20px;
+    **/
+    margin-top: 10px;
+    padding: 20px;
+    overflow: auto;
+}
+
+.marker {
+    border: 1px solid #bce8f1;
+    border-radius: 4px 4px 4px 4px;
+    background-color: #d9edf7;
+    color: #3a87ad;
+    padding: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.edit-marker {
+    background-color: #006DCC;
+    color: #FFFFFF;
+}
+
+.marker-label {
+    float: left;
+}
+
+.marker-remove {
+    float: right;
+}
+
+#instructions {
+    padding: 20px;
+    /**clear: both;**/
+    border: 1px solid #CCCCCC;
+    margin-top: 10px;
+}
+
+#instructionsMarkerIcon {
+    float: left;
+    width: 70px;
+}
+
+#instructionsMarkerName {
+    float: left;
+    margin-left: 20px;
+    margin-top: 15px;
+}
+
+#instructionsMarkerActions {
+    float: right;
+    margin-top: 15px;
+}
+
+#mapWrapper {
+    margin-bottom: 10px;
+}
+
+#mapCanvas img {
+    max-width: none;
+}

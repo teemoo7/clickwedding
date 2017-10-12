@@ -1,0 +1,48 @@
+@(wedding: models.wedding.Wedding, giftListInfo: models.modules.GiftListInfo)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<div>
+
+    @if(ModuleHelper.isGiftList(wedding)) {
+
+        @if(!ModuleHelper.isGiftListReady(wedding)) {
+            <div class="alert alert-error">
+                @Messages("main.modules.giftList.paypal.giftListNotWorkingUntilStatusVerified")
+            </div>
+
+            @if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+                @button(
+                    href = controllers.modules.routes.GiftList.edit(wedding.uid),
+                    title = Messages("main.modules.giftList.edit"),
+                    icon = routes.Assets.at("images/icons/32/edit.png")
+                )
+            }
+
+        } else {
+
+            <p>@ModuleHelper.getInstructions(wedding, models.modules.GiftList.ID)</p>
+            @button(
+                href = controllers.modules.routes.GiftList.display(wedding.uid),
+                title = Messages("main.modules.giftList.nbGifts", giftListInfo.items.size),
+                icon = routes.Assets.at("images/icons/32/list.png")
+            )
+
+            @if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+                @button(
+                    href = controllers.modules.routes.GiftList.list(wedding.uid),
+                    title = Messages("main.modules.giftList.transactions"),
+                    icon = routes.Assets.at("images/icons/32/transactions.png")
+                )
+            }
+
+        }
+
+    } else {
+        <div class="alert alert-error">
+            @Messages("main.modules.giftList.paypal.giftListNotWorkingUntilStatusVerifiedGuests")
+        </div>
+    }
+</div>

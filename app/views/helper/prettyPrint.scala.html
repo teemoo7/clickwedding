@@ -1,0 +1,22 @@
+@**
+* Pretty print a given text with some special chars to make the formatting:
+* \n => <br/>
+*
+* Examples:
+* {{{
+*   @prettyPrint("Hello \n world!")
+*   @prettyPrint(Messages("..."))
+* }}}
+*
+* @param text The text to format
+*@
+@(text: String)(implicit handler: FieldConstructor, lang: Lang)
+
+@lines = @{ text.split("\n") }
+@lastLines = @{ lines.drop(1) }
+
+@lines.head
+@lastLines.map { line =>
+    <br/>
+    @line
+}

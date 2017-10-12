@@ -1,0 +1,65 @@
+@(generalStats: models.admin.stats.GeneralStats)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+    <h2>@Messages("main.admin.console.generalStats")</h2>
+
+    <table class="table table-striped">
+        <tbody>
+            <tr>
+                <td>@Messages("main.admin.console.nbWeddingsTotal")</td>
+                <td>@generalStats.nbWeddingsTotal</td>
+            </tr>
+            <tr>
+                <td>@Messages("main.admin.console.nbEmptyWeddings")</td>
+                <td>@generalStats.nbEmptyWeddings</td>
+            </tr>
+            <tr>
+                <td>@Messages("main.admin.console.averageModulesPerWedding")</td>
+                <td>@generalStats.averageModulesPerWedding</td>
+            </tr>
+            <tr>
+                <td>@Messages("main.admin.console.averageExpensesPerWedding")</td>
+                <td>@generalStats.averageExpensesPerWedding <img src="@routes.Assets.at("images/diamond.png")" alt="@Messages("main.admin.console.averageExpensesPerWedding")"/></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="weddingsPie" style="width: 500px; height: 250px;" class="bordered"></div>
+
+    <h3>@Messages("main.admin.console.weddingExpenseRanges")</h3>
+
+    <div id="weddingExpenseRanges" style="width: 500px; height: 250px;" class="bordered"></div>
+
+    <h3>@Messages("main.admin.console.weddingCreationMonth")</h3>
+
+    <div id="weddingCreationMonth" style="width: 500px; height: 250px;" class="bordered"></div>
+
+    <h3>@Messages("main.admin.console.modulesUsage")</h3>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td>@Messages("main.admin.console.rank")</td>
+                <td>@Messages("main.admin.console.module")</td>
+                <td>@Messages("main.admin.console.price") <img src="@routes.Assets.at("images/diamond.png")" alt="@Messages("main.admin.console.price")"/></td>
+                <td>@Messages("main.admin.console.count")</td>
+                <td>@Messages("main.admin.console.total") <img src="@routes.Assets.at("images/diamond.png")" alt="@Messages("main.admin.console.total")"/></td>
+            </tr>
+        </thead>
+        <tbody>
+            @generalStats.mostUsedModules.zipWithIndex.map { case (moduleUsage, index) =>
+                <tr>
+                    <td>@(index+1)</td>
+                    <td>@Messages("main.modules.name.".concat(moduleUsage.moduleId.toString))</td>
+                    <td style="text-align: right">@moduleUsage.price</td>
+                    <td style="text-align: right">@moduleUsage.usage</td>
+                    <td style="text-align: right">@(moduleUsage.usage*moduleUsage.price)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div id="modulesScatter" style="width: 500px; height: 300px;" class="bordered"></div>

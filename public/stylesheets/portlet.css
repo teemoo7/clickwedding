@@ -1,0 +1,307 @@
+/*********************/
+/** MAIN PROPERTIES **/
+/*********************/
+
+#weddingContent {
+    float: left;
+    width: 450px;
+    margin-left: 13px;
+    padding-left: 20px;
+    padding-right: 20px;
+    /*
+    width: 450px;
+    margin-left: 30px;
+    */
+}
+
+#widgets {
+    float: right;
+}
+
+#adminWidgets {
+    float: left;
+    margin-top: 150px;
+    width: 206px;
+}
+
+.ui-sortable-placeholder {
+    border: 1px dotted black;
+    /**visibility: visible !important;**/
+    /**height: 100px !important;**/
+}
+
+.ui-sortable-placeholder * {
+    visibility: hidden;
+}
+
+.floating-edit-button {
+    background: #333;
+    background: rgba(0,0,0,.5);
+    border-radius: 5px;
+    color: #fff;
+    padding: 5px;
+    position: absolute;
+    z-index: 98;
+}
+
+.widget-movable {
+    cursor: move;
+}
+
+/*******************/
+/** SMALL WIDGETS **/
+/*******************/
+
+.widget {
+    width: 206px;
+    /*
+    margin-left: 20px;
+    */
+    /*margin-right: 20px;*/
+    margin-top: 20px;
+    margin-bottom: 20px;
+    /*
+    border: 1px solid #D4D4D4;
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+    */
+    min-height: 100px;
+}
+
+.widget .widget-header {
+    background-image: url('../themes/default/images/box_top_gradient.png');
+    background-repeat: no-repeat;
+    background-position: top left;
+    height: 21px;
+}
+
+.widget .widget-content {
+    background-image: url('../themes/default/images/box_body.png');
+    background-repeat: repeat-y;
+    padding-left: 13px;
+    padding-right: 16px;
+}
+
+.widget .widget-content-gradient {
+    background-image: linear-gradient(to bottom, #F2F2F2, #CFCFCF);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#F2F2F2', EndColorStr='#CFCFCF');
+    background: -webkit-gradient(linear, left top, left bottom, from(#F2F2F2), to(#CFCFCF)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #F2F2F2,  #CFCFCF); /* for firefox 3.6+ */
+    padding-left: 12px;
+    padding-right: 9px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.widget .widget-footer {
+    background-image: url('../themes/default/images/box_bottom_gradient.png');
+    background-repeat: no-repeat;
+    background-position: bottom left;
+    height: 20px;
+}
+
+.widget .widget-title {
+    font-weight: bold;
+    font-size: 1.2em;
+    text-align: center;
+    margin-bottom: 10px;
+    /*background-color: #E52F86;*/
+    /*background-color: #FF1988;*/
+}
+
+.widget .widget-link {
+    display: none;
+}
+
+.widget .widget-content-body {
+    display: block;
+}
+
+.widget hr {
+    display: none;
+}
+
+.widget .small-content {
+    font-size: 0.7em;
+}
+
+.widget .line-icon {
+    display: inline-block;
+    width: 32px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.widget .line-value {
+    display: inline-block;
+    width: 110px;
+    vertical-align: middle;
+}
+
+
+/**********************/
+/** EXPANDED WIDGETS **/
+/**********************/
+
+.widget-expand {
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+.widget-expand .widget-inner-column {
+    display: inline-block;
+    vertical-align: top;
+    margin: auto;
+    width: 220px;
+    margin-bottom: 10px;
+}
+
+.widget-expand .widget-title {
+    font-weight: bold;
+    font-size: 1.2em;
+    text-align: left;
+    margin-bottom: 10px;
+    /*background-color: #E52F86;*/
+    /*background-color: #FF1988;*/
+}
+
+.widget-expand .widget-link {
+    display: none;
+}
+
+.widget-expand .widget-content-body {
+    display: block;
+}
+
+.widget-expand hr {
+    display: block;
+}
+
+.widget-expand .small-content {
+}
+
+.widget-expand .line-icon {
+    display: inline-block;
+    width: 32px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.widget-expand .line-value {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/******************/
+/** MENU WIDGETS **/
+/******************/
+
+.widget-menu {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+
+.widget-menu .menu-link-separator {
+    display: none;
+    width:1px;
+    background:#FCFCFC;
+    border-left:1px solid #D8D8D8;
+    margin-left: 2px;
+}
+
+.widget-menu + .widget-menu .menu-link-separator {
+    display: inline-block;
+}
+
+.widget-menu .widget-header {
+    display: none;
+}
+
+.widget-menu .widget-content {
+}
+
+.widget-menu .widget-content-gradient {
+}
+
+.widget-menu .widget-footer {
+    display: none;
+}
+
+.widget-menu .widget-title {
+    display: none;
+}
+
+.widget-menu .widget-link {
+    display: block;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.widget-menu .widget-link a {
+    margin: 5px;
+    padding: 5px;
+}
+
+.widget-menu .widget-content-body {
+    display: none;
+}
+
+.widget-menu hr {
+    display: none;
+}
+
+.widget-menu .small-content {
+    display: none;
+}
+
+.widget-menu .line-icon {
+    display: none;
+}
+
+.widget-menu .line-value {
+    display: none;
+}
+
+
+/*************/
+
+.portlet-column {
+    min-height: 200px;
+    min-width: 200px;
+}
+
+#weddingMenu {
+    margin: auto;
+    min-height: 0px;
+    max-width: 500px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+#weddingMenu.top-menu-owner {
+    min-height: 40px !important;
+    min-width: 200px;
+    background-color: #FCFCFC;
+    border: 1px dashed #CCCCCC;
+    padding-bottom: 5px;
+}
+
+#menuPlaceholder {
+    display: none;
+    color: #CCCCCC;
+    margin: 8px;
+}
+
+#weddingMenu.top-menu-owner #menuPlaceholder {
+    display: block;
+}
+
+#weddingMenuSeparator {
+    margin-top: 10px;
+}

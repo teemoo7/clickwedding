@@ -1,0 +1,28 @@
+@(picture: models.modules.Picture, albumId: Long, uid: String)(implicit lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<tr class="picture_@picture.id.get.toString-line">
+    <td rowspan="4" style="text-align: center;"><a href="@models.modules.Gallery.getPictureLink(picture).getOrElse("#")" rel="lightbox[@albumId]"><img src="@models.modules.Gallery.getPictureThumbnailLink(picture).getOrElse("#")" alt="@picture.filename" class="gallery-thumbnail" /></a></td>
+    <td>@Messages("main.modules.gallery.filename")</td>
+    <td>@picture.filename</td>
+</tr>
+<tr class="picture_@picture.id.get.toString-line">
+    <td>@Messages("main.modules.gallery.size")</td>
+    <td>@sizeBytes(picture.size)</td>
+</tr>
+<tr class="picture_@picture.id.get.toString-line">
+    <td>@Messages("main.modules.gallery.date")</td>
+    <td>@picture.date.format("dd.MM.yyyy HH:mm:ss")</td>
+</tr>
+<tr class="picture_@picture.id.get.toString-line">
+    <td>@Messages("main.modules.gallery.delete")</td>
+    <td>
+        <a href="#" onclick="deletePicture(@picture.id.get); return false;" class="btn btn-danger">@Messages("main.modules.gallery.delete")</a>
+    </td>
+</tr>
+<tr class="picture_@picture.id.get.toString-line">
+    <td colspan="4">&nbsp;</td>
+</tr>

@@ -1,0 +1,79 @@
+.customizePicturePreviewContainer {
+    margin-bottom: 10px;
+}
+
+.customizePictureEdit {
+    display: inline-block;
+}
+
+.customizePictureEdit img {
+    border: 1px solid #CCCCCC;
+    background-color: #FCFCFC;
+    max-width: 150px;
+    max-height: 150px;
+}
+
+.customizePictureDelete {
+    text-align: center;
+    margin: 5px;
+    display: inline-block;
+}
+
+.uploadManagement {
+    text-align: center;
+}
+
+.explanationsUpload {
+}
+
+.recommendationUpload {
+    padding: 5px;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.recommendationIcon {
+    display: inline-block;
+    /*width: 35px;*/
+    vertical-align: middle;
+}
+.recommendationText {
+    display: inline-block;
+    width: 320px;
+    vertical-align: middle;
+}
+
+.selectionUpload {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align:left;
+}
+
+.dropZone {
+    border: 1px dashed #CCCCCC;
+    background-color: #FCFCFC;
+    text-align: center;
+}
+.dropZone.in {
+}
+.dropZone.hover {
+    background: #DFF0D8;
+    border: 1px dashed #D6E9C6;
+    color: #468847;
+}
+.dropZone.fade {
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+    opacity: 1;
+}
+
+.transferInfo {
+}
+
+.progress {
+    margin-top: 5px;
+    margin-bottom: 0px;
+}

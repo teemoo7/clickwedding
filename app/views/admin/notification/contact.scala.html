@@ -1,0 +1,86 @@
+@(contactForm: Form[(String, String, String, String, String, String)], captchaUuid: String = helpers.CaptchaHelper.generateCaptcha)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.notification.contact"))(CaptchaHelper.getHeadInsert(captchaUuid)) {
+
+    <div class="note">
+        @Messages("main.notification.contactFormUsage")
+    </div>
+
+    <p align="right"><a href="@controllers.admin.routes.NotificationCenter.reportBug" class="question">@Messages("main.notification.contactWantToReportABug")</a></p>
+
+    <div class="tabbable">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab1" data-toggle="tab">@Messages("main.notification.electronicMail")</a></li>
+            <li><a href="#tab2" data-toggle="tab">@Messages("main.notification.postalMail")</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+
+                <p>@Messages("main.notification.contactEMail")</p>
+
+                @contactForm.globalError.map { error =>
+                    <div class="alert alert-error">
+                        <a href="#" class="close" data-dismiss="alert">×</a>
+                        <strong>@Messages("main.error")!</strong> @error.message
+                    </div>
+                }
+
+                @form(action = controllers.admin.routes.NotificationCenter.doContactMail, 'class -> "form-horizontal") {
+
+                    @inputText(
+                        field = contactForm("name"),
+                        args =  '_label -> Messages("main.notification.name"),
+                                '_showConstraints -> false
+                    )
+                    @inputText(
+                        field = contactForm("email"),
+                        args =  '_label -> Messages("main.notification.email"),
+                                '_showConstraints -> false
+                    )
+                    @inputText(
+                        field = contactForm("title"),
+                        args =  '_label -> Messages("main.notification.title"),
+                                '_showConstraints -> false
+                    )
+                    @textarea(
+                        field = contactForm("message"),
+                        args =  'rows -> 7,
+                                'cols -> 40,
+                                'style -> "width: 75%",
+                                '_label -> Messages("main.notification.message"),
+                                '_showConstraints -> false
+                    )
+
+                    @CaptchaHelper.displayCaptcha(captchaUuid, contactForm("captchaValue"))
+
+                    <div class="form-actions">
+                        <input type="submit" id="submit" class="btn btn-primary" value="@Messages("main.notification.send")">
+                    </div>
+                }
+
+            </div>
+            <div class="tab-pane" id="tab2">
+
+                <p>@Html(Messages("main.notification.contactIntro", "<a href=\"https://www.afidis.ch\" target=\"_blank\">afidis Sàrl</a>"))</p>
+
+                <p>@Messages("main.notification.contactPostalMail")</p>
+
+                <div style="width: 200px; margin: auto;">
+                    <p>
+                        @play.Play.application().configuration().getString("contactAddress.line1")<br/>
+                        @play.Play.application().configuration().getString("contactAddress.line2")<br/>
+                        @play.Play.application().configuration().getString("contactAddress.line3")<br/>
+                        @play.Play.application().configuration().getString("contactAddress.line4")<br/>
+                        @play.Play.application().configuration().getString("contactAddress.line5")
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+}

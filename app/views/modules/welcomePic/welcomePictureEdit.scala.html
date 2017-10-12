@@ -1,0 +1,33 @@
+@(wedding: models.wedding.Wedding, welcomePicture: models.modules.WelcomePicture)(implicit lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@names = @{
+    if(welcomePicture.defined && welcomePicture.showName){
+        welcomePicture.name match {
+            case Some(name) => name
+            case None => {
+                wedding.getNames match {
+                    case Some(names) => names
+                    case None => {}
+                }
+            }
+        }
+    }
+}
+
+<div>
+    @if(welcomePicture.defined){
+        <div id="welcomePicture" class="welcomePictureEdit">
+            <img src="@models.modules.WelcomePic.getWelcomePictureLink(welcomePicture).getOrElse("#")" alt="@welcomePicture.filename" />
+            @if(welcomePicture.showName) {
+                <div class="welcomePicLabel">@names</div>
+            }
+        </div>
+        <div id="welcomePictureDelete">
+            <a href="#" onclick="deleteWelcomePicture(); return false;" class="btn btn-danger">@Messages("main.modules.welcomePic.delete")</a>
+        </div>
+    }
+</div>

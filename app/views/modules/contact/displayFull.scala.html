@@ -1,0 +1,19 @@
+@(wedding: models.wedding.Wedding, contact: models.modules.Contact)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.modules.contact.contact"), wedding = Some(wedding))(){
+    @views.html.modules.contact.display(wedding, contact)
+
+    @if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+        @button(
+            href = controllers.modules.routes.Contact.edit(wedding.uid),
+            title = Messages("main.wedding.edit"),
+            icon = routes.Assets.at("images/icons/32/edit.png")
+        )
+    }
+
+    @backButton(wedding.uid)
+}

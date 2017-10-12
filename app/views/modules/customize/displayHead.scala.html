@@ -1,0 +1,295 @@
+@(customize: models.modules.Customize)(implicit request: play.api.mvc.RequestHeader, lang: Lang)
+
+@fontName = @{ customize.moduleContent.font.name }
+@fontParameterValue = @{ customize.moduleContent.font.parameterValue }
+@fontSize = @{ customize.moduleContent.font.size.toString }
+@fontId = @{ customize.moduleContent.font.id.get.toInt }
+@if(fontId != models.modules.Customize.DEFAULT_FONT_ID) {
+    <link href='https://fonts.googleapis.com/css?family=@fontParameterValue:700,400' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+        <!--
+        html {
+            font-family: '@fontName', sans-serif;
+        }
+        body {
+            font-family: '@fontName', sans-serif;
+            font-size: @{fontSize}em;
+        }
+        label, input, button, select, textarea {
+            font-family: '@fontName', sans-serif;
+        }
+        h1, h2, h3, h4 {
+            font-family: '@fontName', sans-serif;
+        }
+        -->
+    </style>
+}
+@themePath = @{ customize.moduleContent.theme.path }
+@themeId = @{ customize.moduleContent.theme.id.get.toInt }
+@if(themeId != models.modules.Customize.DEFAULT_THEME_ID) {
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("themes/"+themePath+"/style.css")">
+}
+@if(themeId == models.modules.Customize.CUSTOM_THEME_ID) {
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/modules/custom.css")">
+}
+
+@generalAttributes = @{ customize.moduleContent.theme.colors.map(colors => colors.generalAttributes) }
+@menuAttributes = @{ customize.moduleContent.theme.colors.map(colors => colors.menuAttributes) }
+@backgroundAttributes = @{ customize.moduleContent.theme.colors.map(colors => colors.backgroundAttributes) }
+@centralAttributes = @{ customize.moduleContent.theme.colors.map(colors => colors.centralAttributes) }
+@mainAttributes = @{ customize.moduleContent.theme.colors.map(colors => colors.mainAttributes) }
+
+@if(themeId == models.modules.Customize.CUSTOM_THEME_ID && customize.moduleContent.theme.colors.isDefined) {
+    <style type="text/css">
+        <!--
+
+        /** GENERAL **/
+        @if(generalAttributes.get.generalTextFontColor.isDefined) {
+            body, p {
+                color: #@generalAttributes.get.generalTextFontColor.get;
+            }
+        }
+        @if(generalAttributes.get.generalLinkFontColor.isDefined) {
+            a, a:visited, a:hover {
+                color: #@generalAttributes.get.generalLinkFontColor.get;
+            }
+            a.question {
+                color: #@generalAttributes.get.generalLinkFontColor.get;
+                border-bottom: 1px dashed #@generalAttributes.get.generalLinkFontColor.get;
+            }
+        }
+        @if(generalAttributes.get.generalBtnFontColor.isDefined) {
+            .btn, .btn:hover {
+                color: #@generalAttributes.get.generalBtnFontColor.get;
+            }
+
+            .btn-danger, .btn-danger:hover {
+                color: #FFFFFF !important;
+            }
+
+            .welcomePicLabel {
+                color: #@generalAttributes.get.generalBtnFontColor.get;
+            }
+        }
+        @if(generalAttributes.get.generalPrimaryBtnBackColor.isDefined) {
+            .btn-primary, .btn-primary:hover {
+                background-color:#@generalAttributes.get.generalPrimaryBtnBackColor.get;
+            }
+        }
+        @if(generalAttributes.get.generalPrimaryBtnFontColor.isDefined) {
+            .btn-primary, .btn-primary:hover {
+                color: #@generalAttributes.get.generalPrimaryBtnFontColor.get;
+            }
+        }
+
+        /** MENU **/
+
+        @if(menuAttributes.get.menuBackColor.isDefined) {
+            .navbar-inner {
+                background-color: #@menuAttributes.get.menuBackColor.get;
+            }
+            .dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a, .dropdown-menu .active > a, .dropdown-menu .active > a:hover, .navbar .nav > li > a:focus, .navbar .nav > li > a:hover {
+                color: #@menuAttributes.get.menuBackColor.get;
+            }
+            #footer {
+                background-color: #@menuAttributes.get.menuBackColor.get;
+                background-image: none;
+                color: #000000;
+                padding: 5px;
+            }
+        }
+        @if(menuAttributes.get.menuFontColor.isDefined) {
+            .navbar .nav li.dropdown.open > .dropdown-toggle, .navbar .nav li.dropdown.active > .dropdown-toggle, .navbar .nav li.dropdown.open.active > .dropdown-toggle {
+                background-color:#@menuAttributes.get.menuFontColor.get;
+            }
+            .dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a, .dropdown-menu .active > a, .dropdown-menu .active > a:hover, .navbar .nav > li > a:focus, .navbar .nav > li > a:hover {
+                background-color:#@menuAttributes.get.menuFontColor.get;
+            }
+            #footer, #footer a, #footer a:visited, #footer a:hover {
+                color: #@menuAttributes.get.menuFontColor.get;
+            }
+        }
+        @if(menuAttributes.get.menuBackTransparent.isDefined && menuAttributes.get.menuBackTransparent.get) {
+            .navbar-inner, #footer {
+                background-color: transparent;
+                background-image:none;
+            }
+        }
+        @if(menuAttributes.get.menuCornerRadius.isDefined) {
+            .navbar-inner, #footer {
+                -webkit-border-radius: @(menuAttributes.get.menuCornerRadius.get)px;
+                -moz-border-radius: @(menuAttributes.get.menuCornerRadius.get)px;
+                border-radius: @(menuAttributes.get.menuCornerRadius.get)px;
+            }
+        }
+
+        /** BACKGROUND **/
+        @if(backgroundAttributes.get.backgroundBackColor.isDefined) {
+            body, html {
+                background-color: #@backgroundAttributes.get.backgroundBackColor.get;
+            }
+        }
+        @if(backgroundAttributes.get.backgroundPic.isDefined && backgroundAttributes.get.backgroundPicPos.isDefined && backgroundAttributes.get.backgroundPicPos.get != models.modules.Customize.CUSTOM_PICTURE_POSITION_STRETCH) {
+            body, html {
+                background-image: url('@Html(models.modules.Customize.getPictureLink(backgroundAttributes.get.backgroundPic.get).getOrElse(""))');
+                @if(backgroundAttributes.get.backgroundPicPos.isDefined && backgroundAttributes.get.backgroundPicPos.get == models.modules.Customize.CUSTOM_PICTURE_POSITION_MOSAIC) {
+                    background-repeat: repeat;
+                }
+                @if(backgroundAttributes.get.backgroundPicPos.isDefined && backgroundAttributes.get.backgroundPicPos.get == models.modules.Customize.CUSTOM_PICTURE_POSITION_CENTERED) {
+                    background-position:center top;
+                    background-repeat:no-repeat;
+                }
+            }
+        }
+        @if(backgroundAttributes.get.backgroundPic.isDefined && backgroundAttributes.get.backgroundPicPos.isDefined && backgroundAttributes.get.backgroundPicPos.get == models.modules.Customize.CUSTOM_PICTURE_POSITION_STRETCH) {            body, html {
+                background-color: transparent;
+                background-image:none;
+            }
+        }
+
+        /** CENTRAL **/
+        @if(centralAttributes.get.centralBackColorTop.isDefined && centralAttributes.get.centralBackColorBottom.isDefined) {
+            #globalContainer {
+                background: none;
+            }
+            #globalContainerInner {
+                background-image: linear-gradient(to bottom, #@centralAttributes.get.centralBackColorTop.get, #@centralAttributes.get.centralBackColorBottom.get);
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#@centralAttributes.get.centralBackColorTop.get', EndColorStr='#@centralAttributes.get.centralBackColorBottom.get');
+                background: -webkit-gradient(linear, left top, left bottom, from(#@centralAttributes.get.centralBackColorTop.get), to(#@centralAttributes.get.centralBackColorBottom.get)); /* for webkit browsers */
+                background: -moz-linear-gradient(top,  #@centralAttributes.get.centralBackColorTop.get,  #@centralAttributes.get.centralBackColorBottom.get); /* for firefox 3.6+ */
+            }
+        }
+        @if(centralAttributes.get.centralBackTransparent.isDefined && centralAttributes.get.centralBackTransparent.get) {
+            #globalContainer {
+                background: none;
+            }
+            #globalContainerInner {
+                background-color: transparent;
+                background-image:none;
+            }
+        }
+
+        @if(centralAttributes.get.centralBackPic.isDefined) {
+            #globalContainerInner {
+                background-image: url('@Html(models.modules.Customize.getPictureLink(centralAttributes.get.centralBackPic.get).getOrElse(""))');
+                @if(centralAttributes.get.centralBackPicPos.isDefined && centralAttributes.get.centralBackPicPos.get == models.modules.Customize.CUSTOM_PICTURE_POSITION_MOSAIC) {
+                    background-repeat: repeat;
+                }
+                @if(centralAttributes.get.centralBackPicPos.isDefined && centralAttributes.get.centralBackPicPos.get == models.modules.Customize.CUSTOM_PICTURE_POSITION_CENTERED) {
+                    background-position:center top;
+                    background-repeat:no-repeat;
+                }
+                @if(centralAttributes.get.centralBackPicPos.isDefined && centralAttributes.get.centralBackPicPos.get == models.modules.Customize.CUSTOM_PICTURE_POSITION_STRETCH) {
+                    background-position:center center;
+                    background-repeat:no-repeat;
+                    background-attachment:fixed;
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;
+                }
+            }
+        }
+
+
+        @if(centralAttributes.get.centralShadowColor.isDefined && centralAttributes.get.centralShadowH.isDefined && centralAttributes.get.centralShadowV.isDefined) {
+            #globalContainerInner {
+                box-shadow: @(centralAttributes.get.centralShadowH.get)px @(centralAttributes.get.centralShadowV.get)px @(centralAttributes.get.centralShadowBlur.getOrElse(0))px @(centralAttributes.get.centralShadowSpread.getOrElse(0))px #@(centralAttributes.get.centralShadowColor.get)
+            }
+        }
+        @if(centralAttributes.get.centralCornerRadius.isDefined) {
+            #globalContainerInner {
+                -webkit-border-radius: @(centralAttributes.get.centralCornerRadius.get)px;
+                -moz-border-radius: @(centralAttributes.get.centralCornerRadius.get)px;
+                border-radius: @(centralAttributes.get.centralCornerRadius.get)px;
+            }
+        }
+
+        /** MAIN **/
+        @if(mainAttributes.get.mainBackTransparent.isDefined && mainAttributes.get.mainBackTransparent.get) {
+            #mainContentBody, #mainContentTop, #mainContentBottom {
+                background-color: transparent;
+                background-image:none;
+            }
+        }
+        @if(mainAttributes.get.mainSeparatorVisible.isDefined) {
+            @if(mainAttributes.get.mainSeparatorVisible.get) {
+                .widget-expand hr {
+                    display: block;
+                    @if(mainAttributes.get.mainSeparatorColor.isDefined) {
+                        height: 1px;
+                        color: #@mainAttributes.get.mainSeparatorColor.get;
+                        background: #@mainAttributes.get.mainSeparatorColor.get;
+                        font-size: 0;
+                        border: 0;
+                    }
+                }
+            } else {
+                .widget-expand hr {
+                    display: none;
+                }
+            }
+        } else {
+            .widget-expand hr {
+                display: none;
+            }
+        }
+        @if(mainAttributes.get.mainBackColor.isDefined) {
+            #weddingContent, .main-content-fixed {
+                background-color: #@mainAttributes.get.mainBackColor.get
+            }
+            #mainContentBody, #mainContentTop, #mainContentBottom {
+                background-color: transparent;
+                background-image:none;
+            }
+        }
+
+            -->
+    </style>
+}
+@if(customize.moduleContent.theme.hasBigPicture) {
+    <script type="text/javascript">
+        function resizeSuperBg(){
+            var $image = $('img.superbg');
+            var image_width = $image.width();
+            var image_height = $image.height();
+
+            var over = image_width / image_height;
+            var under = image_height / image_width;
+
+            var body_width = $(window).width();
+            var body_height = $(window).height();
+
+            if (body_width / body_height >= over) {
+                $image.css({
+                    'width': body_width + 'px',
+                    'height': Math.ceil(under * body_width) + 'px',
+                    'left': '0px',
+                    'top': Math.abs((under * body_width) - body_height) / -2 + 'px'
+                });
+            } else {
+                $image.css({
+                    'width': Math.ceil(over * body_height) + 'px',
+                    'height': body_height + 'px',
+                    'top': '0px',
+                    'left': Math.abs((over * body_height) - body_width) / -2 + 'px'
+                });
+            }
+            $image.show();
+        }
+
+        $(document).ready(function(){
+            $(window).resize(function(){
+                resizeSuperBg();
+            });
+
+            var superBg = $('img.superbg');
+            if (superBg.complete) {
+                resizeSuperBg();
+            }
+            else {
+                superBg.load(resizeSuperBg);
+            }
+        });
+    </script>
+}

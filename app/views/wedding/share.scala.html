@@ -1,0 +1,114 @@
+@(wedding: models.wedding.Wedding)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.wedding.share.shareYourWedding"), wedding = Some(wedding))() {
+
+    <div>
+        <p>@Messages("main.wedding.share.shareExplanation")</p>
+        <p>@Messages("main.wedding.share.shareExplanation2")</p>
+    </div>
+
+    <div class="tabbable">
+
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab1" data-toggle="tab">@Messages("main.wedding.share.websiteAddress")</a></li>
+            <li><a href="#tab2" data-toggle="tab">@Messages("main.wedding.share.socialNetworks")</a></li>
+            <li><a href="#tab3" data-toggle="tab">@Messages("main.wedding.share.qrCode")</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+
+                <h3>@Messages("main.wedding.share.websiteAddress")</h3>
+
+                <div>
+                    <p>@Messages("main.wedding.share.yourWebsiteAddressIs")</p>
+                    <div class="well medium-well">@routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection)</div>
+                    @if(AuthenticationHelper.isRestrictedAreaDefined(wedding)) {
+                        <p>@Messages("main.wedding.share.andTheVIPCodeIs")</p>
+                        <div class="well small-well">@wedding.code</div>
+                    }
+                </div>
+
+                <hr/>
+
+                <div>
+                    <p>@Messages("main.wedding.share.butYouMayAlsoGiveThemGenericWebsite")</p>
+                    <!--<div class="well">@routes.Wedding.index.absoluteURL(helpers.UtilsHelper.isSecureConnection)</div>-->
+                    <p>@Messages("main.wedding.share.withWeddingID")</p>
+                    <div class="well small-well">@wedding.uid</div>
+                    @if(AuthenticationHelper.isRestrictedAreaDefined(wedding)) {
+                        <p>@Messages("main.wedding.share.andVIPCode")</p>
+                        <div class="well small-well">@wedding.code</div>
+                    }
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="tab2">
+
+                <h3>@Messages("main.wedding.share.socialNetworks")</h3>
+
+                <div style="text-align: center;">
+                    <p>
+                        <a href="#"
+                       onclick="
+                        window.open(
+                          'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('@routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection)'),
+                          'facebook-share-dialog',
+                          'width=626,height=436');
+                        return false;">
+                            <img src="@routes.Assets.at("images/share/"+Messages("main.wedding.share.logo.path")+"/facebook.png")" alt="facebook"/>
+                        </a>
+                    </p>
+                    <p>
+                        <a href="https://plus.google.com/share?url=@helper.urlEncode(routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection))">
+                            <img src="@routes.Assets.at("images/share/"+Messages("main.wedding.share.logo.path")+"/google.png")" alt="google"/>
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab3">
+
+                <h3>@Messages("main.wedding.share.qrCode")</h3>
+
+                <div>
+                    <h4>@Messages("main.wedding.share.qrCodeAgenda")</h4>
+                    <p>@Messages("main.wedding.share.qrCodeExplanation")</p>
+                    <p>@Messages("main.wedding.share.qrCodeAgendaExplanation")</p>
+                    <div style="text-align: center;">
+                        <img src="https://chart.googleapis.com/chart?cht=qr&chs=125x125&chl=@helper.urlEncode(controllers.modules.QRCode.getCalendarEventRaw(wedding))" alt="@Messages("main.modules.qrCode.addItToYourCalendar")" title="@Messages("main.modules.qrCode.addItToYourCalendar")" style="border: 1px solid #CCCCCC;" />
+                        @button(
+                            href = controllers.modules.routes.QRCode.getCalendarQRCode(wedding.uid),
+                            title = Messages("main.wedding.share.download"),
+                            icon = routes.Assets.at("images/icons/32/download.png")
+                        )
+                    </div>
+                    <hr/>
+                    <div>&nbsp;</div>
+                    <h4>@Messages("main.wedding.share.qrCodeURL")</h4>
+                    <p>@Messages("main.wedding.share.qrCodeURLExplanation")</p>
+                    <div style="text-align: center;">
+                        <img src="https://chart.googleapis.com/chart?cht=qr&chs=125x125&chl=@helper.urlEncode(routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection))" alt="@Messages("main.wedding.share.qrCode")" title="@Messages("main.wedding.share.qrCode")" style="border: 1px solid #CCCCCC;" />
+                        @button(
+                            href = controllers.modules.routes.QRCode.getURLQRCode(wedding.uid),
+                            title = Messages("main.wedding.share.download"),
+                            icon = routes.Assets.at("images/icons/32/download.png")
+                        )
+                    </div>
+                </div>
+
+                <div class="small" style="margin-top: 20px; text-align: center;"><p>@Messages("main.wedding.share.qrCodeGoogleCharts")</p></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @backButton(wedding.uid)
+}

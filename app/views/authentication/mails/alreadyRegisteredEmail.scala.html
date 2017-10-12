@@ -1,0 +1,16 @@
+@(identity: securesocial.core.Identity)(implicit flash: play.api.mvc.Flash = play.api.mvc.Flash.emptyCookie, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+@import securesocial.core.IdentityProvider
+
+@import helpers._
+@import helpers.BootstrapHelper._
+@import helper._
+
+@mail(Messages("securesocial.mails.sendAlreadyRegisteredEmail.subject")) {
+    <p>@Messages("securesocial.mails.hello") @identity.firstName, </p>
+
+    <p>@Messages("securesocial.mails.sendAlreadyRegisteredEmail.youTriedToSignUp")
+        <a href="@securesocial.core.providers.utils.RoutesHelper.startResetPassword().absoluteURL(IdentityProvider.sslEnabled)">@Messages("securesocial.mails.sendAlreadyRegisteredEmail.here")</a>
+        @Messages("securesocial.mails.sendAlreadyRegisteredEmail.toResetIt")
+    </p>
+    <p align="right">@Messages("securesocial.mails.withKindRegards")</p>
+}

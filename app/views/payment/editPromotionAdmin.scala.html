@@ -1,0 +1,46 @@
+@(promotionForm: Form[models.payment.Promotion])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.payment.promoCodes"))(){
+    @promotionForm.globalError.map { error =>
+        <div class="alert alert-error">
+            <a href="#" class="close" data-dismiss="alert">×</a>
+            <strong>@Messages("main.error")!</strong> @error.message
+        </div>
+    }
+
+    @form(action = controllers.payment.routes.Money.doEditPromotion, 'class -> "form-horizontal") {
+        <fieldset>
+            @inputHidden(
+                field = promotionForm("id")
+            )
+            @inputText(
+                field = promotionForm("code"),
+                args =  '_label -> Messages("main.payment.code")
+            )
+            @inputText(
+                field = promotionForm("amount"),
+                args =  '_label -> Messages("main.payment.amount")
+            )
+            @inputText(
+                field = promotionForm("remaining"),
+                args =  '_label -> Messages("main.payment.remaining")
+            )
+            @inputText(
+                field = promotionForm("deadline"),
+                args =  '_label -> Messages("main.payment.deadline")
+            )
+            @inputText(
+                field = promotionForm("weddingId"),
+                args =  '_label -> Messages("main.payment.weddingId")
+            )
+        </fieldset>
+
+    <div class="form-actions">
+        <input type="submit" value="@Messages("main.payment.save")" class="btn btn-primary"><br/>
+    </div>
+    }
+}

@@ -1,0 +1,40 @@
+@(wedding: models.wedding.Wedding)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@mail("Nouveau mariage") {
+    <h2>Nouveau mariage</h2>
+    <table cellpadding="5" cellspacing="5" style="font-family: arial, helvetica, sans-serif; font-size: 14px; line-height: 20px; background-color: #ffffff; font-color: black;">
+        @if(wedding.date.isDefined) {
+        <tr>
+            <td>Date</td>
+            <td>@wedding.date.map(_.format("dd.MM.yyyy"))</td>
+        </tr>
+        }
+        @if(wedding.place.isDefined) {
+        <tr>
+            <td>Lieu</td>
+            <td>@wedding.place.get</td>
+        </tr>
+        }
+        @if(wedding.person1.isDefined && wedding.person2.isDefined) {
+        <tr>
+            <td>Mariés</td>
+            <td>@wedding.person1 & @wedding.person2</td>
+        </tr>
+        }
+        <tr>
+            <td>Utilisateur</td>
+            <td>@user.get.fullName (@user.get.email.getOrElse(""))</td>
+        </tr>
+        <tr>
+            <td>UID mariage</td>
+            <td>@wedding.uid</td>
+        </tr>
+        <tr>
+            <td>ID mariage</td>
+            <td>@wedding.id</td>
+        </tr>
+        <tr>
+            <td colspan="2"><a href="@routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection)">@helpers.UtilsHelper.removeMethodToUrl(routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection))</a></td>
+        </tr>
+    </table>
+}

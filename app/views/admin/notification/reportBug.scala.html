@@ -1,0 +1,58 @@
+@(reportBugForm: Form[(Option[String], Option[String], String, String, Option[String], String, String)], captchaUuid: String = helpers.CaptchaHelper.generateCaptcha)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.notification.reportBug"))(CaptchaHelper.getHeadInsert(captchaUuid)) {
+
+    <div class="note">
+        @Messages("main.notification.reportBugFormUsage")
+    </div>
+
+    @reportBugForm.globalError.map { error =>
+        <div class="alert alert-error">
+            <a href="#" class="close" data-dismiss="alert">×</a>
+            <strong>@Messages("main.error")!</strong> @error.message
+        </div>
+    }
+
+    @form(action = controllers.admin.routes.NotificationCenter.doReportBug, 'class -> "form-horizontal") {
+
+        @inputText(
+            field = reportBugForm("name"),
+            args =  '_label -> Messages("main.notification.name"),
+                    '_showConstraints -> false
+        )
+        @inputText(
+            field = reportBugForm("email"),
+            args =  '_label -> Messages("main.notification.email"),
+                    '_showConstraints -> false,
+                    '_help -> Messages("main.notification.emailHelp")
+        )
+        @inputText(
+            field = reportBugForm("title"),
+            args =  '_label -> Messages("main.notification.title"),
+                    '_showConstraints -> false
+        )
+
+        @textarea(
+            field = reportBugForm("description"),
+            args =  'rows -> 7,
+                    'cols -> 40,
+                    'style -> "width: 75%",
+                    '_label -> Messages("main.notification.description"),
+                    '_showConstraints -> false,
+                    '_help -> Messages("main.notification.bePrecise")
+        )
+        @inputHidden(
+            field = reportBugForm("referrer")
+        )
+
+        @CaptchaHelper.displayCaptcha(captchaUuid, reportBugForm("captchaValue"))
+
+        <div class="form-actions">
+            <input type="submit" id="submit" class="btn btn-primary" value="@Messages("main.notification.send")">
+        </div>
+    }
+}

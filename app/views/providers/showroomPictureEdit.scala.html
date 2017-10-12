@@ -1,0 +1,14 @@
+@(showroomPicture: models.providers.ProviderShowroomPicture)(implicit lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<div class="providerShowroomPictureWrapper" id="providerShowroomPicture_@showroomPicture.id.get">
+    <div class="providerShowroomPicture">
+        <a href="@models.providers.Provider.getProviderShowroomPictureLink(showroomPicture).getOrElse("#")" rel="lightbox[0]" id="linkShowroomPicture_@showroomPicture.id.get"><img src="@models.providers.Provider.getProviderShowroomPictureThumbnailLink(showroomPicture).getOrElse("#")" alt="@showroomPicture.filename.getOrElse(Messages("main.providers.showroomPictureAlt"))" /></a>
+    </div>
+    <div class="providerShowroomPictureDelete">
+        <a href="#" onclick="deleteShowroomPicture(@showroomPicture.id.get); return false;" class="btn btn-danger">@Messages("main.providers.deleteShowroomPicture")</a>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+@(wedding: models.wedding.Wedding, isDisplayTutorial: Boolean = false)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang, isOwnerOfWedding: Boolean, viewMode: models.wedding.ViewMode)
+
+@import helpers._
+@import helper._
+
+@main(Messages("main.wedding.wedding"), isFixedContent = false, wedding = Some(wedding)){
+    @views.html.wedding.displayHead(wedding)
+    @if(ModuleHelper.isGeoLocal(wedding)) {
+        @views.html.modules.geoLocal.mapHead(ModuleHelper.getGeoLocal(wedding).get.moduleContent)
+    }
+    @if(ModuleHelper.isGallery(wedding)) {
+        @views.html.modules.gallery.head()
+    }
+    @if(ModuleHelper.isWelcomePic(wedding)) {
+        @views.html.modules.welcomePic.head()
+    }
+    @if(isDisplayTutorial) {
+        @views.html.wedding.tutorialHead(wedding)
+    }
+}{
+    <div id="weddingMenu" class="portlet-column column-menu column-display-link @if(AuthenticationHelper.isDisplayAsOwner){top-menu-owner}" data-placeholder="Your menu here" data-column-id="@models.modules.Module.DISPLAY_COLUMN_MENU">
+        @if(AuthenticationHelper.isDisplayAsOwner){
+            <div id="menuPlaceholder">@Messages("main.modules.moveModulesHereToCreateMenu")</div>
+        }
+        @ModuleHelper.getOrderedModulesForColumn(models.modules.Module.DISPLAY_COLUMN_MENU, wedding).map { module =>
+            @views.html.portlets.widget(module, wedding, Some("menu"), true)
+        }
+        @if(!ModuleHelper.getOrderedModulesForColumn(models.modules.Module.DISPLAY_COLUMN_MENU, wedding).isEmpty && !AuthenticationHelper.isDisplayAsOwner) {
+            <hr id="weddingMenuSeparator"/>
+        }
+    </div>
+    <div id="adminWidgets" class="portlet-column column-small" data-column-id="@models.modules.Module.DISPLAY_COLUMN_LEFT">
+        @if(AuthenticationHelper.isDisplayAsOwner) {
+            <div id="widgetAdmin" class="widget nomove">
+                <div class="widget-header"></div>
+                <div class="widget-content">
+                    <div class="widget-content-gradient">
+                        <div class="widget-title">@Messages("main.wedding.administration")</div>
+                        <div class="widget-content-body">
+                            @views.html.payment.remaining(wedding)
+                            @button(
+                                href = controllers.modules.routes.Module.listAllModules(wedding.uid),
+                                title = Messages("main.modules.modules"),
+                                icon = routes.Assets.at("images/icons/32/module.png"),
+                                id = TutorialHelper.modulesLinkId
+                            )
+                            @if(ModuleHelper.isCustomization(wedding)) {
+                                @button(
+                                    href = controllers.modules.customize.routes.Customize.edit(wedding.uid),
+                                    title = Messages("main.modules.customize.customize"),
+                                    icon = routes.Assets.at("images/icons/32/customize.png")
+                                )
+                            }
+                            @button(
+                                href = controllers.routes.Wedding.share(wedding.uid),
+                                title = Messages("main.wedding.share.shareYourWedding"),
+                                icon = routes.Assets.at("images/icons/32/share.png"),
+                                id = TutorialHelper.shareLinkId
+                            )
+                        </div>
+                    </div>
+                </div>
+                <div class="widget-footer"></div>
+            </div>
+        }
+
+        @ModuleHelper.getOrderedModulesForColumn(models.modules.Module.DISPLAY_COLUMN_LEFT, wedding).map { module =>
+            @views.html.portlets.widget(module, wedding, None, true)
+        }
+    </div>
+
+    <div id="weddingContent" class="portlet-column column-large" data-column-id="@models.modules.Module.DISPLAY_COLUMN_CENTER">
+        @ModuleHelper.getAdFreeBanner(wedding)
+        @ModuleHelper.getOrderedModulesForColumn(models.modules.Module.DISPLAY_COLUMN_CENTER, wedding).map { module =>
+            @views.html.portlets.widget(module, wedding, Some("expand"), false)
+        }
+
+        &nbsp;
+
+    </div>
+    <div id="widgets" class="portlet-column column-small" data-column-id="@models.modules.Module.DISPLAY_COLUMN_RIGHT">
+        @if(AuthenticationHelper.isRestrictedAreaDefined(wedding) && !AuthenticationHelper.isGuestWithRestrictedArea(wedding.uid)) {
+            <div id="widgetVIP" class="widget nomove">
+                <div class="widget-header"></div>
+                <div class="widget-content">
+                    <div class="widget-content-gradient">
+                        <div class="widget-title">@Messages("main.wedding.vipArea")</div>
+                        <div class="widget-content-body">
+                            <p>@Messages("main.wedding.ifYouHaveACode")</p>
+                            @form(action = routes.Wedding.doSearch, 'class -> "form-horizontal") {
+                                <div style="text-align: center; margin: auto;">
+                                    <input type="text" id="code" name="code" value="" class="input-small" placeholder="@Messages("main.wedding.code")" />
+                                    <input type="hidden" id="uid" name="uid" value="@wedding.uid" />
+                                </div>
+                                <div class="actions">
+                                    <input type="submit" id="submit" class="btn btn-primary" value="@Messages("main.wedding.send")" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="widget-footer"></div>
+            </div>
+        }
+
+        @ModuleHelper.getAdFreePortlet(wedding)
+
+        @ModuleHelper.getOrderedModulesForColumn(models.modules.Module.DISPLAY_COLUMN_RIGHT, wedding).map { module =>
+            @views.html.portlets.widget(module, wedding, None, true)
+        }
+
+        &nbsp;
+    </div>
+
+    <div class="clearfix"></div>
+
+    @if(isDisplayTutorial) {
+        @views.html.wedding.tutorial(wedding)
+    }
+}

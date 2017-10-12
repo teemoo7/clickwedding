@@ -1,0 +1,10 @@
+@(marker: models.modules.GeoLocalMarker)(implicit lang: Lang)
+
+<div class="marker" id="marker_@marker.id" data-ref="@marker.id" onclick="editMarker(this);">
+    <img id="markerImage_@marker.id" src="@routes.Assets.at(controllers.helpers.ModuleHelper.getGeoLocalMarkerIcons.getOrElse(marker.markerType, ""))" data-index="@marker.markerType" data-value="@marker.markerType" border="0" alt="@marker.name" />
+    <span id="markerName_@marker.id">@marker.name</span>
+    <a href="#" class="close" onclick="removeMarker(this); return false;"><img src="@routes.Assets.at("images/icons/32/cross.png")" alt="@Messages("main.modules.geoLocal.remove")" /></a>
+    <span id="markerAddress_@marker.id">@marker.address</span><span id="markerLatitude_@marker.id" style="display: none;">@marker.latitude</span><span id="markerLongitude_@marker.id" style="display: none;">@marker.longitude</span>
+    <span id="markerZoom_@marker.id" style="display: none;">@marker.zoom</span>
+    <span id="markerPrivate_@marker.id" style="display: none;">@marker.isPrivate</span>
+</div>

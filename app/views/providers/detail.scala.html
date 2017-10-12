@@ -1,0 +1,74 @@
+@(provider: models.providers.Provider)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = provider.title){
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/providers/providers.css")">
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/lightbox/lightbox.css")">
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/lightbox/lightbox.js")"></script>
+    @views.html.providers.detailMapHead(provider)
+}{
+    <div class="clearfix">
+        <div id="providerDetailsMainColumn">
+            @if(provider.slogan.isDefined){
+                <h3>&laquo; @provider.slogan.get &raquo;</h3>
+            }
+        </div>
+        @if(provider.hasLogo) {
+            <div id="providerDetailsLogoColumn">
+                <div id="providerDetailsLogo">
+                    <img src="@models.providers.Provider.getProviderLogoPictureLink(provider.logo.get).getOrElse("#")" alt="@provider.logo.get.filename" />
+                </div>
+            </div>
+        }
+    </div>
+    <div class="clearfix">
+        @if(provider.description.isDefined){
+            <div>@provider.description.get</div>
+        } else {
+            &nbsp;
+        }
+    </div>
+
+    <h3>@Messages("main.providers.search.address")</h3>
+    <div id="providerDetailsInfo">
+        <div class="well" id="providerDetailsAddress">
+            <div>@provider.name</div>
+            <div>@provider.street @provider.streetNb.getOrElse("")</div>
+            <div>@provider.zip @provider.place</div>
+            <div>@Messages("main.providers.countries."+provider.country)</div>
+            @if(provider.phone.isDefined) {
+                <div id="providerDetailsPhone"><img src="@routes.Assets.at("images/icons/16/phone.png")" alt="@Messages("main.providers.phone")"/> @provider.phone</div>
+            }
+        </div>
+        <div id="providerContact">
+            @if(provider.website.isDefined) {
+                <div class="provider-details-contact-info"><a href="@controllers.providers.routes.Provider.website(provider.id.get)" class="btn" target="_blank"><img src="@routes.Assets.at("images/icons/16/internet.png")" alt="@provider.website"/> @Messages("main.providers.search.visitWebsite")</a></div>
+            }
+            <div class="provider-details-contact-info"><a href="@controllers.providers.routes.Provider.contactMail(provider.id.get)" class="btn"><img src="@routes.Assets.at("images/icons/16/mail.png")" alt="@Messages("main.providers.search.contactByMail")"/> @Messages("main.providers.search.contactByMail")</a></div>
+            <div class="provider-details-contact-info"><a href="@controllers.providers.routes.Provider.print(provider.id.get)" target="_blank" class="btn"><img src="@routes.Assets.at("images/icons/16/print.png")" alt="@Messages("main.providers.search.printPage")"/> @Messages("main.providers.search.printPage")</a></div>
+        </div>
+    </div>
+    <div id="providerDetailsMap"></div>
+    <div class="clearfix">&nbsp;</div>
+
+    @if(provider.hasShowroom) {
+        <h3>@Messages("main.providers.showRoom")</h3>
+
+        @provider.showroom.map { showroomPicture =>
+            <div class="providerShowroomPictureWrapper">
+                <div class="providerShowroomPicture">
+                    <a href="@models.providers.Provider.getProviderShowroomPictureLink(showroomPicture).getOrElse("#")" rel="lightbox[0]" id="linkShowroomPicture_@showroomPicture.id.get"><img src="@models.providers.Provider.getProviderShowroomPictureThumbnailLink(showroomPicture).getOrElse("#")" alt="@showroomPicture.filename.getOrElse(Messages("main.providers.showroomPictureAlt"))" /></a>
+                </div>
+            </div>
+        }
+    }
+
+    @if(AuthenticationHelper.isOwnerOfProvider(provider.id.get)){
+        <div class="actions" style="margin-top: 20px;">
+            <a href="@controllers.providers.routes.Provider.edit(provider.id.get)" class="btn">@Messages("main.providers.edit")</a>
+        </div>
+    }
+}

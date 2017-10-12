@@ -1,0 +1,48 @@
+@(provider: models.providers.Provider)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@mail("Nouveau prestataire") {
+    <h2>Nouveau prestataire</h2>
+    <table cellpadding="5" cellspacing="5" style="font-family: arial, helvetica, sans-serif; font-size: 14px; line-height: 20px; background-color: #ffffff; font-color: black;">
+        <tr>
+            <td>Nom</td>
+            <td>@provider.name</td>
+        </tr>
+        @if(provider.slogan.isDefined) {
+        <tr>
+            <td>Slogan</td>
+            <td>@provider.slogan.get</td>
+        </tr>
+        }
+        @if(provider.description.isDefined) {
+        <tr>
+            <td>Description</td>
+            <td>@provider.description.get</td>
+        </tr>
+        }
+        <tr>
+            <td>Catégorie</td>
+            <td>@controllers.providers.Provider.getCategoryName(provider.categoryId)</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>@provider.email</td>
+        </tr>
+        @if(provider.website.isDefined) {
+        <tr>
+            <td>Site web</td>
+            <td>@provider.website.get</td>
+        </tr>
+        }
+        <tr>
+            <td>Utilisateur</td>
+            <td>@user.get.fullName (@user.get.email.getOrElse(""))</td>
+        </tr>
+        <tr>
+            <td>ID service</td>
+            <td>@provider.id</td>
+        </tr>
+        <tr>
+            <td colspan="2"><a href="@controllers.providers.routes.Provider.edit(provider.id.get).absoluteURL(helpers.UtilsHelper.isSecureConnection)">Afficher</a></td>
+        </tr>
+    </table>
+}

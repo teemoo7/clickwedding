@@ -1,0 +1,19 @@
+@(captchaWords: Seq[String], uuid: String)(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+<p>@Messages("main.captcha.captcha")</p>
+
+<p>@Messages("main.captcha.travel.instructions")</p>
+
+<ul>
+    @for(word <- captchaWords) {
+        <li>@word</li>
+    }
+</ul>
+
+<input type="text" name="travelCaptchaLabel" value="" id="travelCaptchaLabel" />
+
+<input type="hidden" name="captchaValue" value="" id="travelCaptchaValue" />
+
+<input type="hidden" name="captchaUuid" value="@uuid" id="travelCaptchaUuid" />
+
+<div id="travelCaptchaMap" style="width: 600px; height: 400px"></div>

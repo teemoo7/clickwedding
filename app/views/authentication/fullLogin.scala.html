@@ -1,0 +1,9 @@
+@(loginForm: Form[(String,String)], errorMsg: Option[String] = None)(implicit flash: play.api.mvc.Flash = play.api.mvc.Flash.emptyCookie, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.authentication.login"))(){
+    @views.html.authentication.login(loginForm, errorMsg)
+}

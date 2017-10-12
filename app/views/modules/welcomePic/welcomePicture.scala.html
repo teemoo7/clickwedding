@@ -1,0 +1,34 @@
+@(wedding: models.wedding.Wedding, welcomePicture: models.modules.WelcomePicture)(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@names = @{
+    if(welcomePicture.defined && welcomePicture.showName){
+        welcomePicture.name match {
+            case Some(name) => name
+            case None => {
+                wedding.getNames match {
+                    case Some(names) => names
+                    case None => {}
+                }
+            }
+        }
+    }
+}
+
+@if(welcomePicture.defined){
+    <div id="welcomePicture">
+        <img src="@models.modules.WelcomePic.getWelcomePictureLink(welcomePicture).getOrElse("#")" alt="@welcomePicture.filename" />
+        @if(welcomePicture.showName) {
+            <div class="welcomePicLabel">@names</div>
+        }
+    </div>
+} else {
+    @if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+        <div class="addButtonZone">
+            <div class="editButton"><a href="@ModuleHelper.getEditLink(wedding, models.modules.WelcomePic.ID).getOrElse("")" class="btn"><img src="@routes.Assets.at("images/icons/32/add.png")"/> @Messages("main.modules.welcomePic.addWelcomePic")</a></div>
+        </div>
+    }
+}

@@ -1,0 +1,486 @@
+@(wedding: models.wedding.Wedding, customizeForm: Form[models.modules.Customize], colors: Option[models.modules.CustomizeThemeColors])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@pictureBackground = @{ colors match {
+        case Some(c) => c.backgroundAttributes.backgroundPic
+        case None => None
+    }
+}
+@pictureCentral = @{ colors match {
+        case Some(c) => c.centralAttributes.centralBackPic
+        case None => None
+    }
+}
+
+@main(Messages("main.modules.customize.customize"), wedding = Some(wedding)){
+    @views.html.modules.customize.editHead()
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/vendor/jquery.ui.widget.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.iframe-transport.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.fileupload.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/load-image.min.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/canvas-to-blob.min.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jQuery-File-Upload/jquery.fileupload-fp.js")"></script>
+    <script type="text/javascript" src='@controllers.modules.customize.routes.Customize.javascriptRoutes'></script>
+    <script type="text/javascript">
+        // Delete the picture
+        function deletePicture(picType) {
+            if (confirm('@Messages("main.modules.customize.confirmDeletePicture")')) {
+                // Data are sent to the server
+                jsRoutes.controllers.modules.customize.Customize.deletePictureAjax('@wedding.uid', picType).ajax({
+                    success : function() {
+                        $('#picture_'+picType).remove();
+                        $('#pictureDelete_'+picType).remove();
+                    },
+                    error : function(data) {
+                        showWarningDialog('@Messages("main.modules.customize.error.couldNotDeletePicture")')
+                    }
+                });
+            }
+        }
+
+        $(function () {
+            $('#fileUploadBackground').fileupload({
+                dataType: 'html',
+                dropZone: $('#dropZoneBackground'),
+                process:
+                    [
+                        {
+                            action: 'load',
+                            fileTypes: /^image\/(gif|jpeg|png)$/,
+                            maxFileSize: 20000000 // 20MB
+                        },
+                        {
+                            action: 'save'
+                        }
+                    ],
+                progressall: function (e, data) {
+                    showWaitInfo('Background');
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#progressBackground .bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                },
+                done: function (e, data) {
+                    $('#picture_@models.modules.Customize.PIC_TYPE_BACKGROUND').remove();
+                    $('#pictureDelete_@models.modules.Customize.PIC_TYPE_BACKGROUND').remove();
+                    $('#pictureContainerBackground').append(data.result);
+                    hideWaitInfo('Background');
+                    $('#progressBackground .bar').css(
+                        'width', '0%'
+                    );
+                },
+                fail: function (e, data) {
+                    hideWaitInfo('Background');
+                    showWarningDialog(data.errorThrown);
+                    $('#progressBackground .bar').css(
+                        'width', '0%'
+                    );
+                }
+            });
+
+            $(document).bind('dragover', function (e) {
+                var dropZone = $('#dropZoneBackground'),
+                timeout = window.dropZoneTimeout;
+                if (!timeout) {
+                    dropZone.addClass('in');
+                } else {
+                    clearTimeout(timeout);
+                }
+                if (e.target === dropZone[0]) {
+                    dropZone.addClass('hover');
+                } else {
+                    dropZone.removeClass('hover');
+                }
+                window.dropZoneTimeout = setTimeout(function () {
+                    window.dropZoneTimeout = null;
+                    dropZone.removeClass('in hover');
+                }, 100);
+            });
+
+            $('#fileUploadCentral').fileupload({
+                dataType: 'html',
+                dropZone: $('#dropZoneCentral'),
+                process:
+                    [
+                        {
+                            action: 'load',
+                            fileTypes: /^image\/(gif|jpeg|png)$/,
+                            maxFileSize: 20000000 // 20MB
+                        },
+                        {
+                            action: 'save'
+                        }
+                    ],
+                progressall: function (e, data) {
+                    showWaitInfo('Central');
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#progressCentral .bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                },
+                done: function (e, data) {
+                    $('#picture_@models.modules.Customize.PIC_TYPE_CENTRAL').remove();
+                    $('#pictureDelete_@models.modules.Customize.PIC_TYPE_CENTRAL').remove();
+                    $('#pictureContainerCentral').append(data.result);
+                    hideWaitInfo('Central');
+                    $('#progressCentral .bar').css(
+                        'width', '0%'
+                    );
+                },
+                fail: function (e, data) {
+                    hideWaitInfo('Central');
+                    showWarningDialog(data.errorThrown);
+                    $('#progressCentral .bar').css(
+                        'width', '0%'
+                    );
+                }
+            });
+
+            $(document).bind('dragover', function (e) {
+                var dropZone = $('#dropZoneCentral'),
+                timeout = window.dropZoneTimeout;
+                if (!timeout) {
+                    dropZone.addClass('in');
+                } else {
+                    clearTimeout(timeout);
+                }
+                if (e.target === dropZone[0]) {
+                    dropZone.addClass('hover');
+                } else {
+                    dropZone.removeClass('hover');
+                }
+                window.dropZoneTimeout = setTimeout(function () {
+                    window.dropZoneTimeout = null;
+                    dropZone.removeClass('in hover');
+                }, 100);
+            });
+
+            $(document).bind('drop dragover', function (e) {
+                e.preventDefault();
+            });
+        });
+
+        function showWaitInfo(name) {
+            $('#uploadManagement'+name).slideUp(function() {
+                $('#waitInfo'+name).slideDown();
+            });
+        }
+
+        function hideWaitInfo(name) {
+            $('#waitInfo'+name).slideUp(function() {
+                $('#uploadManagement'+name).slideDown();
+            });
+        }
+
+        $(document).ready( function() {
+            $('#fileUploadBackgroundBtn').click(function(){
+                $("#fileUploadBackground").click();
+                return false;
+            });
+            $('#fileUploadCentralBtn').click(function(){
+                $("#fileUploadCentral").click();
+                return false;
+            });
+        });
+    </script>
+}{
+
+    @form(action = controllers.modules.customize.routes.Customize.doEdit(wedding.uid), 'class -> "form-horizontal") {
+        <fieldset>
+            <h2>@Messages("main.modules.customize.fontStyle")</h2>
+            @select(
+                field = customizeForm("customizeInfo")("customizedFont")("id"),
+                options = ModuleHelper.getOptionsCustomizeFont,
+                args =  '_label -> Messages("main.modules.customize.font"),
+                        '_showConstraints -> false
+            )
+            <div class="control-group">
+                <label class="control-label">@Messages("main.modules.customize.sample")</label>
+                <div class="controls"><span id="fontStylePreview">@Messages("main.modules.customize.sampleText")</span></div>
+            </div>
+            <hr/>
+            <h2>@Messages("main.modules.customize.themeColors")</h2>
+            @select(
+                field = customizeForm("customizeInfo")("customizedTheme")("id"),
+                options = ModuleHelper.getOptionsCustomizeTheme,
+                args =  '_label -> Messages("main.modules.customize.theme"),
+                        '_showConstraints -> false
+            )
+            <div class="control-group " id="themePreviewContainer">
+                <label class="control-label">@Messages("main.modules.customize.preview") </label>
+                <div class="controls">
+                    @ModuleHelper.getCustomizeThemePreviewPath.map { case(themeId, themeName, themePath) =>
+                        <img class="themePreview" id="themePreview_@themeId" src="@routes.Assets.at("themes/"+themePath+"/images/preview.png")"" alt="@Messages("main.modules.customize.preview")" style="border: 1px solid #CCCCCC; margin: auto; width: 150px; display: none;" />
+                    }
+                </div>
+            </div>
+            <div id="customThemeColorsContainer" style="display: none;">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab1" data-toggle="tab">@Messages("main.modules.customize.general")</a></li>
+                    <li><a href="#tab2" data-toggle="tab">@Messages("main.modules.customize.menu")</a></li>
+                    <li><a href="#tab3" data-toggle="tab">@Messages("main.modules.customize.background")</a></li>
+                    <li><a href="#tab4" data-toggle="tab">@Messages("main.modules.customize.central")</a></li>
+                    <li><a href="#tab5" data-toggle="tab">@Messages("main.modules.customize.main")</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab1">
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("generalAttributes")("generalPrimaryBtnBackColor"),
+                            args =  '_label -> Messages("main.modules.customize.generalPrimaryBtnBackColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("generalAttributes")("generalPrimaryBtnFontColor"),
+                            args =  '_label -> Messages("main.modules.customize.generalPrimaryBtnFontColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("generalAttributes")("generalBtnFontColor"),
+                            args =  '_label -> Messages("main.modules.customize.generalBtnFontColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("generalAttributes")("generalLinkFontColor"),
+                            args =  '_label -> Messages("main.modules.customize.generalLinkFontColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("generalAttributes")("generalTextFontColor"),
+                            args =  '_label -> Messages("main.modules.customize.generalTextFontColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                    </div>
+
+                    <div class="tab-pane" id="tab2">
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("menuAttributes")("menuFontColor"),
+                            args =  '_label -> Messages("main.modules.customize.menuFontColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("menuAttributes")("menuBackColor"),
+                            args =  '_label -> Messages("main.modules.customize.menuBackColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                        @checkbox(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("menuAttributes")("menuBackTransparent"),
+                            args =  '_label -> Messages("main.modules.customize.menuBackTransparent"),
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("menuAttributes")("menuCornerRadius"),
+                            args =  '_label -> Messages("main.modules.customize.menuCornerRadius"),
+                                    '_showConstraints -> true,
+                                    'class -> "spinner020"
+                        )
+                    </div>
+
+                    <div class="tab-pane" id="tab3">
+
+                        <div class="control-group ">
+                            <label for="fileUploadBackground" class="control-label">@Messages("main.modules.customize.backgroundPic") </label>
+                            <div class="controls ">
+                                <div class="upload-customize-picture">
+                                    <div id="pictureContainerBackground">
+                                        @if(pictureBackground.isDefined) {
+                                            @views.html.modules.customize.pictureEdit(pictureBackground.get)
+                                        }
+                                    </div>
+
+                                    <div class="uploadManagement">
+                                        <div id="dropZoneBackground" class="fade well block dropZone">
+                                            <input style="display: none;" id="fileUploadBackground" type="file" name="filesBackground" data-url="@controllers.modules.customize.routes.Customize.addPictureAjax(wedding.uid, models.modules.Customize.PIC_TYPE_BACKGROUND)">
+                                            <div id="uploadManagementBackground">
+                                                <span><a href="#" id="fileUploadBackgroundBtn" class="btn">@Messages("main.modules.customize.selectPicture")</a><br/>
+                                                @Messages("main.modules.customize.orDropFileHere")</span>
+                                            </div>
+                                            <div id="waitInfoBackground" style="display: none;">
+                                                <span>@Messages("main.modules.customize.pleaseWait")</span>
+                                            </div>
+                                            <div id="transferInfoBackground" class="clearfix transferInfo">
+                                                <div class="progress progress-striped active" id="progressBackground">
+                                                    <div class="bar" style="width: 0%;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="recommendationUpload alert alert-info">
+                                        <div class="recommendationIcon"><img src="@routes.Assets.at("images/icons/32/warning.png")" alt="@Messages("main.modules.customize.pictureSizeBackgroundInfo", models.modules.Customize.BACKGROUND_PICTURE_MAX_SIZE)" /></div>
+                                        <div class="recommendationText">@Messages("main.modules.customize.pictureSizeBackgroundInfo", models.modules.Customize.BACKGROUND_PICTURE_MAX_SIZE)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @inputRadioGroup2(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("backgroundAttributes")("backgroundPicPos"),
+                            options = options(
+                                "0"->Messages("main.modules.customize.backgroundPicPos.Stretch"),
+                                "1"->Messages("main.modules.customize.backgroundPicPos.Centered"),
+                                "2"->Messages("main.modules.customize.backgroundPicPos.Mosaic")
+                            ),
+                            args =  '_label -> Messages("main.modules.customize.backgroundPicPos"),
+                                    '_showConstraints -> false
+                        )
+
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("backgroundAttributes")("backgroundBackColor"),
+                            args =  '_label -> Messages("main.modules.customize.backgroundBackColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                    </div>
+
+                    <div class="tab-pane" id="tab4">
+
+                        <div class="control-group ">
+                            <label for="fileUploadCentral" class="control-label">@Messages("main.modules.customize.centralBackPic") </label>
+                            <div class="controls ">
+                                <div class="upload-customize-picture">
+                                    <div id="pictureContainerCentral">
+                                        @if(pictureCentral.isDefined) {
+                                            @views.html.modules.customize.pictureEdit(pictureCentral.get)
+                                        }
+                                    </div>
+
+                                    <div class="uploadManagement">
+                                        <div id="dropZoneCentral" class="fade well block dropZone">
+                                            <input style="display: none;" id="fileUploadCentral" type="file" name="filesCentral" data-url="@controllers.modules.customize.routes.Customize.addPictureAjax(wedding.uid, models.modules.Customize.PIC_TYPE_CENTRAL)">
+                                            <div id="uploadManagementCentral">
+                                                <span><a href="#" id="fileUploadCentralBtn" class="btn">@Messages("main.modules.customize.selectPicture")</a><br/>
+                                                @Messages("main.modules.customize.orDropFileHere")</span>
+                                            </div>
+                                            <div id="waitInfoCentral" style="display: none;">
+                                                <span>@Messages("main.modules.customize.pleaseWait")</span>
+                                            </div>
+                                            <div id="transferInfoCentral" class="clearfix transferInfo">
+                                                <div class="progress progress-striped active" id="progressCentral">
+                                                    <div class="bar" style="width: 0%;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="recommendationUpload alert alert-info">
+                                        <div class="recommendationIcon"><img src="@routes.Assets.at("images/icons/32/warning.png")" alt="@Messages("main.modules.customize.pictureSizeCentralInfo", models.modules.Customize.CENTRAL_PICTURE_MAX_SIZE)" /></div>
+                                        <div class="recommendationText">@Messages("main.modules.customize.pictureSizeCentralInfo", models.modules.Customize.CENTRAL_PICTURE_MAX_SIZE)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @inputRadioGroup2(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("centralAttributes")("centralBackPicPos"),
+                            options = options(
+                                "0"->Messages("main.modules.customize.backgroundPicPos.Stretch"),
+                                "1"->Messages("main.modules.customize.backgroundPicPos.Centered"),
+                                "2"->Messages("main.modules.customize.backgroundPicPos.Mosaic")
+                            ),
+                            args =  '_label -> Messages("main.modules.customize.centralBackPicPos"),
+                                    '_showConstraints -> false
+                        )
+
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("centralAttributes")("centralBackColorTop"),
+                            args =  '_label -> Messages("main.modules.customize.centralBackColorTop"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("centralAttributes")("centralBackColorBottom"),
+                            args =  '_label -> Messages("main.modules.customize.centralBackColorBottom"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                        @checkbox(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("centralAttributes")("centralBackTransparent"),
+                            args =  '_label -> Messages("main.modules.customize.centralBackTransparent"),
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("centralAttributes")("centralShadowH"),
+                            args =  '_label -> Messages("main.modules.customize.centralShadowH"),
+                                    '_showConstraints -> false,
+                                    'class -> "spinner0100"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("centralAttributes")("centralShadowV"),
+                            args =  '_label -> Messages("main.modules.customize.centralShadowV"),
+                                    '_showConstraints -> false,
+                                    'class -> "spinner0100"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("centralAttributes")("centralShadowBlur"),
+                            args =  '_label -> Messages("main.modules.customize.centralShadowBlur"),
+                                    '_showConstraints -> false,
+                                    'class -> "spinner0100"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("centralAttributes")("centralShadowSpread"),
+                            args =  '_label -> Messages("main.modules.customize.centralShadowSpread"),
+                                    '_showConstraints -> false,
+                                    'class -> "spinner0100"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("centralAttributes")("centralShadowColor"),
+                            args =  '_label -> Messages("main.modules.customize.centralShadowColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("centralAttributes")("centralCornerRadius"),
+                            args =  '_label -> Messages("main.modules.customize.centralCornerRadius"),
+                                    '_showConstraints -> false,
+                                    'class -> "spinner0100"
+                        )
+                    </div>
+
+                    <div class="tab-pane" id="tab5">
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("mainAttributes")("mainBackColor"),
+                            args =  '_label -> Messages("main.modules.customize.mainBackColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                        @checkbox(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("mainAttributes")("mainBackTransparent"),
+                            args =  '_label -> Messages("main.modules.customize.mainBackTransparent"),
+                                    '_showConstraints -> false
+                        )
+                        @checkbox(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("mainAttributes")("mainSeparatorVisible"),
+                            args =  '_label -> Messages("main.modules.customize.mainSeparatorVisible"),
+                                    '_showConstraints -> false
+                        )
+                        @inputText(
+                            field = customizeForm("customizeInfo")("customizedTheme")("colors")("mainAttributes")("mainSeparatorColor"),
+                            args =  '_label -> Messages("main.modules.customize.mainSeparatorColor"),
+                                    '_showConstraints -> false,
+                                    'class -> "color {required:false}"
+                        )
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="form-actions">
+            <input type="submit" value="@Messages("main.modules.customize.save")" class="btn btn-primary">
+        </div>
+
+        @backButton(wedding.uid)
+    }
+
+}

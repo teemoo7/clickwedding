@@ -1,0 +1,34 @@
+@(o: Seq[Int], x: Seq[Int])(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+<script type="text/javascript">
+
+    $(function(){
+
+        var o = [@o.mkString(", ")];
+        var x = [@x.mkString(", ")];
+        var cells = $('#board table tr td');
+        for(var i = 0; i<x.length; i++) {
+            var c = x[i];
+            var cell = cells[c];
+            $(cell).addClass('x');
+        }
+        for(var i = 0; i<o.length; i++) {
+            var c = o[i];
+            var cell = cells[c];
+            $(cell).addClass('o');
+        }
+        var emptyCells = $('#board table tr td:not(.o,.x)');
+        emptyCells.mouseover(function() {
+            $(this).addClass('over');
+        });
+        emptyCells.mouseout(function() {
+            $(this).removeClass('over');
+        });
+        emptyCells.click(function() {
+            $('#captchaValue').val($(this).attr('data-title'));
+            cells.removeClass('selected');
+            $(this).addClass('selected');
+        });
+
+    });
+</script>

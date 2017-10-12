@@ -1,0 +1,92 @@
+@(generalStats: models.admin.stats.GeneralStats)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<script type="text/javascript">
+    function drawGeneralCharts() {
+        drawWeddingsChart();
+        drawModulesChart();
+        drawWeddingExpenseRangesChart();
+        drawWeddingCreationByMonth();
+    }
+
+    function drawWeddingsChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['@Messages("main.admin.console.weddings")', '@Messages("main.admin.console.weddings")'],
+            ['@Messages("main.admin.console.emptyWeddings")', @generalStats.nbEmptyWeddings],
+            ['@Messages("main.admin.console.usedWeddings")', @(generalStats.nbWeddingsTotal-generalStats.nbEmptyWeddings)]
+        ]);
+
+        var options = {
+            title: '@Messages("main.admin.console.weddings")',
+            is3D: true
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('weddingsPie'));
+        chart.draw(data, options);
+    }
+
+    function drawModulesChart() {
+        var data2 = google.visualization.arrayToDataTable([
+            ['@Messages("main.admin.console.usage")', '@Messages("main.admin.console.price")'],
+            @generalStats.mostUsedModules.map{moduleUsage => [@moduleUsage.usage, @moduleUsage.price]}.mkString(", \n")
+        ]);
+
+        data = new google.visualization.DataTable()
+        data.addColumn('number', '@Messages("main.admin.console.usage")');
+        data.addColumn('number', '@Messages("main.admin.console.price")');
+        data.addColumn({type:'string',role:'tooltip'});
+
+        @generalStats.mostUsedModules.zipWithIndex.map{ case (moduleUsage, index) =>
+            data.addRow();
+            data.setValue(@index, 0, @moduleUsage.usage);
+            data.setValue(@index, 1, @moduleUsage.price);
+            data.setValue(@index, 2, "@Messages("main.modules.name.".concat(moduleUsage.moduleId.toString))");
+        }
+
+        var options = {
+            title: '@Messages("main.admin.console.modulesUsage")',
+            hAxis: {title: '@Messages("main.admin.console.usage")', minValue: 0},
+            vAxis: {title: '@Messages("main.admin.console.price")', minValue: 0},
+            legend: 'none'
+        };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('modulesScatter'));
+        chart.draw(data, options);
+    }
+
+    function drawWeddingExpenseRangesChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['@Messages("main.admin.console.weddingExpense")', '@Messages("main.admin.console.weddingNumber")'] @generalStats.weddingExpenseRanges.map{ range =>, ['@(range.rangeStart)-@(range.rangeEnd)',  @range.nb]}
+        ]);
+
+        var options = {
+            title: '@Messages("main.admin.console.weddingExpenseRanges")',
+            hAxis: {title: '@Messages("main.admin.console.weddingExpense")'},
+            vAxis: {title: '@Messages("main.admin.console.weddingNumber")'},
+            seriesType: "bars"
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('weddingExpenseRanges'));
+        chart.draw(data, options);
+    }
+
+    function drawWeddingCreationByMonth() {
+        var data = google.visualization.arrayToDataTable([
+            ['@Messages("main.admin.console.weddingMonth")', '@Messages("main.admin.console.weddingNumber")'] @generalStats.weddingCreationMonth.map{ creationMonth =>, ['@(creationMonth.year+"/"+creationMonth.month)',  @creationMonth.nb]}
+        ]);
+
+        var options = {
+            title: '@Messages("main.admin.console.weddingExpenseRanges")',
+            hAxis: {title: '@Messages("main.admin.console.weddingMonth")'},
+            vAxis: {title: '@Messages("main.admin.console.weddingNumber")'},
+            seriesType: "bars"
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('weddingCreationMonth'));
+        chart.draw(data, options);
+    }
+
+</script>

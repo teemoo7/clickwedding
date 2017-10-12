@@ -1,0 +1,53 @@
+@(dbStats: models.admin.stats.DBStats)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<h2>@Messages("main.admin.console.dbStats")</h2>
+
+<table class="table table-striped">
+    <tbody>
+    <tr>
+        <td>@Messages("main.admin.console.dbSize")</td>
+        <td>@dbStats.dbSize</td>
+    </tr>
+    <tr>
+        <td>@Messages("main.admin.console.processes")</td>
+        <td>@dbStats.processes.length</td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>@Messages("main.admin.console.processes")</h3>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <!--<td>#</td>-->
+        <td>@Messages("main.admin.console.processId")</td>
+        <!--<td>@Messages("main.admin.console.processUser")</td>-->
+        <td>@Messages("main.admin.console.processHost")</td>
+        <!--<td>@Messages("main.admin.console.processDb")</td>-->
+        <td>@Messages("main.admin.console.processCommand")</td>
+        <td>@Messages("main.admin.console.processTime")</td>
+        <td>@Messages("main.admin.console.processState")</td>
+        <td>@Messages("main.admin.console.processInfo")</td>
+    </tr>
+    </thead>
+    <tbody>
+    @dbStats.processes.zipWithIndex.map { case (process, index) =>
+    <tr>
+        <!--<td>@(index+1)</td>-->
+        <td>@process.id</td>
+        <!--<td>@process.user</td>-->
+        <td>@process.host</td>
+        <!--<td>@process.db</td>-->
+        <td>@process.command</td>
+        <td>@process.time</td>
+        <td>@process.state</td>
+        <td>@process.info</td>
+    </tr>
+    }
+    </tbody>
+</table>

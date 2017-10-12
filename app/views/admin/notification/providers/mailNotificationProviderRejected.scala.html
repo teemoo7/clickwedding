@@ -1,0 +1,11 @@
+@(provider: models.providers.Provider)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@mail(Messages("main.providers.subscriptionRejected.title")) {
+    <h2>@Messages("main.providers.subscriptionRejected.title")</h2>
+    <h3>
+        @Messages("main.providers.subscriptionRejected.sorry")
+    </h3>
+    <p>
+        @Messages("main.providers.subscriptionRejected.anyQuestion") <a href="@controllers.admin.routes.NotificationCenter.contact.absoluteURL(helpers.UtilsHelper.isSecureConnection)">@Messages("main.providers.subscriptionRejected.here")</a>.
+    </p>
+}

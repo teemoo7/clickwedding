@@ -1,0 +1,10 @@
+@(cartItem: models.modules.CartItem, currencyStr: String)(implicit lang: Lang)
+
+@import helper._
+
+<tr>
+    <td class="force-wrap">@cartItem.item.description</td>
+    @price(currencyStr, cartItem.item.unitPrice)
+    <td class="force-wrap">@cartItem.number</td>
+    @price(currencyStr, cartItem.total)
+</tr>

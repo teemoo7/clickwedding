@@ -1,0 +1,19 @@
+@**
+* Generate an edit button with an icon.
+*
+* Example:
+* {{{
+*   @editButton(href = routes.Wedding.edit(wedding.uid), title = Messages("main.wedding.editWedding"), align = "right")
+*   @editButton(href = routes.Wedding.edit(wedding.uid))
+* }}}
+*
+* @param href The target of the button
+* @param title The title of the button
+* @param align The alignment of the button ("center", "left", "right")
+*@
+@(href: play.api.mvc.Call, title: String = Messages("main.wedding.edit"), align: String = "center")(implicit lang: Lang)
+
+<div class="editButton" style="text-align: @align;">
+    <a href="@href" class="btn"><img src="@routes.Assets.at("images/icons/32/edit.png")"/> @title</a>
+</div>
+

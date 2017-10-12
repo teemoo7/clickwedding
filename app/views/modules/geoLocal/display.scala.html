@@ -1,0 +1,25 @@
+@(wedding: models.wedding.Wedding, geoLocalInfo: models.modules.GeoLocalInfo)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = Messages("main.modules.geoLocal.geoLocalization"), wedding = Some(wedding)){
+    @views.html.modules.geoLocal.mapHead(geoLocalInfo)
+} {
+
+    <div id="displayMapWrapperNormal">
+        @views.html.modules.geoLocal.map(wedding, geoLocalInfo)
+    </div>
+
+    @if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+        @button(
+            href = controllers.modules.routes.GeoLocal.edit(wedding.uid),
+            title = Messages("main.wedding.edit"),
+            icon = routes.Assets.at("images/icons/32/edit.png")
+        )
+    }
+
+    @backButton(wedding.uid)
+
+}

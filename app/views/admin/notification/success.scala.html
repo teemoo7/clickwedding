@@ -1,0 +1,7 @@
+@()(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@main(Messages("main.notification.thankYou"))() {
+
+    <p>@Messages("main.notification.messageSuccessfullySent")</p>
+
+}

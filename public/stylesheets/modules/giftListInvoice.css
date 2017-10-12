@@ -1,0 +1,65 @@
+body {
+    height: 240mm;
+    width: 160mm;
+    font-family: verdana,helvetica,arial,sans-serif;
+    font-size: 0.8em;
+}
+
+#invoiceWrapper {
+    width: 150mm;
+    margin: auto;
+    height: 220mm;
+    border: 1px solid #CCCCCC;
+    padding: 10mm;
+}
+
+#invoiceHeader {
+    background-color: #CCCCCC;
+    text-align: center;
+    font-size: 1.2em;
+    padding: 2mm;
+}
+
+#sellerAddress {
+    width: 70mm;
+}
+
+#buyerAddress {
+    margin-right:0mm;
+    margin-left:80mm;
+    width: 70mm;
+}
+
+#invoiceTable {
+    margin: auto;
+    margin-top: 10mm;
+    width: 80mm;
+    border: 1px solid #CCCCCC;
+}
+
+#invoiceTable thead {
+    font-weight: bold;
+    background-color: #EAEAEA;
+}
+
+#invoiceTable tfoot tr td {
+    font-weight: bold;
+    border-top: 1px solid #CCCCCC;
+}
+
+#invoicePaymentInfo {
+    margin-top: 15mm;
+    text-align: justify;
+}
+
+#invoiceRegards {
+    text-align: right;
+    margin-right: 40mm;
+    margin-top: 15mm;
+}
+
+#invoiceVATInfo {
+    margin-top: 20mm;
+    font-size: 0.7em;
+    text-align: center;
+}

@@ -1,0 +1,85 @@
+@(wedding: models.wedding.Wedding)(implicit request: play.api.mvc.RequestHeader, lang: Lang)
+
+@import helpers._
+@import helper._
+
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/modules/giftList.css")">
+<script type="text/javascript" src='@controllers.modules.routes.GiftList.javascriptRoutes'></script>
+<script type="text/javascript">
+
+    // Add gift to cart
+    function addToCart(id) {
+        // Data are sent to the server
+        jsRoutes.controllers.modules.GiftList.addToCart('@wedding.uid', id).ajax({
+            dataType: "json",
+            success : function(data) {
+                var line = $('#cartItem_'+id);
+                var htmlData = data.line;
+                var totalNumber = data.totalNumber;
+                var totalPrice = data.totalPrice;
+                $('#cartTotalNumber').text(totalNumber);
+                $('#cartTotalPrice').text(totalPrice);
+                if (line != null && line.size() > 0) {
+                    line.replaceWith(htmlData);
+                } else {
+                    $('#cartItemList').append(htmlData);
+                }
+                $('#itemAdded_'+id).fadeIn(function() {
+                    $('#itemAdded_'+id).delay(2000).fadeOut('slow');
+                })
+            },
+            error : function(data) {
+                showWarningDialog('@Messages("main.modules.giftList.errorCouldNotSaveInfo")')
+            }
+        });
+    }
+
+    // Remove gift from cart
+    function removeFromCart(id) {
+        // Data are sent to the server
+        jsRoutes.controllers.modules.GiftList.removeFromCart('@wedding.uid', id).ajax({
+            success : function(data) {
+                var line = $('#cartItem_'+id);
+                var htmlData = data.line;
+                var totalNumber = data.totalNumber;
+                var totalPrice = data.totalPrice;
+                $('#cartTotalNumber').text(totalNumber);
+                $('#cartTotalPrice').text(totalPrice);
+                if (htmlData != null && htmlData.length > 0) {
+                    line.replaceWith(htmlData);
+                } else {
+                    line.remove();
+                }
+            },
+            error : function(data) {
+                showWarningDialog('@Messages("main.modules.giftList.errorCouldNotSaveInfo")')
+            }
+        });
+    }
+
+    // Display details of the cart
+    function showCart() {
+        $('#cart').animate({
+            width: 500
+        }, 500, function() {
+            $('#cartDetails').slideDown(500, function() {
+                $('#showCartButton').fadeOut(function() {
+                    $('#hideCartButton').fadeIn();
+                });
+            });
+        });
+    }
+
+    // Hide details of the cart
+    function hideCart() {
+        $('#cartDetails').slideUp(500, function() {
+            $('#cart').animate({
+                width: 300
+            }, 500, function() {
+                $('#hideCartButton').fadeOut(function() {
+                    $('#showCartButton').fadeIn();
+                });
+            });
+        });
+    }
+</script>

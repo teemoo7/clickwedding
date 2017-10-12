@@ -1,0 +1,232 @@
+@(addProviderForm: Form[models.providers.Provider], availablePacks: List[models.providers.ProviderPackType])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@isError = @{addProviderForm.hasErrors || addProviderForm.hasGlobalErrors}
+
+@main(title = Messages("main.providers.subscribeAsServiceProviders")){
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/providers/providers.css")">
+    @views.html.providers.mapHead()
+    <script type="text/javascript">
+        var currentStep = 1;
+        function nextStep() {
+            $("#step"+currentStep).slideUp();
+            currentStep = currentStep+1
+            $("#step"+currentStep).slideDown();
+            if(currentStep == 1) {
+                $("#previousBtn").hide();
+            } else {
+                $("#previousBtn").show();
+            }
+            if(currentStep == 4) {
+                google.maps.event.trigger(map, 'resize');
+                checkAndShowAddress();
+                $("#nextBtn").hide();
+                $("#sendBtn").show();
+            } else {
+                $("#nextBtn").show();
+                $("#sendBtn").hide();
+            }
+        }
+        function previousStep() {
+            $("#step"+currentStep).slideUp();
+            currentStep = currentStep-1
+            $("#step"+currentStep).slideDown();
+            if(currentStep == 1) {
+                $("#previousBtn").hide();
+            } else {
+                $("#previousBtn").show();
+            }
+            if(currentStep == 4) {
+                $("#nextBtn").hide();
+                $("#sendBtn").show();
+            } else {
+                $("#nextBtn").show();
+                $("#sendBtn").hide();
+            }
+        }
+
+        function selectPack(packId) {
+            $('#packId').val(packId);
+            $('.pack-content').removeClass('pack-selected');
+            $('#packContent_'+packId).addClass('pack-selected');
+        }
+
+        $(function() {
+            $('.pack').click(function() {
+                selectPack($(this).attr('data-packid'));
+            });
+            @if(addProviderForm("packId").value.isDefined) {
+                selectPack(@addProviderForm("packId").value.get);
+            }
+        });
+    </script>
+}{
+    <div class="well">
+        <div style="font-weight: bold;">@Messages("main.providers.importantNotice")</div>
+        <div style="margin-top: 10px;">@Messages("main.providers.subscribeExplanation")</div>
+        <div style="margin-top: 10px;">@Messages("main.providers.subscribeExplanation2")</div>
+    </div>
+    @if(isError){
+        <div class="alert alert-error">@Messages("main.providers.error")</div>
+    }
+    @form(action = controllers.providers.routes.Provider.doCreate, 'class -> "form-horizontal") {
+        <fieldset>
+            <div id="step1">
+                <h3>@Messages("main.providers.step") 1 - @Messages("main.providers.packChoice")</h3>
+                <div id="packs">
+                    @availablePacks.map{ pack =>
+                        <div class="pack" data-packid="@pack.id.get.toString">
+                            <div class="pack-content" id="packContent_@pack.id.get.toString">
+                                <div class="pack-name">@pack.name</div>
+                                <div class="pack-price">@pack.currency @currency(pack.price)</div>
+                                <div class="pack-months">@Messages("main.providers.months", pack.nbMonths)</div>
+                                @if(pack.nbUsage.isDefined && pack.nbUsage.get <= 1) {
+                                    <div class="pack-usage">@Messages("main.providers.uniqueUsage")</div>
+                                } else {
+                                    <div class="pack-usage">@Messages("main.providers.renewable")</div>
+                                }
+                                <div class="pack-logo">@Messages("main.providers.logoUploadAvailable")</div>
+                                @if(pack.nbPicturesShowroom > 0) {
+                                    <div class="pack-showroom">@Messages("main.providers.showroomPicturesUploadAvailable", pack.nbPicturesShowroom)</div>
+                                } else {
+                                    <div class="pack-showroom pack-cons">@Messages("main.providers.showroomPicturesUploadNotAvailable")</div>
+                                }
+                            </div>
+                            <div class="pack-slogan">@Messages("main.providers.packs."+pack.id.get.toString+".slogan")</div>
+                        </div>
+                    }
+                    @inputHidden(field = addProviderForm("packId"))
+                    @if(addProviderForm("packId").hasErrors) {
+                        <span class="help-inline alert alert-error">@Messages("main.providers.pleaseChooseAPack")</span>
+                    }
+                </div>
+            </div>
+            <div id="step2" @if(!isError){ style="display: none;" }>
+                <h3>@Messages("main.providers.step") 2 - @Messages("main.providers.service")</h3>
+                @select(
+                    field = addProviderForm("categoryId"),
+                    options = controllers.providers.Provider.getCategories,
+                    args =  '_label -> Messages("main.providers.category"),
+                            'class -> "input-xlarge",
+                            '_showConstraints -> false
+                )
+
+                @inputText(
+                    field = addProviderForm("title"),
+                    args =  '_label -> Messages("main.providers.title"),
+                            'class -> "input-xlarge",
+                            'placeholder -> Messages("main.providers.titleHelp")
+                )
+
+                @inputText(
+                    field = addProviderForm("slogan"),
+                    args =  '_label -> Messages("main.providers.slogan"),
+                            'class -> "input-xlarge",
+                            'placeholder -> Messages("main.providers.sloganHelp")
+                )
+                @textarea(
+                    field = addProviderForm("description"),
+                    args =  '_label -> Messages("main.providers.description"),
+                            'class -> "input-xlarge",
+                            'placeholder -> Messages("main.providers.descriptionHelp", 300)
+                )
+                @inputText(
+                    field = addProviderForm("email"),
+                    args =  '_label -> Messages("main.providers.email"),
+                            'class -> "input-xlarge",
+                            '_showConstraints -> false
+                )
+
+                @inputText(
+                    field = addProviderForm("website"),
+                    args =  '_label -> Messages("main.providers.website"),
+                            'class -> "input-xlarge",
+                            '_showConstraints -> false
+                )
+            </div>
+            <div id="step3" @if(!isError){ style="display: none;" }>
+                <h3>@Messages("main.providers.step") 3 - @Messages("main.providers.contact")</h3>
+
+                @inputText(
+                    field = addProviderForm("name"),
+                    args =  '_label -> Messages("main.providers.name"),
+                            'class -> "input-xlarge",
+                            '_showConstraints -> false
+                )
+
+                <div class="control-group ">
+                    <label for="street" class="control-label">@Messages("main.providers.street") *</label>
+                    <div class="controls">
+                        <input type="text" placeholder="@Messages("main.providers.streetHelp")" class="input-large locationInfo" value="@addProviderForm("street").value.getOrElse("")" name="street" id="street">
+                        <input type="text" placeholder="@Messages("main.providers.streetNbHelp")" class="input-mini locationInfo" value="@addProviderForm("streetNb").value.getOrElse("")" name="streetNb" id="streetNb">
+                    </div>
+                </div>
+
+                @inputText(
+                    field = addProviderForm("place"),
+                    args =  '_label -> Messages("main.providers.place"),
+                            'class -> "input-xlarge locationInfo",
+                            '_showConstraints -> false
+                )
+                @inputText(
+                    field = addProviderForm("zip"),
+                    args =  '_label -> Messages("main.providers.zip"),
+                            'class -> "input-xlarge locationInfo",
+                            '_showConstraints -> false
+                )
+                @select(
+                    field = addProviderForm("country"),
+                    options = controllers.providers.Provider.COUNTRIES.map{ c =>
+                        c -> Messages("main.providers.countries."+c)
+                    },
+                    args =  '_label -> Messages("main.providers.country"),
+                            'class -> "input-xlarge locationInfo",
+                            '_showConstraints -> false
+                )
+
+                @inputText(
+                    field = addProviderForm("phone"),
+                    args =  '_label -> Messages("main.providers.phone"),
+                            'class -> "input-xlarge",
+                            '_showConstraints -> false
+                )
+
+                @inputHidden(
+                    field = addProviderForm("latitude")
+                )
+                @inputHidden(
+                    field = addProviderForm("longitude")
+                )
+            </div>
+
+            <div id="step4" @if(!isError){ style="display: none;" }>
+                <h3>@Messages("main.providers.step") 4 - @Messages("main.providers.acceptance")</h3>
+                @checkbox2(
+                    field = addProviderForm("acceptTerms"),
+                    args = '_label -> None, '_text -> Messages("main.wedding.acceptTermsAndConditions"), '_showConstraints -> false, '_error -> addProviderForm.error("acceptTerms")
+                )
+                @checkbox2(
+                    field = addProviderForm("acceptProvider"),
+                    args = '_label -> None, '_text -> Messages("main.providers.acceptProvider"), '_showConstraints -> false, '_error -> addProviderForm.error("acceptProvider")
+                )
+                <div class="terms-conditions">
+                    <pre class="short">
+@TermsConditionsHelper.getTermsAndConditionsProvider(lang)
+                    </pre>
+                    <p align="right"><a href="@controllers.admin.routes.HelpCenter.termsProvider" target="_blank">@Messages("main.wedding.expandTermsAndConditions")</a></p>
+                </div>
+
+                <div id="mapCanvasProvider" style="width: 400px; height: 300px; margin: auto; border: 1px solid #CCCCCC; display: none;"></div>
+            </div>
+        </fieldset>
+
+        <div class="form-actions">
+            <a href="#" class="btn" onclick="previousStep(); return false;" id="previousBtn" style="display: none;">@Messages("main.providers.previous")</a>
+            <a href="#" class="btn btn-primary" onclick="nextStep(); return false;" id="nextBtn" @if(isError){style="display: none;"}>@Messages("main.providers.next")</a>
+            <input type="submit" value="@Messages("main.providers.send")" class="btn btn-primary" id="sendBtn" @if(!isError) {style="display: none;"}>
+        </div>
+    }
+}

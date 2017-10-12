@@ -1,0 +1,70 @@
+@(userProviders: List[models.providers.Provider])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = Messages("main.providers.serviceProviders")){
+    @views.html.providers.listHead()
+}{
+
+    <div style="text-align: right;">
+        <a href="@controllers.providers.routes.Provider.info" class="question">@Messages("main.providers.subscribeAsServiceProviders")</a>
+    </div>
+
+    @if(!userProviders.isEmpty){
+        <div>
+            <h3>@Messages("main.providers.myServices")</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>@Messages("main.providers.title")</td>
+                        <!--<td>@Messages("main.providers.category")</td>-->
+                        <td>@Messages("main.providers.status")</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @userProviders.map { provider =>
+                        <tr class="@if(provider.isValid){success} else {warning}">
+                            <td>@provider.title</td>
+                            <!--<td>@controllers.providers.Provider.getCategoryName(provider.categoryId)</td>-->
+                            @if(provider.isValid || AuthenticationHelper.isUserAdmin) {
+                                <td>@Messages("main.providers.approved")</td>
+                                <td>
+                                    <a href="@controllers.providers.routes.Provider.edit(provider.id.get)" class="btn">@Messages("main.providers.edit")</a>
+                                    @if(provider.currentPack.isDefined){
+                                        <a href="@controllers.providers.routes.Provider.invoice(provider.currentPack.get.purchase.id.get)" class="btn">@Messages("main.providers.invoices")</a>
+                                    }
+                                    <a target="_blank" href="@controllers.providers.routes.Provider.detail(provider.id.get)" class="btn">@Messages("main.providers.search.details")</a>
+                                </td>
+                            } else {
+                                <td>@Messages("main.providers.pending")</td>
+                                <td></td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <hr/>
+        </div>
+    }
+
+    <div style="text-align: center;">
+        <div style="margin-bottom: 10px; margin-top: 10px; text-align: left;">@Messages("main.providers.search.pleaseSelectACategoryBelow")</div>
+        <select name="category" id="categorySelect" class="input-xlarge">
+            <option value="-1" selected="selected">@Messages("main.providers.search.pleaseSelectACategory")</option>
+            @controllers.providers.Provider.getCategories.map { category =>
+                <option value="@category._1">@category._2</option>
+            }
+        </select>
+
+        <div id="mapCanvasProviders" style="height: 300px; margin: auto; border: 1px solid #CCCCCC;"></div>
+
+        <div id="resultsContainer" style="display: none;">
+            <div id="resultsSummary"></div>
+            <div id="resultsItemsContainer"></div>
+        </div>
+    </div>
+
+}

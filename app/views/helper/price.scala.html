@@ -1,0 +1,18 @@
+@**
+* Create two cells to pretty-display the currency and the price. If reimburse is set to true, display the amount and
+* then the minus amount in order to have a null balance.
+*
+* Examples:
+* {{{
+*   @price("CHF", 15.50)
+*   @price(currency = "CHF", amount = 15.50, reimburse = true)
+* }}}
+*
+* @param currency The currency of the price
+* @param amount The price itself
+* @param reimburse id If true, add a minus "-" symbol in front of the price
+* @param id The ID of the price cell
+*@
+@(currency: String = "CHF", amount: Double = 0.0, reimburse: Boolean = false, id: String = "")(implicit handler: FieldConstructor, lang: Lang)
+<td style="width: 40px;">@currency@if(reimburse){<br/>@currency}</td>
+<td style="text-align: right; width: 60px;" @if(id != null && id.length > 0) { id="@id"}>@helper.currency(amount)@if(reimburse){<br/>- @helper.currency(amount)}</td>

@@ -1,0 +1,49 @@
+@(provider: models.providers.Provider, purchase: models.providers.ProviderPurchase, packType: models.providers.ProviderPackType, transaction: models.providers.ProviderTransaction)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = Messages("main.providers.checkout.checkout"))(){
+
+    <div>
+        <p>@Messages("main.providers.checkout.pleaseConfirm")</p>
+    </div>
+
+    <table class="table table-striped table-hover" cellpadding="5" cellspacing="0">
+        <thead>
+        <tr>
+            <th>
+                @Messages("main.providers.pack")
+            </th>
+            <th>
+                @Messages("main.providers.amount")
+            </th>
+        </tr>
+        </thead>
+        <tfoot>
+        <tr>
+            <td>@Messages("main.providers.total")</td>
+            <td>@transaction.currency @currency(transaction.amount)</td>
+        </tr>
+        </tfoot>
+        <tbody>
+        <tr>
+            <td>
+                <div>@packType.name - @provider.title</div>
+            </td>
+            <td>@transaction.currency @currency(transaction.amount)</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="action">
+        @button(
+            href = controllers.providers.routes.Provider.doPayInvoice(transaction.purchaseId),
+            title = Messages("main.providers.checkout.process"),
+            icon = routes.Assets.at("images/icons/32/lock.png"),
+            isPrimary = true
+        )
+    </div>
+
+}

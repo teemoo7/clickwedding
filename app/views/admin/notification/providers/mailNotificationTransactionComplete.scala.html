@@ -1,0 +1,35 @@
+@(transaction: models.providers.ProviderTransaction, provider: models.providers.Provider, userPayment: models.authentication.User, warningMessage: Option[String] = None)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@mail("Paiement reçu (fournisseur de service)") {
+    @if(warningMessage.isDefined){
+        <div style="background-color: #F2DEDE; border-color: #EED3D7; color: #B94A48; padding: 10px; font-family: arial, helvetica, sans-serif; font-size: 20px; line-height: 20px;">
+            @warningMessage.get
+        </div>
+    }
+    <h2>Paiement reçu (fournisseur de service)</h2>
+    <table cellpadding="5" cellspacing="5" style="font-family: arial, helvetica, sans-serif; font-size: 14px; line-height: 20px; background-color: #ffffff; font-color: black;">
+        <tr>
+            <td>Montant</td>
+            <td>@transaction.currency @helper.currency(transaction.amount)</td>
+        </tr>
+        <tr>
+            <td>Utilisateur</td>
+            <td>@userPayment.fullName (@userPayment.email.getOrElse(""))</td>
+        </tr>
+        <tr>
+            <td>Fournisseur</td>
+            <td>@provider.title</td>
+        </tr>
+        <tr>
+            <td>Adresse</td>
+            <td>
+                @provider.name<br/>
+                @provider.street @provider.streetNb.getOrElse("")<br/>
+                @provider.zip @provider.place<br/>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><a href="@controllers.providers.routes.Provider.invoice(transaction.purchaseId).absoluteURL(helpers.UtilsHelper.isSecureConnection)">Facture</a></td>
+        </tr>
+    </table>
+}

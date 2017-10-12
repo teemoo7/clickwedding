@@ -1,0 +1,17 @@
+@(t: Throwable)(implicit flash: play.api.mvc.Flash = play.api.mvc.Flash.emptyCookie, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.error.unexpectedError"))(){
+    <div class="error-page">
+        <div class="error-explanation">@Messages("main.error.unexpectedErrorMessage")</div>
+
+        <div class="error-actions">
+            <a href="javascript:history.go(-1)" class="btn">@Messages("main.error.backTryAgain")</a>
+            <a href="@controllers.admin.routes.NotificationCenter.contact" class="btn">@Messages("main.error.contact")</a>
+            <a href="@controllers.admin.routes.NotificationCenter.reportBug" target="_blank" class="btn">@Messages("main.error.reportError")</a>
+        </div>
+    </div>
+}

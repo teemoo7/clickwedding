@@ -1,0 +1,17 @@
+@(income: models.modules.BudgetIncome, currencyStr: String)(implicit request: play.api.mvc.RequestHeader, lang: Lang)
+
+@import helper._
+
+<tr id="income_@income.id" data-ref="@income.id" data-sort="incomes_@income.id" class="income">
+    <td class="ui-state-default" style="text-align: center;"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span></td>
+    <td id="incomeDescription_@income.id">@income.description</td>
+    @price(
+        currency = currencyStr,
+        amount = income.price,
+        id = "incomePrice_".concat(income.id.get.toString)
+    )
+    <td id="incomeActions_@income.id" style="white-space: nowrap">
+        <a href="#" class="btn" onclick="editIncome(@income.id); return false;">@Messages("main.modules.budget.edit")</a>
+        <a href="#" onclick="deleteIncome(@income.id); return false;"><img class="close" style="float: none;" src="@routes.Assets.at("images/icons/32/cross.png")" alt="@Messages("main.modules.budget.delete")" title="@Messages("main.modules.budget.delete")" /> </a>
+    </td>
+</tr>

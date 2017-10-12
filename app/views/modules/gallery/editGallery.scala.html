@@ -1,0 +1,141 @@
+@(wedding: models.wedding.Wedding, gallery: models.modules.Gallery, albums: List[models.modules.Album], addAlbumForm: Form[models.modules.Album])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@usedSpace = @{ albums.map{album => album.pictures.map{p => p.size}.sum}.sum }
+@availableSpace = @{ models.modules.Gallery.MAX_AVAILABLE_SPACE }
+@remainingSpace = @{ availableSpace-usedSpace }
+@usedSpaceRate = @{ ((usedSpace.toDouble/availableSpace.toDouble)*100.toDouble).toInt }
+@nbPicsTotal = @{ albums.map{album => album.pictures.length}.sum }
+@sizePerPic = @{ if(nbPicsTotal > 0){usedSpace/nbPicsTotal} else {0} }
+@remainingPics = @{ if(sizePerPic > 0) {remainingSpace / sizePerPic} else {100} }
+
+@main(title = Messages("main.modules.gallery.gallery"), wedding = Some(wedding)){
+    @views.html.modules.gallery.head()
+    <script type="text/javascript" src='@controllers.modules.gallery.routes.Gallery.javascriptRoutes'></script>
+    <script type="text/javascript">
+        // Delete an album
+        function deleteAlbum(id) {
+            if (confirm('@Messages("main.modules.gallery.confirmDeleteAlbum")')) {
+                // Data are sent to the server
+                jsRoutes.controllers.modules.gallery.Gallery.deleteAlbumAjax('@wedding.uid', id).ajax({
+                    success : function() {
+                        $('#album_'+id).remove();
+                    },
+                    error : function(data) {
+                        showWarningDialog('@Messages("main.modules.gallery.error.couldNotDeleteAlbum"): '+data.responseText)
+                    }
+                });
+            }
+        }
+    </script>
+}{
+
+    <div class="tabbable">
+
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab1" data-toggle="tab">@Messages("main.modules.gallery.albums")</a></li>
+            <li><a href="#tab2" data-toggle="tab">@Messages("main.modules.gallery.quota")</a></li>
+        </ul>
+
+        <div class="tab-content">
+
+            <div class="tab-pane active" id="tab1">
+
+                <h3>@Messages("main.modules.gallery.albums")</h3>
+                <div class="gallery">
+                @albums.map{ album =>
+                    <div class="gallery-album" id="album_@album.id.get">
+                        @if(album.pictures.nonEmpty){
+                            <div>
+                                <a href="@controllers.modules.gallery.routes.Gallery.editAlbum(wedding.uid, album.id.get)">
+                                    <img src="@models.modules.Gallery.getPictureThumbnailLink(album.pictures.head).getOrElse("#")" alt="@album.pictures.head.filename" class="gallery-album-preview" />
+                                </a>
+                            </div>
+                        }
+                        <div>
+                            <a href="@controllers.modules.gallery.routes.Gallery.editAlbum(wedding.uid, album.id.get)">@album.title</a>
+                            <br/>
+                            @Messages("main.modules.gallery.nbPictures", album.pictures.length)
+                            <br/>
+                            @ModuleHelper.getGalleryVisibilityValues.get(album.visibility)
+                            <br/>
+                            <div class="actions">
+                                <p><a href="@controllers.modules.gallery.routes.Gallery.editAlbum(wedding.uid, album.id.get)" class="btn btn-primary">@Messages("main.modules.gallery.managePictures")</a></p>
+                                <p><a href="#" onclick="@if(album.pictures.isEmpty){deleteAlbum(@album.id.get); return false;}" class="btn btn-danger @if(album.pictures.nonEmpty){disabled}">@Messages("main.modules.gallery.delete")</a></p>
+                            </div>
+                        </div>
+                    </div>
+                }
+                </div>
+
+                <hr/>
+
+                <h3>@Messages("main.modules.gallery.addAlbum")</h3>
+                @form(action = controllers.modules.gallery.routes.Gallery.addAlbum(wedding.uid), 'class -> "form-horizontal") {
+                    <fieldset>
+                        @inputText(
+                            field = addAlbumForm("title"),
+                            args =  '_label -> Messages("main.modules.gallery.title"),
+                                    '_showConstraints -> false
+                        )
+                        @select(
+                            field = addAlbumForm("visibility"),
+                            options = ModuleHelper.getGalleryVisibilityValues.map{case(k,v) => (k.toString, v)}.toSeq,
+                            args =  '_label -> Messages("main.modules.gallery.visibility"),
+                                    '_showConstraints -> false,
+                                    '_isVIP -> true
+                        )
+
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.modules.gallery.save")" class="btn btn-primary">
+                    </div>
+                }
+
+            </div>
+
+            <div class="tab-pane" id="tab2">
+
+                <h3>@Messages("main.modules.gallery.quota")</h3>
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <td>@Messages("main.modules.gallery.availableSpace")</td>
+                            <td>@sizeBytes(availableSpace)</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>@Messages("main.modules.gallery.usedSpace")</td>
+                            <td>@sizeBytes(usedSpace) (@usedSpaceRate %)</td>
+                            <td>@Messages("main.modules.gallery.picturesUploaded")</td>
+                            <td>@nbPicsTotal</td>
+                        </tr>
+                        <tr>
+                            <td>@Messages("main.modules.gallery.remainingSpace")</td>
+                            <td>@sizeBytes(remainingSpace)</td>
+                            <td>@Messages("main.modules.gallery.estimatedRemainingPictures")</td>
+                            <td>@remainingPics</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <div class="progress">
+                                    <div class="bar bar-success" style="width: @usedSpaceRate%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @backButton(wedding.uid)
+}

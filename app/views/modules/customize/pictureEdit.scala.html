@@ -1,0 +1,14 @@
+@(picture: models.modules.CustomizePicture)(implicit lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<div class="customizePicturePreviewContainer">
+    <div id="picture_@picture.picType" class="customizePictureEdit">
+        <img src="@models.modules.Customize.getPictureLink(picture).getOrElse("#")" alt="@picture.getFilename.getOrElse("")" />
+    </div>
+    <div id="pictureDelete_@picture.picType" class="customizePictureDelete">
+        <a href="#" onclick="deletePicture(@picture.picType); return false;" class="btn btn-danger">@Messages("main.modules.customize.delete")</a>
+    </div>
+</div>

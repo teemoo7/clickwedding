@@ -1,0 +1,340 @@
+@(wedding: models.wedding.Wedding)(implicit request: play.api.mvc.RequestHeader, lang: Lang)
+
+@import helpers._
+
+<script type="text/javascript" src='@controllers.modules.routes.Budget.javascriptRoutes'></script>
+<script type="text/javascript">
+    // Add an expense to the list
+    function addExpense() {
+        var description = $('#description').val();
+        var price = $('#price').val();
+        if (description.length > 0 && description.length <= 50 && price.length > 0 && !isNaN(price) && price > 0) {
+            // Data are sent to the server
+            jsRoutes.controllers.modules.Budget.addExpense('@wedding.uid').ajax({
+                dataType: "json",
+                data : {
+                    id: "",
+                    weddingId: "",
+                    description: description,
+                    price: price
+                },
+                success : function(data) {
+                    var htmlData = data.line;
+                    var total = data.total;
+                    var result = data.result;
+                    $('#expenseList').append(htmlData);
+                    $('#expensesTotal').text(total)
+                    $('#expensesTotalResult').text(total)
+                    $('#totalResult').text(result)
+                    resetFields();
+                },
+                error : function(data) {
+                    showWarningDialog("@Html(Messages("main.modules.budget.errorCouldNotSaveInfo"))");
+                }
+            });
+        } else {
+            showWarningDialog("@Html(Messages("main.modules.budget.enterValidDescriptionAndPrice"))");
+        }
+    }
+
+    // Edit the expense
+    function editExpense(id) {
+        if ($('#actionUpdateExpense').is(":visible")) {
+            cancelUpdateExpense();
+        }
+        $('#expense_'+id).addClass('edit-expense');
+        $('#description').val($('#expenseDescription_'+id).text());
+        $('#price').val($('#expensePrice_'+id).text());
+        $('#actionAddExpense').hide();
+        $('#actionUpdateExpense').attr('data-ref', id);
+        $('#actionUpdateExpense').show();
+        $('#actionCancelUpdateExpense').show();
+        $('#formTitle').text('@Messages("main.modules.budget.updateExpense")');
+    }
+
+    // Update the expense data on the server
+    function updateExpense() {
+        var id = $('#actionUpdateExpense').attr('data-ref');
+        var description = $('#description').val();
+        var price = $('#price').val();
+        if (description.length > 0 && description.length <= 50 && price.length > 0 && !isNaN(price) && price > 0) {
+            // Data are sent to the server
+            jsRoutes.controllers.modules.Budget.editExpense('@wedding.uid').ajax({
+                dataType: "json",
+                data : {
+                    id: id,
+                    weddingId: "",
+                    description: description,
+                    price: price
+                },
+                success : function(data) {
+                    var htmlData = data.line;
+                    var total = data.total;
+                    var result = data.result;
+                    $('#expense_'+id).replaceWith(htmlData);
+                    $('#expensesTotal').text(total)
+                    $('#expensesTotalResult').text(total)
+                    $('#totalResult').text(result)
+                    resetFields();
+                },
+                error : function(data) {
+                    showWarningDialog("@Html(Messages("main.modules.budget.errorCouldNotSaveInfo"))");
+                }
+            });
+        } else {
+            showWarningDialog("@Html(Messages("main.modules.budget.enterValidDescriptionAndPrice"))");
+        }
+    }
+
+    // Delete the expense data on the server
+    function deleteExpense(id) {
+        if (confirm('@Messages("main.modules.budget.confirmDeleteExpense")')) {
+            // Data are sent to the server
+            jsRoutes.controllers.modules.Budget.deleteExpense('@wedding.uid', id).ajax({
+                dataType: "json",
+                success : function(data) {
+                    var total = data.total;
+                    var result = data.result;
+                    $('#expense_'+id).remove();
+                    $('#expensesTotal').text(total)
+                    $('#expensesTotalResult').text(total)
+                    $('#totalResult').text(result)
+                    resetFields();
+                },
+                error : function(data) {
+                    showWarningDialog("@Html(Messages("main.modules.budget.errorCouldNotSaveInfo"))");
+                }
+            });
+        }
+    }
+
+    // Cancel the edition of an expense
+    function cancelUpdateExpense() {
+        var id = $('#actionUpdateExpense').attr('data-ref');
+        $('#expense_'+id).removeClass('edit-expense');
+        resetFields();
+    }
+
+    // Reset all fields, empty values
+    function resetFields() {
+        $('#actionUpdateExpense').hide();
+        $('#actionCancelUpdateExpense').hide();
+        $('#actionAddExpense').show();
+
+        $('#description').val('');
+        $('#price').val('');
+
+        $('#formTitle').text('@Messages("main.modules.budget.addExpense")');
+    }
+
+    // Send the expenses sorting
+    function sortExpenses() {
+        var sortedExpenses = $( "#expenseList" ).sortable( "serialize", { attribute : "data-sort" } );
+        // Data are sent to the server
+        jsRoutes.controllers.modules.Budget.sortExpenses('@wedding.uid').ajax({
+            data : sortedExpenses,
+            error : function(data) {
+                showWarningDialog("@Html(Messages("main.modules.budget.errorCouldNotSaveSorting"))");
+            }
+        });
+    }
+
+    // Add an income to the list
+    function addIncome() {
+        var description = $('#descriptionIncome').val();
+        var price = $('#priceIncome').val();
+        if (description.length > 0 && description.length <= 50 && price.length > 0 && !isNaN(price) && price > 0) {
+            // Data are sent to the server
+            jsRoutes.controllers.modules.Budget.addIncome('@wedding.uid').ajax({
+                dataType: "json",
+                data : {
+                    id: "",
+                    weddingId: "",
+                    description: description,
+                    price: price
+                },
+                success : function(data) {
+                    var htmlData = data.line;
+                    var total = data.total;
+                    var result = data.result;
+                    $('#incomeList').append(htmlData);
+                    $('#incomesTotal').text(total)
+                    $('#incomesTotalResult').text(total)
+                    $('#totalResult').text(result)
+                    resetFieldsIncome();
+                },
+                error : function(data) {
+                    showWarningDialog("@Html(Messages("main.modules.budget.errorCouldNotSaveInfo"))");
+                }
+            });
+        } else {
+            showWarningDialog("@Html(Messages("main.modules.budget.enterValidDescriptionAndPrice"))");
+        }
+    }
+
+    // Edit the income
+    function editIncome(id) {
+        if ($('#actionUpdateIncome').is(":visible")) {
+            cancelUpdateIncome();
+        }
+        $('#income_'+id).addClass('edit-income');
+        $('#descriptionIncome').val($('#incomeDescription_'+id).text());
+        $('#priceIncome').val($('#incomePrice_'+id).text());
+        $('#actionAddIncome').hide();
+        $('#actionUpdateIncome').attr('data-ref', id);
+        $('#actionUpdateIncome').show();
+        $('#actionCancelUpdateIncome').show();
+        $('#formTitleIncome').text('@Messages("main.modules.budget.updateIncome")');
+    }
+
+    // Update the income data on the server
+    function updateIncome() {
+        var id = $('#actionUpdateIncome').attr('data-ref');
+        var description = $('#descriptionIncome').val();
+        var price = $('#priceIncome').val();
+        if (description.length > 0 && description.length <= 50 && price.length > 0 && !isNaN(price) && price > 0) {
+            // Data are sent to the server
+            jsRoutes.controllers.modules.Budget.editIncome('@wedding.uid').ajax({
+                dataType: "json",
+                data : {
+                    id: id,
+                    weddingId: "",
+                    description: description,
+                    price: price
+                },
+                success : function(data) {
+                    var htmlData = data.line;
+                    var total = data.total;
+                    var result = data.result;
+                    $('#income_'+id).replaceWith(htmlData);
+                    $('#incomesTotal').text(total)
+                    $('#incomesTotalResult').text(total)
+                    $('#totalResult').text(result)
+                    resetFieldsIncome();
+                },
+                error : function(data) {
+                    showWarningDialog("@Html(Messages("main.modules.budget.errorCouldNotSaveInfo"))");
+                }
+            });
+        } else {
+            showWarningDialog("@Html(Messages("main.modules.budget.enterValidDescriptionAndPrice"))");
+        }
+    }
+
+    // Delete the income data on the server
+    function deleteIncome(id) {
+        if (confirm('@Messages("main.modules.budget.confirmDeleteIncome")')) {
+            // Data are sent to the server
+            jsRoutes.controllers.modules.Budget.deleteIncome('@wedding.uid', id).ajax({
+                dataType: "json",
+                success : function(data) {
+                    var total = data.total;
+                    var result = data.result;
+                    $('#income_'+id).remove();
+                    $('#incomesTotal').text(total)
+                    $('#incomesTotalResult').text(total)
+                    $('#totalResult').text(result)
+                    resetFieldsIncome();
+                },
+                error : function(data) {
+                    showWarningDialog("@Html(Messages("main.modules.budget.errorCouldNotSaveInfo"))");
+                }
+            });
+        }
+    }
+
+    // Cancel the edition of an income
+    function cancelUpdateIncome() {
+        var id = $('#actionUpdateIncome').attr('data-ref');
+        $('#income_'+id).removeClass('edit-income');
+        resetFieldsIncome();
+    }
+
+    // Reset all fields, empty values
+    function resetFieldsIncome() {
+        $('#actionUpdateIncome').hide();
+        $('#actionCancelUpdateIncome').hide();
+        $('#actionAddIncome').show();
+
+        $('#descriptionIncome').val('');
+        $('#priceIncome').val('');
+
+        $('#formTitleIncome').text('@Messages("main.modules.budget.addIncome")');
+    }
+
+    // Send the incomes sorting
+    function sortIncomes() {
+        var sortedIncomes = $( "#incomeList" ).sortable( "serialize", { attribute : "data-sort" } );
+        // Data are sent to the server
+        jsRoutes.controllers.modules.Budget.sortIncomes('@wedding.uid').ajax({
+            data : sortedIncomes,
+            error : function(data) {
+                showWarningDialog("@Html(Messages("main.modules.budget.errorCouldNotSaveSorting"))");
+            }
+        });
+    }
+
+    // When page is loaded, calls the initialization
+    $(function() {
+        $('#price').keypress(function(event) {
+            if ( event.keyCode === 13 ) {
+                if ($('#actionUpdateExpense').is(":visible")) {
+                    updateExpense();
+                } else {
+                    addExpense();
+                }
+                event.preventDefault();
+            }
+        });
+
+        $('#priceIncome').keypress(function(event) {
+            if ( event.keyCode === 13 ) {
+                if ($('#actionUpdateIncome').is(":visible")) {
+                    updateIncome();
+                } else {
+                    addIncome();
+                }
+                event.preventDefault();
+            }
+        });
+
+        // If user press ESC, cancel current edition
+        $(document).keypress(function(event) {
+            if ( event.keyCode === 27 ) {
+                if ($('#actionUpdateExpense').is(":visible")) {
+                    cancelUpdateExpense();
+                    event.preventDefault();
+                }
+            }
+        });
+
+        // If user press ESC, cancel current edition
+        $(document).keypress(function(event) {
+            if ( event.keyCode === 27 ) {
+                if ($('#actionUpdateIncome').is(":visible")) {
+                    cancelUpdateIncome();
+                    event.preventDefault();
+                }
+            }
+        });
+
+        $( "#expenseList" ).sortable({
+            update: function( event, ui ) {
+                sortExpenses();
+            }
+        });
+        $( "#expenseList" ).disableSelection();
+
+        $( "#incomeList" ).sortable({
+            update: function( event, ui ) {
+                sortIncomes();
+            }
+        });
+        $( "#incomeList" ).disableSelection();
+    });
+</script>
+<style type="text/css">
+    .table th, .table td {
+        vertical-align: middle;
+    }
+</style>

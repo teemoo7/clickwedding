@@ -1,0 +1,55 @@
+@(purchase: models.modules.GiftListPurchase)(implicit lang: Lang)
+
+@import helper._
+
+<tr id="purchase_@purchase.id" data-ref="@purchase.id" class="purchase">
+    <td class="force-wrap"><a href="#" class="btn" onclick="$('.purchaseDetails_@purchase.id').toggle();return false;"><b class="caret-right">&nbsp;</b></a></td>
+    <td class="force-wrap">@purchase.id</td>
+    <td class="force-wrap">@purchase.date.format("dd.MM.yyyy HH:mm")</td>
+    <td class="force-wrap">@purchase.name</td>
+    <td class="force-wrap">@purchase.transactionId</td>
+    @price(purchase.currency, purchase.totalCost)
+</tr>
+<tr class="purchaseDetails_@purchase.id" style="display: none;">
+    <td class="force-wrap">&nbsp;</td>
+    <td colspan="2" class="force-wrap">
+        <h4>@Messages("main.modules.giftList.email")</h4>
+    </td>
+    <td colspan="4" class="force-wrap">
+        @purchase.email
+    </td>
+</tr>
+<tr class="purchaseDetails_@purchase.id" style="display: none;">
+    <td class="force-wrap">&nbsp;</td>
+    <td colspan="2" class="force-wrap">
+        <h4>@Messages("main.modules.giftList.message")</h4>
+    </td>
+    <td colspan="4" class="force-wrap">
+        <q>
+            @purchase.message.getOrElse("")
+        </q>
+    </td>
+</tr>
+<tr class="purchaseDetails_@purchase.id" style="display: none;">
+    <td class="force-wrap">&nbsp;</td>
+    <td colspan="2" class="force-wrap">
+        <h4>@Messages("main.modules.giftList.gGifts")</h4>
+    </td>
+    <td colspan="4" class="force-wrap">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                @header(Messages("main.modules.giftList.description"))
+                @headerPrice(Messages("main.modules.giftList.unitPrice"))
+                @header(Messages("main.modules.giftList.number"))
+                @headerPrice(Messages("main.modules.giftList.total"))
+            </tr>
+            </thead>
+            <tbody>
+                @purchase.cart.items.values.map { cartItem =>
+                    @views.html.modules.giftList.listItem(cartItem, purchase.currency)
+                }
+            </tbody>
+        </table>
+    </td>
+</tr>

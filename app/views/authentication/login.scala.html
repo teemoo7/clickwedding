@@ -1,0 +1,88 @@
+@(loginForm: Form[(String,String)], errorMsg: Option[String] = None)(implicit request: RequestHeader, lang: Lang)
+
+@import helpers._
+@import helpers.BootstrapHelper._
+@import helper._
+@import securesocial.core.Registry
+@import securesocial.core.AuthenticationMethod._
+@import securesocial.core.providers.UsernamePasswordProvider.UsernamePassword
+@import securesocial.core.IdentityProvider
+@import securesocial.core.providers.utils.RoutesHelper
+
+    @errorMsg.map { msg =>
+        <div class="alert alert-error">
+            @Messages(msg)
+        </div>
+    }
+
+    @request.flash.get("success").map { msg =>
+        <div class="alert alert-info">
+            @msg
+        </div>
+    }
+
+    @request.flash.get("error").map { msg =>
+        <div class="alert alert-error">
+            @msg
+        </div>
+    }
+
+    @defining( Registry.providers.all.values.filter( _.id != UsernamePassword) ) { externalProviders =>
+
+        @if( externalProviders.size > 0 ) {
+            <div class="clearfix">
+                <p>@Messages("securesocial.login.instructions")</p>
+                <div style="text-align: center;">
+                    @for(p <- externalProviders) {
+                        @defining( "images/login/"+Messages("securesocial.login.button.path")+"/%s.png".format(p.id) ) { imageUrl =>
+                            <p><a href="@p.authenticationUrl" style="margin: 5px;"><img src="@routes.Assets.at(imageUrl)"/></a></p>
+                        }
+                    }
+                </div>
+            </div>
+        }
+
+        @Registry.providers.get(UsernamePassword).map { up =>
+            <div class="clearfix" style="margin-top: 20px;">
+                @if( externalProviders.size > 0 ) {
+                    <p>@Messages("securesocial.login.useEmailAndPassword")</p>
+                } else {
+                    <p>@Messages("securesocial.login.useEmailAndPasswordOnly")</p>
+                }
+
+                <form action = "@securesocial.core.providers.utils.RoutesHelper.authenticateByPost("userpass").absoluteURL(IdentityProvider.sslEnabled)" class="form-horizontal" autocomplete="off" method="POST">
+                    <fieldset>
+
+                        @inputText(
+                            field = loginForm("username"),
+                            args =  '_label -> Messages("securesocial.signup.email1"),
+                                    'class -> "input-xlarge",
+                                    '_showConstraints -> false
+                        )
+
+                        @inputPassword(
+                            field = loginForm("password"),
+                            args =  '_label -> Messages("securesocial.signup.password1"),
+                                    'class -> "input-xlarge",
+                                    '_showConstraints -> false
+                        )
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">@Messages("securesocial.login.title")</button>
+                            <div class="clearfix" style="text-align: right;">
+                                <a href="@securesocial.core.providers.utils.RoutesHelper.startResetPassword()"><p>@Messages("securesocial.login.forgotPassword") </a></p>
+                            </div>
+                        </div>
+                        <div class="clearfix">
+                            <p>@Messages("securesocial.login.signUp")</p>
+                        </div>
+                        <div class="form-actions">
+                            <a href="@securesocial.core.providers.utils.RoutesHelper.startSignUp()" class="btn btn-primary">@Messages("securesocial.signup.title")</a>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        }
+    }
+
+    @views.html.authentication.securityLogin()

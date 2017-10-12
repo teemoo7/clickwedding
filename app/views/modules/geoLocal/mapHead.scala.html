@@ -1,0 +1,76 @@
+@(geoLocalInfo: models.modules.GeoLocalInfo)(implicit lang: Lang)
+
+@import helpers._
+
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/modules/geoLocal.css")">
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=@play.Play.application().configuration().getString("geoLocal.apiKey")&sensor=false"></script>
+<script type="text/javascript">
+
+    var map = null;
+    var allMarkers = {};
+    var lausanneCoordinates = new google.maps.LatLng(46.5199617, 6.6335970999999745);
+    var initCoordinates = lausanneCoordinates;
+
+    // When page is loaded, calls the initialization of the map
+    $(function() {
+        // Map definition
+        var mapOptions = {
+            center: initCoordinates,
+            zoom: 8,
+            mapTypeId: '@geoLocalInfo.mapType'
+        };
+        map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
+
+        // Drawing of markers to be drawn
+        @geoLocalInfo.markers.map { marker =>
+            drawMarker(@marker.id, @marker.latitude, @marker.longitude, '@marker.name', '@routes.Assets.at(ModuleHelper.getGeoLocalMarkerIcons.get(marker.markerType).getOrElse(""))');
+        }
+
+        // Centering and zooming around the markers
+        autoZoomMap();
+    });
+
+    // Draw the current marker on the map
+    function drawMarker(id, latitude, longitude, name, image) {
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(latitude, longitude, false),
+            map: map,
+            draggable: false,
+            icon: image,
+            title: name
+        });
+        allMarkers[id] = marker;
+
+        var infowindow = new google.maps.InfoWindow({
+            content: name
+        });
+
+        infowindow.open(marker.get('map'), marker);
+        google.maps.event.addListener(marker, 'click', function() {
+            infowindow.open(marker.get('map'), marker);
+        });
+
+    }
+
+    // Set map zoom and center in function of the markers
+    function autoZoomMap() {
+        var allBounds = new google.maps.LatLngBounds();
+        var nbMarkers = 0;
+        for (var id in allMarkers) {
+            allBounds.extend(allMarkers[id].getPosition())
+            nbMarkers++;
+        }
+        if (nbMarkers > 0) {
+            map.fitBounds(allBounds);
+            if (nbMarkers == 1) {
+                zoomChangeBoundsListener = google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {
+                    if (this.getZoom()){
+                        this.setZoom(16);
+                    }
+                });
+                setTimeout(function(){google.maps.event.removeListener(zoomChangeBoundsListener)}, 2000);
+            }
+        }
+    }
+
+</script>

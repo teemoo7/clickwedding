@@ -1,0 +1,12 @@
+@(customize: models.modules.Customize)(implicit request: play.api.mvc.RequestHeader, lang: Lang)
+@themeId = @{ customize.moduleContent.theme.id.get.toInt }
+@backgroundAttributes = @{ customize.moduleContent.theme.colors.map(colors => colors.backgroundAttributes) }
+
+@if(customize.moduleContent.theme.hasPicture) {
+    <img style="display: none;" src="@routes.Assets.at("themes/"+customize.moduleContent.theme.path+"/images/background.jpg")" class="superbg" />
+}
+@if(themeId == models.modules.Customize.CUSTOM_THEME_ID && customize.moduleContent.theme.colors.isDefined) {
+    @if(backgroundAttributes.get.backgroundPic.isDefined && backgroundAttributes.get.backgroundPicPos.isDefined && backgroundAttributes.get.backgroundPicPos.get == models.modules.Customize.CUSTOM_PICTURE_POSITION_STRETCH) {
+        <img style="display: none;" src="@Html(models.modules.Customize.getPictureLink(backgroundAttributes.get.backgroundPic.get).getOrElse(""))" class="superbg" />
+    }
+}

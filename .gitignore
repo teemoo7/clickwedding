@@ -1,0 +1,15 @@
+cert
+logs
+project/project
+project/target
+target
+tmp
+.history
+.idea
+.idea_modules
+.svn
+RUNNING_PID
+*.psd
+*.iml
+*.sql
+*.bat

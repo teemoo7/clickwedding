@@ -1,0 +1,29 @@
+@(wedding: models.wedding.Wedding)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<div>
+    @if(ModuleHelper.isContact(wedding)) {
+        @if(!ModuleHelper.isContactReady(wedding)) {
+            <div class="alert alert-error">
+                @Messages("main.modules.contact.contactModuleEmpty")
+            </div>
+
+            @if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+                @button(
+                    href = controllers.modules.routes.Contact.edit(wedding.uid),
+                    title = Messages("main.modules.contact.editContactInfo"),
+                    icon = routes.Assets.at("images/icons/32/edit.png")
+                )
+            }
+        } else {
+            @ModuleHelper.getContact(wedding)
+        }
+    } else {
+        <div class="alert alert-error">
+            @Messages("main.modules.contact.contactModuleEmpty")
+        </div>
+    }
+</div>

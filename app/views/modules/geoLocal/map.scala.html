@@ -1,0 +1,15 @@
+@(wedding: models.wedding.Wedding, geoLocalInfo: models.modules.GeoLocalInfo)(implicit lang: Lang)
+
+@import helpers._
+@import helper._
+
+<div id="mapWrapper">
+    <div id="mapCanvas" class="map-display"></div>
+</div>
+<div id="buttonWrapper">
+    @button(
+        href = controllers.modules.routes.GeoLocal.display(wedding.uid),
+        title = Messages("main.modules.geoLocal.enlarge"),
+        icon = routes.Assets.at("images/icons/32/zoom.png")
+    )
+</div>

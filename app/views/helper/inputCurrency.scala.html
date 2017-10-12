@@ -1,0 +1,23 @@
+@**
+* Generate a currency HTML input (with currency prepend).
+*
+* Example:
+* {{{
+*   @inputCurrency(field = myForm("name"), currencyStr = "CHF", args = 'data-ref -> 0)
+* }}}
+*
+* @param field The form field.
+* @param currencyStr The field currency.
+* @param args Set of extra attributes.
+* @param handler The field constructor.
+*@
+@(field: play.api.data.Field, currencyStr: String, args: (Symbol,Any)*)(implicit handler: FieldConstructor, lang: Lang)
+@cleanArgs = @{ args.filter(arg => !arg._1.name.startsWith("currencyStr")) }
+
+<div class="input-prepend">
+    <span class="add-on">@currencyStr</span>
+    @inputText(
+        field = field,
+        args = cleanArgs:_*
+    )
+</div>

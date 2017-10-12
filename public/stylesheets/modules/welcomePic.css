@@ -1,0 +1,28 @@
+#welcomePicture {
+    text-align: center;
+    margin: auto;
+    max-width: 450px;
+    margin-bottom: 10px;
+}
+
+.welcomePictureEdit {
+    border: 1px solid #CCCCCC;
+    background-color: #FCFCFC;
+}
+
+#welcomePictureDelete {
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.welcomePicLabel {
+    background:rgba(255,255,255,0.7);
+    padding: 10px;
+    position: relative;
+    top: -100px;
+    font-size: 1.5em;
+    margin-left: 50%;
+    color: #FF1988;
+    margin-bottom: -40px;
+}

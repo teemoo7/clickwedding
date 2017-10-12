@@ -1,0 +1,222 @@
+@(wedding: models.wedding.Wedding, budget: models.modules.Budget, addBudgetExpenseForm: Form[models.modules.BudgetExpense], budgetInfoForm: Form[models.modules.BudgetInfo])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(title = Messages("main.modules.budget.budget"), wedding = Some(wedding)){
+    @views.html.modules.budget.editHead(wedding)
+}{
+
+    @button(
+        href = controllers.modules.routes.Budget.exportToExcel(wedding.uid),
+        title = Messages("main.modules.budget.exportToExcel"),
+        icon = routes.Assets.at("images/icons/32/download.png")
+    )
+
+    <div>&nbsp;</div>
+
+    <div class="tabbable">
+
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab1" data-toggle="tab">@Messages("main.modules.budget.expenses")</a></li>
+            <li><a href="#tab2" data-toggle="tab">@Messages("main.modules.budget.incomes")</a></li>
+            <li><a href="#tab3" data-toggle="tab">@Messages("main.modules.budget.result")</a></li>
+            <li><a href="#tab4" data-toggle="tab">@Messages("main.modules.budget.settings")</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+
+                <h3>@Messages("main.modules.budget.expenses")</h3>
+
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            @header(Messages("main.modules.budget.description"))
+                            @headerPrice(Messages("main.modules.budget.price"))
+                            @header(Messages("main.modules.budget.actions"))
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td>@Messages("main.modules.budget.total")</td>
+                            @price(
+                                currency = budget.moduleContent.currency,
+                                amount = budget.moduleContent.expenses.map(e => e.price).sum,
+                                id = "expensesTotal"
+                            )
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                    <tbody id="expenseList">
+                        @budget.moduleContent.expenses.map { expense =>
+                            @views.html.modules.budget.editExpense(expense, budget.moduleContent.currency)
+                        }
+                    </tbody>
+
+                </table>
+
+                <hr/>
+
+                <h3 id="formTitle">@Messages("main.modules.budget.addExpense")</h3>
+                <div class="form-horizontal">
+                    <fieldset>
+                        <div class="control-group">
+                            <label class="control-label" for="description">
+                                @Messages("main.modules.budget.description")
+                            </label>
+                            <div class="controls">
+                                <input type="text" name="description" id="description" value="" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="price">
+                                @Messages("main.modules.budget.price").concat(" (").concat(budget.moduleContent.currency).concat(")")
+                            </label>
+                            <div class="controls">
+                                <input type="text" name="price" id="price" value="" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="actions">
+                    <a id="actionAddExpense" href="#" onclick="addExpense(); return false;" class="btn btn-primary">@Messages("main.modules.budget.add")</a>
+                    <a id="actionUpdateExpense" href="#" onclick="updateExpense(); return false;" class="btn btn-primary" style="display: none;">@Messages("main.modules.budget.update")</a>
+                    <a id="actionCancelUpdateExpense" href="#" onclick="cancelUpdateExpense(); return false;" class="btn" style="display: none;">@Messages("main.modules.budget.cancel")</a>
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="tab2">
+
+                <h3>@Messages("main.modules.budget.incomes")</h3>
+
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            @header(Messages("main.modules.budget.description"))
+                            @headerPrice(Messages("main.modules.budget.price"))
+                            @header(Messages("main.modules.budget.actions"))
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td>@Messages("main.modules.budget.total")</td>
+                            @price(
+                                currency = budget.moduleContent.currency,
+                                amount = budget.moduleContent.incomes.map(i => i.price).sum,
+                                id = "incomesTotal"
+                            )
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                    <tbody id="incomeList">
+                        @budget.moduleContent.incomes.map { income =>
+                            @views.html.modules.budget.editIncome(income, budget.moduleContent.currency)
+                        }
+                    </tbody>
+
+                </table>
+
+                <hr/>
+
+                <h3 id="formTitleIncome">@Messages("main.modules.budget.addIncome")</h3>
+                <div class="form-horizontal">
+                    <fieldset>
+                        <div class="control-group">
+                            <label class="control-label" for="descriptionIncome">
+                                @Messages("main.modules.budget.description")
+                            </label>
+                            <div class="controls">
+                                <input type="text" name="description" id="descriptionIncome" value="" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="priceIncome">
+                                @Messages("main.modules.budget.price").concat(" (").concat(budget.moduleContent.currency).concat(")")
+                            </label>
+                            <div class="controls">
+                                <input type="text" name="price" id="priceIncome" value="" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="actions">
+                    <a id="actionAddIncome" href="#" onclick="addIncome(); return false;" class="btn btn-primary">@Messages("main.modules.budget.add")</a>
+                    <a id="actionUpdateIncome" href="#" onclick="updateIncome(); return false;" class="btn btn-primary" style="display: none;">@Messages("main.modules.budget.update")</a>
+                    <a id="actionCancelUpdateIncome" href="#" onclick="cancelUpdateIncome(); return false;" class="btn" style="display: none;">@Messages("main.modules.budget.cancel")</a>
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="tab3">
+
+                <h3>@Messages("main.modules.budget.result")</h3>
+
+                <table class="table table-striped table-hover">
+                    <tfoot>
+                        <tr>
+                            <td>@Messages("main.modules.budget.total")</td>
+                            @price(
+                                currency = budget.moduleContent.currency,
+                                amount = budget.moduleContent.getResult,
+                                id = "totalResult"
+                            )
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <tr>
+                            <td>@Messages("main.modules.budget.incomes")</td>
+                            @price(
+                                currency = budget.moduleContent.currency,
+                                amount = budget.moduleContent.incomes.map(i => i.price).sum,
+                                id = "incomesTotalResult"
+                            )
+                        </tr>
+                        <tr>
+                            <td>@Messages("main.modules.budget.expenses")</td>
+                            @price(
+                                currency = budget.moduleContent.currency,
+                                amount = -budget.moduleContent.expenses.map(e => e.price).sum,
+                                id = "expensesTotalResult"
+                            )
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="tab-pane" id="tab4">
+
+                <h3>@Messages("main.modules.budget.settings")</h3>
+                @form(action = controllers.modules.routes.Budget.doEdit(wedding.uid), 'class -> "form-horizontal") {
+                    <fieldset>
+                        @select(
+                            field = budgetInfoForm("currency"),
+                            options = controllers.modules.Budget.CURRENCIES.map{ c =>
+                                c -> c
+                            },
+                            args =  '_label -> Messages("main.modules.budget.currency"),
+                                    '_showConstraints -> false
+                        )
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.modules.budget.save")" class="btn btn-primary">
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @backButton(wedding.uid)
+}

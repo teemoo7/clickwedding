@@ -1,0 +1,27 @@
+@**
+* Generate a button with an icon.
+*
+* Example:
+* {{{
+*   @button(href = routes.Wedding.edit(wedding.uid), title = Messages("main.wedding.editWedding"), icon = routes.Assets.at("images/icons/32/edit.png"), align = "right", isPrimary = true, target = "_blank", id = "editButton")
+* }}}
+*
+* @param href The target of the button
+* @param title The title of the button
+* @param icon The icon src of the button
+* @param align The alignment of the button ("center", "left", "right")
+* @param isPrimary Is the button primary or normal
+* @param target The target of the link button ("_blank", "_top", ...)
+* @param onClick The Javascript event to be executed when the button is clicked
+* @param id The id of the button
+*@
+@(href: play.api.mvc.Call, title: String, icon: play.api.mvc.Call, align: String = "center", isPrimary: Boolean = false, target: String = "", onClick: String = "", id: String = "")(implicit lang: Lang)
+
+@classStr = @{ isPrimary match { case true => "btn btn-primary" case false => "btn" } }
+@targetStr = @{ (target != null && target.length > 0) match { case true => "target=\""+target+"\"" case false => "" } }
+@onClickStr = @{ Html((onClick != null && onClick.length > 0) match { case true => "onclick=\""+onClick+"\"" case false => "" }) }
+@idStr = @{ (id != null && id.length > 0) match { case true => "id="+id+"" case false => "" } }
+
+<div class="button" style="text-align: @align;" @idStr>
+    <a href="@href" class="@classStr" @targetStr @onClickStr><img src="@icon" alt="@title"/> @title</a>
+</div>

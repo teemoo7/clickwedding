@@ -1,0 +1,52 @@
+@(contactForm: Form[(String, String, String, String, String, String)], provider: models.providers.Provider, captchaUuid: String = helpers.CaptchaHelper.generateCaptcha)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.providers.contact.contactProvider"))(CaptchaHelper.getHeadInsert(captchaUuid)) {
+
+    @contactForm.globalError.map { error =>
+        <div class="alert alert-error">
+            <a href="#" class="close" data-dismiss="alert">×</a>
+            <strong>@Messages("main.error")!</strong> @error.message
+        </div>
+    }
+
+    <div class="well">@Messages("main.providers.contact.fillFieldsBelowToSendAMailTo") <span style="font-weight: bold;">@provider.title</span>.</div>
+
+    @form(action = controllers.providers.routes.Provider.doContactMail(provider.id.get), 'class -> "form-horizontal") {
+
+        @inputText(
+            field = contactForm("name"),
+            args =  '_label -> Messages("main.notification.name"),
+                    '_showConstraints -> false
+        )
+        @inputText(
+            field = contactForm("email"),
+            args =  '_label -> Messages("main.notification.email"),
+                    '_showConstraints -> false
+        )
+        @inputText(
+            field = contactForm("title"),
+            args =  '_label -> Messages("main.notification.title"),
+                    '_showConstraints -> false
+        )
+        @textarea(
+            field = contactForm("message"),
+            args =  'rows -> 7,
+                    'cols -> 40,
+                    'style -> "width: 75%",
+                    '_label -> Messages("main.notification.message"),
+                    '_showConstraints -> false
+        )
+
+        @CaptchaHelper.displayCaptcha(captchaUuid, contactForm("captchaValue"))
+
+        <div class="form-actions">
+            <input type="submit" id="submit" class="btn btn-primary" value="@Messages("main.notification.send")">
+            <a href="@controllers.providers.routes.Provider.list" class="btn">@Messages("main.providers.cancel")</a>
+        </div>
+    }
+
+}

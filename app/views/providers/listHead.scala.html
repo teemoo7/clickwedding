@@ -1,0 +1,178 @@
+@()(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/providers/providers.css")">
+<script type="text/javascript" src="@routes.Assets.at("javascripts/scrollTo/jquery.scrollTo-min.js")"></script>
+<script type="text/javascript" src="@controllers.providers.routes.Provider.javascriptRoutes"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=@play.Play.application().configuration().getString("geoLocal.apiKey")&sensor=false"></script>
+<script type="text/javascript">
+    var map = null;
+    var markers = Array();
+    var lausanneCoordinates = new google.maps.LatLng(46.5199617, 6.6335970999999745);
+    var initCoordinates = lausanneCoordinates;
+
+    // Initialization of the geo localisation map and markers
+    function initialize() {
+        // The geocoder is used to convert an address to a location coordinates (and reverse it)
+        geocoder = new google.maps.Geocoder();
+
+        // Map definition
+        var mapOptions = {
+            center: initCoordinates,
+            zoom: 8
+        };
+        map = new google.maps.Map(document.getElementById("mapCanvasProviders"), mapOptions);
+    }
+
+    // Center the map to the given location (no move, contrary to panToLocation)
+    function centerMap(location) {
+        map.setCenter(location);
+        map.setZoom(16);
+    }
+
+    // Set map zoom and center in function of the markers
+    function autoZoomMap() {
+        var allBounds = new google.maps.LatLngBounds();
+        var nbMarkers = 0;
+        for (var id in markers) {
+            allBounds.extend(markers[id].getPosition())
+            nbMarkers++;
+        }
+        if (nbMarkers > 0) {
+            map.fitBounds(allBounds);
+            if (nbMarkers == 1) {
+                zoomChangeBoundsListener = google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {
+                    if (this.getZoom()){
+                        this.setZoom(16);
+                    }
+                });
+                setTimeout(function(){google.maps.event.removeListener(zoomChangeBoundsListener)}, 2000);
+            }
+        }
+    }
+
+    // Search methods
+    function searchCategory(catId) {
+        // Clear map and markers
+        $('#resultsContainer').slideUp(function(){
+            $('#resultsItemsContainer').html('');
+            jQuery.each(markers, function() {
+                var marker = this;
+                marker.setMap(null);
+            });
+            markers = Array();
+
+            // Data are sent to the server
+            jsRoutes.controllers.providers.Provider.search(catId).ajax({
+                dataType: "json",
+                data : {
+                },
+                success : function(data) {
+                    if(data.length > 0) {
+                        $('#resultsSummary').html('<span class="important">'+data.length+'</span> @Messages("main.providers.search.resultsFound")')
+                        jQuery.each(data, function(index){
+                            var provider = this;
+                            var websiteHtml = '';
+                            if (provider.website != null && provider.website.length > 0){
+                                websiteHtml = '<div class="search-provider-footer-content"><a href="'+jsRoutes.controllers.providers.Provider.website(provider.id).absoluteURL()+'" target="_blank" class="btn"><img src="@routes.Assets.at("images/icons/16/internet.png")" alt="'+provider.website+'"/> @Messages("main.providers.search.visitWebsite")</a></div>';
+                            }
+                            var streetHtml = provider.street;
+                            if (provider.streetNb != null && provider.streetNb.length > 0) {
+                                streetHtml += ' '+provider.streetNb;
+                            }
+                            var phoneHtml = '';
+                            if (provider.phone != null && provider.phone.length > 0) {
+                                phoneHtml += '<div class="search-provider-phone"><img src="@routes.Assets.at("images/icons/16/phone.png")" alt="@Messages("main.providers.phone")"/> '+provider.phone+'</div>';
+                            }
+                            var logoHtml = '';
+                            if(provider.logoUrl != null && provider.logoUrl.length > 0) {
+                                logoHtml += '<img src="'+provider.logoUrl+'" alt="'+provider.title+'" />';
+                            }
+                            var sloganHtml = '';
+                            if(provider.slogan != null && provider.slogan.length > 0) {
+                                sloganHtml += '&laquo; '+provider.slogan+' &raquo;';
+                            }
+                            var showroomHtml = '';
+                            if(provider.showroom != null && provider.showroom > 0) {
+                                showroomHtml += '<div class="search-provider-showroom"><a target="_blank" href="'+jsRoutes.controllers.providers.Provider.detail(provider.id).absoluteURL()+'">' + provider.showroom + ' @Messages("main.providers.pictures")' + '</a></div>';
+                            }
+                            var html = '\
+                                <div class="search-provider clearfix" id="provider_'+provider.id+'"> \
+                                    <div class="search-provider-column-1"> \
+                                        <div class="search-provider-marker"><img src="https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld='+toLetters(index+1)+'|E52F86|FFFFFF" alt="'+provider.title+'" /> </div> \
+                                    </div> \
+                                    <div class="search-provider-column-2"> \
+                                        <div class="search-provider-title">'+provider.title+'</div> \
+                                        <div class="search-provider-slogan">'+sloganHtml+'</div> \
+                                    </div> \
+                                    <div class="search-provider-column-3"> \
+                                        <div class="search-provider-address"><p>'+provider.name+'<br/>'+streetHtml+'<br/>'+provider.zip+' '+provider.place+'</p></div> \
+                                        '+phoneHtml+' \
+                                    </div> \
+                                    <div class="search-provider-column-4"> \
+                                        <div class="search-provider-logo">'+logoHtml+'</div> \
+                                        '+showroomHtml+' \
+                                    </div> \
+                                    <div class="search-provider-footer clearfix"> \
+                                        '+websiteHtml+' \
+                                        <div class="search-provider-footer-content"><a href="'+jsRoutes.controllers.providers.Provider.contactMail(provider.id).absoluteURL()+'" class="btn"><img src="@routes.Assets.at("images/icons/16/mail.png")" alt="@Messages("main.providers.search.contactByMail")"/> @Messages("main.providers.search.contactByMail")</a></div> \
+                                        <div class="search-provider-footer-content"><a target="_blank" href="'+jsRoutes.controllers.providers.Provider.detail(provider.id).absoluteURL()+'" class="btn"><img src="@routes.Assets.at("images/icons/16/zoom.png")" alt="@Messages("main.providers.search.details")"/> @Messages("main.providers.search.details")</a></div> \
+                                    </div> \
+                                </div> \
+                            ';
+                            $('#resultsItemsContainer').append(html);
+                            var marker = new google.maps.Marker({
+                                position: new google.maps.LatLng(provider.latitude, provider.longitude),
+                                map: map,
+                                draggable: false,
+                                icon: 'https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld='+toLetters(index+1)+'|E52F86|FFFFFF',
+                                title: provider.title
+                            });
+                            markers[markers.length] = marker;
+
+                            google.maps.event.addListener(marker, 'click', function(event) {
+                                var target = $('#provider_'+provider.id);
+                                $.scrollTo(target, {duration:500});
+                                target.effect("highlight", {}, 3000);
+                            });
+                        });
+                    } else {
+                        $('#resultsSummary').text('@Messages("main.providers.search.noResultsFound")')
+                        map.setCenter(initCoordinates);
+                        map.setZoom(8);
+                    }
+                    autoZoomMap();
+                    $('#resultsContainer').slideDown();
+                },
+                error : function(data) {
+                    showWarningDialog('@Messages("main.providers.search.errorCouldNotPerformSearch")')
+                }
+            });
+        });
+    }
+
+    // Convert a number into a letter (1 -> A, 2 -> B, ...)
+    function toLetters(num) {
+        "use strict";
+        var mod = num % 26,
+            pow = num / 26 | 0,
+            out = mod ? String.fromCharCode(64 + mod) : (--pow, 'Z');
+        return pow ? toLetters(pow) + out : out;
+    }
+
+    // When page is loaded, calls the initialization of the map
+    $(function() {
+        initialize();
+
+        $("#categorySelect").change(function() {
+            var catId = $(this).val();
+            if(catId > -1) {
+                searchCategory(catId);
+            }
+        });
+    });
+
+</script>

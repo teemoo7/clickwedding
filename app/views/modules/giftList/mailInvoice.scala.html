@@ -1,0 +1,99 @@
+@(purchase: models.modules.GiftListPurchase, paypalInfo: models.modules.GiftListPayPalInfo, wedding: models.wedding.Wedding)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper.currency
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@Messages("main.modules.giftList.invoice")</title>
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("favicon.png")">
+    </head>
+    <body style="width: 160mm; font-family: verdana,helvetica,arial,sans-serif; font-size: 0.9em;">
+        <div id="invoiceWrapper" style="width: 150mm; margin: auto; border: 1px solid #CCCCCC; padding: 10mm;">
+            <div id="invoiceHeader" style="background-color: #CCCCCC; text-align: center; font-size: 1.2em; padding: 2mm;">@Messages("main.modules.giftList.invoice")</div>
+            <div id="sellerAddress" style="width: 70mm;">
+                <p>
+                    @paypalInfo.fullName.getOrElse("")<br/>
+                    @paypalInfo.accountId.getOrElse("")
+                </p>
+                <p>
+                    <a href="@routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection)">@routes.Wedding.display(wedding.uid).absoluteURL(helpers.UtilsHelper.isSecureConnection)</a>
+                </p>
+            </div>
+            <div id="buyerAddress" style="margin-right:0mm; margin-left:80mm; width: 70mm;">
+                <p>
+                    @purchase.name<br/>
+                    @purchase.email
+                </p>
+            </div>
+            <div id="invoiceInfo">
+                <table cellpadding="5" cellspacing="5" border="0"style="font-family: verdana,helvetica,arial,sans-serif; font-size: 0.9em;">
+                    <tr>
+                        <td>@Messages("main.payment.invoiceNumber")</td>
+                        <td>@purchase.id</td>
+                    </tr>
+                    <tr>
+                        <td>@Messages("main.payment.invoiceDate")</td>
+                        <td>@purchase.date.format("dd.MM.yyyy")</td>
+                    </tr>
+                    <tr>
+                        <td>@Messages("main.payment.invoicePayPalTransaction")</td>
+                        <td>@purchase.transactionId</td>
+                    </tr>
+                </table>
+            </div>
+            <table class="table table-striped table-hover" id="invoiceTable" cellpadding="5" cellspacing="0" style="margin: auto; margin-top: 10mm; width: 140mm; border: 1px solid #CCCCCC; font-family: verdana,helvetica,arial,sans-serif; font-size: 0.9em;">
+                <thead style="font-weight: bold;background-color: #EAEAEA;">
+                    <tr>
+                        <th align="left">
+                            @Messages("main.modules.giftList.gift")
+                        </th>
+                        <th align="right">
+                            @Messages("main.modules.giftList.unitPrice")
+                        </th>
+                        <th align="right">
+                            @Messages("main.modules.giftList.number")
+                        </th>
+                        <th align="right">
+                            @Messages("main.modules.giftList.total")
+                        </th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <td colspan="2" style="font-weight: bold; border-top: 1px solid #CCCCCC;">@Messages("main.modules.giftList.total")</td>
+                    <td style="font-weight: bold; border-top: 1px solid #CCCCCC;">&nbsp;</td>
+                    <td align="right" style="font-weight: bold; border-top: 1px solid #CCCCCC;">@purchase.currency @currency(purchase.totalCost)</td>
+                </tfoot>
+                <tbody>
+                    @purchase.cart.items.values.map { cartItem =>
+                        <tr>
+                            <td>@cartItem.item.description</td>
+                            <td align="right">@purchase.currency @currency(cartItem.item.unitPrice)</td>
+                            <td align="right">@cartItem.number</td>
+                            <td align="right">@purchase.currency @currency(cartItem.total)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if(purchase.message.isDefined){
+            <div id="invoiceMessage">
+                <p>@Messages("main.modules.giftList.message")</p>
+                <div style="margin-left: 10mm; margin-right: 10mm; margin-top: 5mm; margin-bottom: 5mm;">
+                    <q>@purchase.message</q>
+                </div>
+            </div>
+            }
+            <div id="invoicePaymentInfo" style="margin-top: 10mm; text-align: justify;">
+                <p>@Messages("main.payment.invoicePaidWithPayPalAccount") @purchase.payerId.getOrElse("") @Messages("main.payment.invoicePaidOn") @purchase.date.format("dd.MM.yyyy").</p>
+                <p>@Messages("main.payment.invoiceTerms")</p>
+            </div>
+            <div id="invoiceRegards" style="text-align: right; margin-right: 40mm; margin-top: 10mm;">
+                <p>@Messages("main.payment.invoiceWithKindRegards")</p>
+            </div>
+            <div id="invoiceVATInfo" style="margin-top: 15mm; font-size: 0.7em; text-align: center;">
+               <p>@Messages("main.payment.invoiceVATInfo")</p>
+            </div>
+        </div>
+    </body>
+</html>

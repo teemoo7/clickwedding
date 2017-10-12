@@ -1,0 +1,5 @@
+@(wedding: models.wedding.Wedding)(implicit request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+<div style="text-align: center;">
+    <img src="https://chart.googleapis.com/chart?cht=qr&chs=125x125&chl=@helper.urlEncode(controllers.modules.QRCode.getCalendarEventRaw(wedding))" alt="@Messages("main.modules.qrCode.addItToYourCalendar")" title="@Messages("main.modules.qrCode.addItToYourCalendar")" style="border: 1px solid #CCCCCC;" />
+</div>

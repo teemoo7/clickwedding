@@ -1,0 +1,29 @@
+@(purchase: models.modules.GiftListPurchase, wedding: models.wedding.Wedding, urlAccount: String)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper.currency
+
+@mail(Messages("main.modules.giftList.paymentReceived")) {
+    <div style="font-family: arial, helvetica, sans-serif; font-size: 14px; line-height: 20px; background-color: #ffffff; font-color: black;">
+        <h2>@Messages("main.modules.giftList.goodNews")</h2>
+        <p>
+            @purchase.name (@purchase.email.getOrElse(Messages("main.modules.giftList.noMail"))) @Messages("main.modules.giftList.justOfferedYou")
+            <b>@purchase.currency @currency(purchase.totalCost)</b>.
+            <br/>
+        </p>
+        <p>
+            @Messages("main.modules.giftList.consultYourAccount") <a href="@urlAccount">@Messages("main.modules.giftList.here")</a>.
+            <br/>
+        </p>
+        @if(purchase.message.isDefined){
+            <div id="invoiceMessage">
+                <p>@Messages("main.modules.giftList.message")</p>
+                <div style="margin-left: 10mm; margin-right: 10mm; margin-top: 5mm; margin-bottom: 5mm;">
+                    <q>@purchase.message</q>
+                </div>
+            </div>
+        }
+        <div id="invoiceRegards" style="text-align: right; margin-right: 40mm; margin-top: 10mm;">
+            <p>@Messages("main.payment.invoiceWithKindRegards")</p>
+        </div>
+    </div>
+}

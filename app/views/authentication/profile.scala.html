@@ -1,0 +1,29 @@
+@(profileForm: Form[(String, String)])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.authentication.profile"))(){
+
+    @form(action = controllers.authentication.routes.Authentication.doEdit, 'class -> "form-horizontal") {
+        <fieldset>
+            @inputText(
+                field = profileForm("firstName"),
+                args =  '_label -> Messages("securesocial.signup.firstName"),
+                        '_showConstraints -> false
+            )
+            @inputText(
+                field = profileForm("lastName"),
+                args =  '_label -> Messages("securesocial.signup.lastName"),
+                        '_showConstraints -> false
+            )
+        </fieldset>
+
+        <div class="form-actions">
+            <input type="submit" value="@Messages("main.authentication.save")" class="btn btn-primary">
+            <a href="@routes.Wedding.index" class="btn">@Messages("main.modules.contact.cancel")</a>
+        </div>
+    }
+
+}

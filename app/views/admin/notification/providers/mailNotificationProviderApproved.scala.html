@@ -1,0 +1,29 @@
+@(provider: models.providers.Provider)(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@mail(Messages("main.providers.subscriptionApproved.title")) {
+    <h2>@Messages("main.providers.subscriptionApproved.title")</h2>
+    <h3>
+        @Messages("main.providers.subscriptionApproved.congratulations")
+    </h3>
+    <p>
+        @Messages("main.providers.subscriptionApproved.youCanCheck") <a href="@controllers.providers.routes.Provider.detail(provider.id.get).absoluteURL(helpers.UtilsHelper.isSecureConnection)">@Messages("main.providers.subscriptionApproved.info")</a> @Messages("main.providers.subscriptionApproved.areOk") <a href="@controllers.providers.routes.Provider.edit(provider.id.get).absoluteURL(helpers.UtilsHelper.isSecureConnection)">@Messages("main.providers.subscriptionApproved.edit")</a> @Messages("main.providers.subscriptionApproved.areOk2").
+    </p>
+    @if(provider.currentPack.get.purchase.amount > 0){
+        <p>
+            @Messages("main.providers.subscriptionApproved.theInvoice") <a href="@controllers.providers.routes.Provider.invoice(provider.currentPack.get.purchase.id.get).absoluteURL(helpers.UtilsHelper.isSecureConnection)">@provider.currentPack.get.purchase.invoiceNumber</a> @Messages("main.providers.subscriptionApproved.isAvailable").
+            <br/>
+            @Messages("main.providers.subscriptionApproved.pleasePayIt", UtilsHelper.dateToString(provider.currentPack.get.purchase.deadline)) <a href="@controllers.providers.routes.Provider.invoice(provider.currentPack.get.purchase.id.get).absoluteURL(helpers.UtilsHelper.isSecureConnection)">@Messages("main.providers.subscriptionApproved.instructions")</a>.
+        </p>
+    }
+    <p>
+        @Messages("main.providers.subscriptionApproved.weShallContactYou", UtilsHelper.dateToString(provider.currentPack.get.purchase.until)).
+    </p>
+    <p>
+        @Messages("main.providers.subscriptionApproved.inTheMeanwhile") <a href="@controllers.admin.routes.NotificationCenter.contact.absoluteURL(helpers.UtilsHelper.isSecureConnection)">@Messages("main.providers.subscriptionApproved.here")</a>.
+    </p>
+
+}

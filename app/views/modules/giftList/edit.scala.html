@@ -1,0 +1,224 @@
+@(wedding: models.wedding.Wedding, giftList: models.modules.GiftList, addGiftListItemForm: Form[models.modules.GiftListItem], giftListInfoForm: Form[models.modules.GiftListInfo], giftListInstructionsForm: Form[Option[String]])(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@isTab2Active = @{ giftListInfoForm.hasErrors || giftListInfoForm.globalError.isDefined }
+@isTab4Active = @{ giftListInstructionsForm.hasErrors || giftListInstructionsForm.globalError.isDefined }
+@isTab1Active = @{ !isTab2Active && !isTab4Active }
+
+@main(title = Messages("main.modules.giftList.editGiftList"), wedding = Some(wedding)){
+    @views.html.modules.giftList.editHead(wedding, giftList)
+}{
+
+    @if(giftList.moduleContent.paypalInfo.status != models.modules.GiftList.PAYPAL_PERMISSIONS_STATUS_VERIFIED) {
+        <div class="alert alert-error">
+            <a href="#" class="close" data-dismiss="alert">×</a>
+            @Messages("main.modules.giftList.paypal.giftListNotWorkingUntilStatusVerified")
+        </div>
+    }
+
+    <div class="tabbable">
+
+        <ul class="nav nav-tabs">
+            <li @if( isTab1Active ) {class="active"}><a href="#tab1" data-toggle="tab">@Messages("main.modules.giftList.giftList")</a></li>
+            <li @if( isTab2Active ) {class="active"}><a href="#tab2" data-toggle="tab">@Messages("main.modules.giftList.settings")</a></li>
+            <li><a href="#tab3" data-toggle="tab">@Messages("main.modules.giftList.payPalSettings")</a></li>
+            <li @if( isTab4Active ) {class="active"}><a href="#tab4" data-toggle="tab">@Messages("main.modules.giftList.editGiftListInfoInstructions")</a></li>
+        </ul>
+
+        <div class="tab-content">
+
+            <div class="tab-pane @if( isTab1Active ) {active}" id="tab1">
+
+                <h3>@Messages("main.modules.giftList.giftList")</h3>
+
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        @header(Messages("main.modules.giftList.description"))
+                        @headerPrice(Messages("main.modules.giftList.unitPrice"))
+                        @header(Messages("main.modules.giftList.actions"))
+                    </tr>
+                    </thead>
+                    <tbody id="itemList">
+                        @giftList.moduleContent.items.values.map { item =>
+                            @views.html.modules.giftList.editItem(item, giftList.moduleContent.currency)
+                        }
+                    </tbody>
+
+                </table>
+
+                <hr/>
+
+                <h3 id="formTitle">@Messages("main.modules.giftList.addGift")</h3>
+                <div class="form-horizontal">
+                    <fieldset>
+                        <div class="control-group">
+                            <label class="control-label" for="description">
+                                @Messages("main.modules.giftList.description")
+                            </label>
+                            <div class="controls">
+                                <input type="text" name="description" id="description" value="" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="unitPrice">
+                                @Messages("main.modules.giftList.unitPrice").concat(" (").concat(giftList.moduleContent.currency).concat(")")
+                            </label>
+                            <div class="controls">
+                                <input type="text" name="unitPrice" id="unitPrice" value="" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="actions">
+                    <a id="actionAddItem" href="#" onclick="addItem(); return false;" class="btn btn-primary">@Messages("main.modules.giftList.addTheGift")</a>
+                    <a id="actionUpdateItem" href="#" onclick="updateItem(); return false;" class="btn btn-primary" style="display: none;">@Messages("main.modules.giftList.updateGift")</a>
+                    <a id="actionCancelUpdateItem" href="#" onclick="cancelUpdateItem(); return false;" class="btn" style="display: none;">@Messages("main.modules.giftList.cancelUpdate")</a>
+                </div>
+
+            </div>
+
+            <div class="tab-pane @if( isTab2Active ) {active}" id="tab2">
+
+                <h3>@Messages("main.modules.giftList.settings")</h3>
+                @form(action = controllers.modules.routes.GiftList.doEdit(wedding.uid), 'class -> "form-horizontal") {
+                    <fieldset>
+                        @inputText(
+                            field = giftListInfoForm("email"),
+                            args =  '_label -> Messages("main.modules.giftList.notificationEmail"),
+                                    '_showConstraints -> false,
+                                    'placeholder -> "yourname@domain.com"
+                        )
+
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <input type="submit" value="@Messages("main.modules.giftList.save")" class="btn btn-primary">
+                    </div>
+                }
+
+            </div>
+
+            <div class="tab-pane" id="tab3">
+
+                <h3>@Messages("main.modules.giftList.payPalSettings")</h3>
+
+                @if(giftList.moduleContent.paypalInfo.status == models.modules.GiftList.PAYPAL_PERMISSIONS_STATUS_NOT_WORKING) {
+                    <table cellpadding="5" cellspacing="5" border="0" align="center">
+                        <tr>
+                            <td><span class="important">@Messages("main.modules.giftList.paypal.status")</span></td>
+                            <td><span class="alert alert-error">@Messages("main.modules.giftList.paypal.statusPermissionsRequired")</span></td>
+                            <td>
+                                @button(
+                                    href = controllers.modules.routes.GiftList.grantPermissions(wedding.uid),
+                                    title = Messages("main.modules.giftList.paypal.grantPermissions"),
+                                    icon = routes.Assets.at("images/icons/32/paypal.png")
+                                )
+                            </td>
+                        </tr>
+                    </table>
+                }
+
+                @if(giftList.moduleContent.paypalInfo.status == models.modules.GiftList.PAYPAL_PERMISSIONS_STATUS_NOT_VERIFIED) {
+                    <table cellpadding="5" cellspacing="5" border="0" align="center">
+                        <tr>
+                            <td><span class="important">@Messages("main.modules.giftList.paypal.status")</span></td>
+                            <td><span class="alert alert-error">@Messages("main.modules.giftList.paypal.statusVerificationRequired")</span></td>
+                            <td>
+                                @button(
+                                    href = controllers.modules.routes.GiftList.verifyPermissions(wedding.uid),
+                                    title = Messages("main.modules.giftList.paypal.verifyPermissions"),
+                                    icon = routes.Assets.at("images/icons/32/paypal.png")
+                                )
+                            </td>
+                        </tr>
+                    </table>
+                }
+
+                @if(giftList.moduleContent.paypalInfo.status == models.modules.GiftList.PAYPAL_PERMISSIONS_STATUS_VERIFIED) {
+                    <table cellpadding="5" cellspacing="5" border="0" align="center">
+                        <tr>
+                            <td><span class="important">@Messages("main.modules.giftList.paypal.status")</span></td>
+                            <td><span class="alert alert-success">@Messages("main.modules.giftList.paypal.statusVerified")</span></td>
+                            <td>
+                                @button(
+                                    href = controllers.modules.routes.GiftList.cancelPermissions(wedding.uid),
+                                    title = Messages("main.modules.giftList.paypal.cancelPermissions"),
+                                    icon = routes.Assets.at("images/icons/32/paypal.png")
+                                )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Messages("main.modules.giftList.paypal.check")
+                            </td>
+                            <td colspan="2">
+                                <span id="paypalCheckResult" class="alert">@Messages("main.modules.giftList.paypal.pleaseWait")</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>@Messages("main.modules.giftList.paypal.accountId")</td>
+                            <td colspan="2">@giftList.moduleContent.paypalInfo.accountId</td>
+                        </tr>
+                        <tr>
+                            <td>@Messages("main.modules.giftList.paypal.holder")</td>
+                            <td colspan="2">@giftList.moduleContent.paypalInfo.fullName</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">@Messages("main.modules.giftList.paypal.ready")</td>
+                        </tr>
+                    </table>
+                }
+
+            </div>
+
+            <div class="tab-pane @if( isTab4Active ) {active}" id="tab4">
+                <h3>@Messages("main.modules.giftList.editGiftListInfoInstructions")</h3>
+
+                <p>@Messages("main.modules.giftList.editGiftListInfoInstructionsExplanation")</p>
+
+                @defining(if (giftListInstructionsForm("instructions").value.isEmpty) Seq('disabled -> "disabled") else Seq()) { disabledSeq =>
+                    @form(action = controllers.modules.routes.GiftList.doEditInstructions(wedding.uid), 'class -> "form-horizontal") {
+                        <fieldset>
+                            <div class="control-group ">
+                                <label for="textUse" class="control-label">@Messages("main.modules.giftList.textUse")</label>
+                                <div class="controls">
+                                            <span id="textUse" class="buttonset">
+                                                <label class="radio" for="textUseDefault"><input type="radio" name="textUse" value="default" id="textUseDefault" @if(giftListInstructionsForm("instructions").value.isEmpty){ checked="checked" }>@Messages("main.modules.giftList.textUseDefault")</label>
+                                                <div class="well inner">
+                                                    @Messages("main.modules.giftList.explanation")
+                                                </div>
+
+                                                <label class="radio" for="textUsePerso"><input type="radio" name="textUse" value="perso" id="textUsePerso" @if(giftListInstructionsForm("instructions").value.isDefined){ checked="checked" }>@Messages("main.modules.giftList.textUsePerso")</label>
+                                                <div class="inner">
+                                                    @textarea(
+                                                        field = giftListInstructionsForm("instructions"),
+                                                        args =  (Seq(
+                                                                '_label -> "",
+                                                                'placeholder -> Messages("main.modules.giftList.textUseYourTextHere"),
+                                                                'class -> "input-xlarge",
+                                                                'rows -> 3)++disabledSeq):_*
+                                                    )(handler = views.html.helper.basicInput.f, lang)
+                                                </div>
+                                            </span>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="form-actions">
+                            <input type="submit" value="@Messages("main.modules.giftList.save")" class="btn btn-primary">
+                            <a href="@routes.Wedding.display(wedding.uid)" class="btn">@Messages("main.modules.register.cancel")</a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+    </div>
+
+    <div>&nbsp;</div>
+    @backButton(wedding.uid)
+}

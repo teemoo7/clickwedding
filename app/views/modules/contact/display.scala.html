@@ -1,0 +1,58 @@
+@(wedding: models.wedding.Wedding, contact: models.modules.Contact)(implicit request: play.api.mvc.RequestHeader, flash: play.api.mvc.Flash, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helpers._
+@import helper._
+@import helpers.BootstrapHelper._
+
+@isCoupleAddress = @{ UtilsHelper.isNotEmpty(contact.moduleContent.coupleAddressName) || UtilsHelper.isNotEmpty(contact.moduleContent.coupleAddressStreet) || UtilsHelper.isNotEmpty(contact.moduleContent.coupleAddressZip) || UtilsHelper.isNotEmpty(contact.moduleContent.coupleAddressPlace) }
+@isCouplePhone = @{ UtilsHelper.isNotEmpty(contact.moduleContent.couplePhone) }
+
+<p>@ModuleHelper.getInstructions(wedding, models.modules.Contact.ID)</p>
+<div class="contact">
+    @if((isCoupleAddress) || isCouplePhone) {
+        <div class="widget-inner-column">
+            <h5>@Messages("main.modules.contact.couple")</h5>
+            @if(isCoupleAddress) {
+                <div class="inner">
+                    <p>
+                        @contact.moduleContent.coupleAddressName<br/>
+                        @contact.moduleContent.coupleAddressStreet<br/>
+                        @contact.moduleContent.coupleAddressZip
+                        @contact.moduleContent.coupleAddressPlace
+                    </p>
+                </div>
+            }
+            @if(isCouplePhone) {
+                <div class="inner">
+                    @contact.moduleContent.couplePhone
+                </div>
+            }
+        </div>
+    }
+    @if(UtilsHelper.isNotEmpty(contact.moduleContent.organizerName) || UtilsHelper.isNotEmpty(contact.moduleContent.organizerPhone)) {
+        <div class="widget-inner-column">
+            <h5>@Messages("main.modules.contact.organizer")</h5>
+            @if(UtilsHelper.isNotEmpty(contact.moduleContent.organizerName)) {
+                <div class="inner">
+                    <p>@contact.moduleContent.organizerName</p>
+                </div>
+            }
+            @if(UtilsHelper.isNotEmpty(contact.moduleContent.organizerPhone)) {
+                <div class="inner">
+                    @contact.moduleContent.organizerPhone
+                </div>
+            }
+        </div>
+    }
+
+    @if(UtilsHelper.isNotEmpty(contact.moduleContent.coupleMail) || UtilsHelper.isNotEmpty(contact.moduleContent.organizerMail)) {
+        <div>
+            @button(
+                href = controllers.modules.routes.Contact.mail(wedding.uid),
+                title = Messages("main.modules.contact.sendMail"),
+                icon = routes.Assets.at("images/icons/32/mail.png")
+            )
+        </div>
+    }
+
+</div>

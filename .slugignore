@@ -1,0 +1,13 @@
+RUNNING_PID
+/cert
+/tmp
+/logs
+/.history
+/.svn
+/.git
+/.idea
+/.idea_modules
+*.psd
+*.iml
+*.sql
+*.bat

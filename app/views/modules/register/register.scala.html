@@ -1,0 +1,151 @@
+@(wedding: models.wedding.Wedding, registerInfo: models.modules.RegisterInfo, registerGuestForm: Form[models.modules.RegisterGuest])(implicit request: play.api.mvc.RequestHeader, flash: play.api.mvc.Flash, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+@main(Messages("main.modules.register.registration"), wedding = Some(wedding)){
+    <script type="text/javascript">
+        function toggle(input) {
+            var name = $(input).attr('data-name');
+            var checked = input.checked;
+            var inputTextId = 'nbFor'+name.charAt(0).toUpperCase() + name.slice(1);
+            var spanId = inputTextId+'Span';
+            $('input[type="text"][data-name="'+name+'"]').each(function(index) {
+                if (checked == true) {
+                    $(this).removeAttr('disabled');
+                    $(this).val(0);
+                    $('#'+inputTextId).val(1);
+                    $('#'+spanId).text(1);
+                } else {
+                    $(this).attr('disabled', 'disabled');
+                    $(this).val(0);
+                    $('#'+inputTextId).val(0);
+                    $('#'+spanId).text(0);
+                }
+            });
+        }
+
+        function updateNbTotal(input) {
+            var name = $(input).attr('data-name');
+            var inputTextId = 'nbFor'+name.charAt(0).toUpperCase() + name.slice(1);
+            var spanId = inputTextId+'Span';
+            var value = input.value;
+            if (isNaN(value)) {
+                $('#'+inputTextId).val('');
+                $('#'+spanId).text('');
+            } else {
+                var total = +value +1
+                $('#'+inputTextId).val(total);
+                $('#'+spanId).text(total);
+            }
+        }
+
+        $(function() {
+            $( "#isComing_false" ).change(function() {
+                $('#iComeToContainer').slideUp();
+            });
+            $( "#isComing_true" ).change(function() {
+                $('#iComeToContainer').slideDown();
+            });
+            @if(registerGuestForm("isComing").value.getOrElse("false").toBoolean){
+                $('#iComeToContainer').show();
+            }
+        });
+    </script>
+}{
+    <div class="register">
+
+        @registerGuestForm.globalError.map { error =>
+            <div class="alert alert-error">
+                <a href="#" class="close" data-dismiss="alert">×</a>
+                <strong>@Messages("main.error")!</strong> @error.message
+            </div>
+        }
+
+
+        @form(action = controllers.modules.routes.Register.doRegister(wedding.uid), 'class -> "form-horizontal") {
+            <fieldset>
+                @inputText(
+                    field = registerGuestForm("firstName"),
+                    args =  '_label -> Messages("main.modules.register.firstName"),
+                            '_showConstraints -> false
+                )
+                @inputText(
+                    field = registerGuestForm("lastName"),
+                    args =  '_label -> Messages("main.modules.register.lastName"),
+                            '_error -> registerGuestForm.error("lastName"),
+                            '_showConstraints -> false
+                )
+                @inputText(
+                    field = registerGuestForm("mailAddress"),
+                    args =  '_label -> Messages("main.modules.register.mailAddress"),
+                            '_showConstraints -> false,
+                            'placeholder -> "name@domain.com"
+                )
+                @inputText(
+                    field = registerGuestForm("mobilePhone"),
+                    args =  '_label -> Messages("main.modules.register.mobilePhone"),
+                            '_showConstraints -> false,
+                            'placeholder -> "+00 00 000 00 00"
+                )
+
+                @uidHidden(wedding.uid)
+
+                <p>&nbsp;</p>
+
+                @inputRadioGroup2(
+                    field = registerGuestForm("isComing"),
+                    options = options("false"->Messages("main.modules.register.iDoNotCome"), "true"->Messages("main.modules.register.iComeTo")),
+                    args =  '_label -> Messages("main.modules.register.answer"),
+                            '_error -> registerGuestForm("isComing").error.map(_.withMessage("main.modules.register.errorPleaseAnswer")),
+                            '_showConstraints -> false
+                )
+
+                <div id="iComeToContainer" style="display: none;">
+                    <div class="clearfix checkbox-area" style="display: @if(registerInfo.isReception){block}else{none}">
+                        <input type="checkbox" name="checkboxReception" data-name="reception" onchange="toggle(this);" /> <span>@Messages("main.modules.register.reception")</span>
+                        <div class="inner">
+                            <p>
+                                @Messages("main.modules.register.with") <input type="text" data-name="reception" class="input-mini" name="nbComingWithReception" disabled="disabled" value="0" size="3" maxlength="2" onchange="updateNbTotal(this);" />
+                                @Messages("main.modules.register.otherPersons").
+                                @Messages("main.modules.register.thusWeWillBe") <input type="hidden" name="nbForReception" id="nbForReception" value="0" /><span id="nbForReceptionSpan" class="important">0</span>.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="clearfix checkbox-area" style="display: @if(registerInfo.isDinner && (!registerInfo.isDinnerPrivate || AuthenticationHelper.isGuestWithRestrictedArea(wedding.uid))){block}else{none}">
+                        <input type="checkbox" name="checkboxDinner" data-name="dinner" onchange="toggle(this);" /> <span>@Messages("main.modules.register.dinner")</span>
+                        <div class="inner">
+                            <p>
+                                @Messages("main.modules.register.with") <input type="text" data-name="dinner" class="input-mini" name="nbComingWithDinner" disabled="disabled" value="0" size="3" maxlength="2" onchange="updateNbTotal(this);" />
+                                @Messages("main.modules.register.otherPersons").
+                                @Messages("main.modules.register.thusWeWillBe") <input type="hidden" name="nbForDinner" id="nbForDinner" value="0" /><span id="nbForDinnerSpan" class="important">0</span>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                @textarea(
+                    field = registerGuestForm("comment"),
+                    args =  'rows -> 3,
+                            'cols -> 50,
+                            'maxlength -> 300,
+                            '_label -> Messages("main.modules.register.comment")
+                )
+
+            </fieldset>
+
+            <div class="form-actions">
+                <input type="submit" value="@Messages("main.modules.register.send")" class="btn btn-primary">
+                <a href="@routes.Wedding.display(wedding.uid)" class="btn">@Messages("main.modules.register.cancel")</a>
+            </div>
+        }
+    </div>
+    @if(AuthenticationHelper.isOwnerOfWedding(wedding.uid)) {
+        @button(
+            href = controllers.modules.routes.Register.edit(wedding.uid),
+            title = Messages("main.wedding.edit"),
+            icon = routes.Assets.at("images/icons/32/edit.png")
+        )
+    }
+}

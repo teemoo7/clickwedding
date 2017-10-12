@@ -1,0 +1,16 @@
+@(item: models.modules.GiftListItem, currencyStr: String)(implicit lang: Lang)
+
+@import helper._
+
+<tr id="item_@item.id" data-ref="@item.id" class="item">
+    <td id="itemDescription_@item.id">@item.description</td>
+    @price(
+        currency = currencyStr,
+        amount = item.unitPrice,
+        id = "itemUnitPrice_".concat(item.id.get.toString)
+    )
+    <td id="itemActions_@item.id" style="white-space: nowrap;">
+        <a href="#" class="btn" onclick="editItem(@item.id); return false;">@Messages("main.modules.giftList.edit")</a>
+        <a href="#" onclick="deleteItem(@item.id); return false;"><img class="close" style="float: none;" src="@routes.Assets.at("images/icons/32/cross.png")" alt="@Messages("main.modules.giftList.delete")" title="@Messages("main.modules.giftList.delete")" /> </a>
+    </td>
+</tr>

@@ -1,0 +1,84 @@
+@()(implicit request: play.api.mvc.RequestHeader, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/modules/customize.css")">
+@for(font <- ModuleHelper.getCustomizeFonts) {
+    <link href='https://fonts.googleapis.com/css?family=@font.parameterValue:700,400' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+        <!--
+        #fontStylePreview.mod_customize_style_@{font.id.get.toInt} {
+            font-family: '@font.name', sans-serif;
+            font-size: @{font.size}em;
+        }
+        -->
+    </style>
+}
+<script type="text/javascript">
+    $(function() {
+        $('#customizeInfo_customizedFont_id').change(function() {
+            $('#fontStylePreview').attr('class', 'mod_customize_style_'+$(this).val());
+        });
+        $('#customizeInfo_customizedTheme_id').change(function() {
+            refreshCustomThemeColorsContainer();
+        });
+
+        refreshCustomThemeColorsContainer();
+
+        $( ".spinner0100" ).spinner({
+            spin: function( event, ui ) {
+                if ( ui.value > 100 ) {
+                    $( this ).spinner( "value", 100 );
+                    return false;
+                } else if ( ui.value < 0 ) {
+                    $( this ).spinner( "value", 0 );
+                    return false;
+                }
+            }
+        });
+        $( ".spinner020" ).spinner({
+            spin: function( event, ui ) {
+                if ( ui.value > 20 ) {
+                    $( this ).spinner( "value", 20 );
+                    return false;
+                } else if ( ui.value < 0 ) {
+                    $( this ).spinner( "value", 0 );
+                    return false;
+                }
+            }
+        });
+    });
+
+    function refreshCustomThemeColorsContainer() {
+        $('.themePreview').hide();
+        var id = $('#customizeInfo_customizedTheme_id').val();
+        if (id == @models.modules.Customize.CUSTOM_THEME_ID) {
+            $('#themePreviewContainer').hide();
+            $('#customThemeColorsContainer').show();
+        } else {
+            $('#customThemeColorsContainer').hide();
+            $('#themePreview_'+id).show();
+            $('#themePreviewContainer').show();
+        }
+    }
+
+    $(function() {
+        //for bootstrap 3 use 'shown.bs.tab' instead of 'shown' in the next line
+        $('a[data-toggle="tab"]').on('shown', function (e) {
+            var href = $(e.target).attr('href');
+            var $lastTab = $(''+href+'');
+            localStorage.setItem('lastTab', $lastTab.attr('id'));
+        });
+
+        //go to the latest tab, if it exists:
+        var lastTab = localStorage.getItem('lastTab');
+        if (lastTab) {
+            var $tab = $('[data-toggle="tab"][href="#'+lastTab+'"]')
+            console.log('last: '+lastTab);
+            $tab.click();
+        }
+    });
+</script>
+<script src="@routes.Assets.at("javascripts/jscolor/jscolor.js")" type="text/javascript"></script>

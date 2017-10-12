@@ -1,0 +1,82 @@
+@()(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User], lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=@play.Play.application().configuration().getString("geoLocal.apiKey")&sensor=false"></script>
+<script type="text/javascript">
+    var map = null;
+    var geocoder = null;
+    var marker = null;
+    var lausanneCoordinates = new google.maps.LatLng(46.5199617, 6.6335970999999745);
+    var initCoordinates = lausanneCoordinates;
+
+    // Initialization of the geo localisation map and markers
+    function initialize() {
+        // The geocoder is used to convert an address to a location coordinates (and reverse it)
+        geocoder = new google.maps.Geocoder();
+
+        // Map definition
+        var mapOptions = {
+            center: initCoordinates,
+            zoom: 8
+        };
+        map = new google.maps.Map(document.getElementById("mapCanvasProvider"), mapOptions);
+    }
+
+    function checkAndShowAddress() {
+        var street = $('#street').val();
+        var streetNb = $('#streetNb').val();
+        var place = $('#place').val();
+        var zip = $('#zip').val();
+        var country = $('#country').val();
+        if(street.length > 0 && place.length > 0 && zip.length > 0 && country.length > 0) {
+            var address = street + " " + streetNb + ", " + zip + " " + place + ", " + country;
+            findAddress(address, centerMap);
+        }
+    }
+
+    // Retrieve the given address and then calls the callback method with the geocoded location
+    function findAddress(address, callback) {
+        clearCoordinateFields();
+        geocoder.geocode({'address': address}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                $("#latitude").val(results[0].geometry.location.lat());
+                $("#longitude").val(results[0].geometry.location.lng());
+                callback(results[0].geometry.location);
+            } else {
+                //showWarningDialog('@Messages("main.providers.place.errorGeocodeNotSuccessfulReason") [' + address + '] ' + status);
+            }
+        });
+    }
+
+    // Center the map to the given location (no move, contrary to panToLocation)
+    function centerMap(location) {
+        map.setCenter(location);
+        map.setZoom(16);
+        marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            draggable: false,
+        });
+    }
+
+    function clearCoordinateFields() {
+        if (marker != null ) {
+            marker.setMap(null);
+            marker = null;
+        }
+        $("#latitude").val('');
+        $("#longitude").val('');
+    }
+
+    // When page is loaded, calls the initialization of the map
+    $(function() {
+        initialize();
+        $(".locationInfo").blur(function() {
+            checkAndShowAddress();
+        });
+    });
+
+</script>

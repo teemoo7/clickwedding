@@ -1,0 +1,31 @@
+@(currentPageId: String = "")(implicit flash: play.api.mvc.Flash, request: play.api.mvc.RequestHeader, user: Option[models.authentication.User] = None, lang: Lang)
+
+@import helper._
+@import helpers._
+@import helpers.BootstrapHelper._
+
+<div class="well">
+    <ul class="nav nav-list">
+        <li class="@if( currentPageId.equals(controllers.admin.Console.NAV_PAGE_HOME) ) {active}"><a href="#">@Messages("main.admin.console.home")</a></li>
+
+        <li class="divider"></li>
+        <li class="nav-header">@Messages("main.admin.console.weddings")</li>
+        <li class="@if( currentPageId.equals(controllers.admin.Console.NAV_PAGE_WEDDINGS_LIST) ) {active}"><a href="@routes.Wedding.listAll">@Messages("main.admin.console.listAllWeddings")</a></li>
+        <li class="@if( currentPageId.equals(controllers.admin.Console.NAV_PAGE_PROMO_CODES) ) {active}"><a href="@controllers.payment.routes.Money.listPromotion">@Messages("main.admin.console.promoCodes")</a></li>
+
+        <li class="divider"></li>
+
+        <li class="nav-header">@Messages("main.admin.console.statistics")</li>
+        <li class="@if( currentPageId.equals(controllers.admin.Console.NAV_PAGE_SITE_STATISTICS) ) {active}"><a href="@controllers.admin.routes.Console.stats">@Messages("main.admin.console.siteStatistics")</a></li>
+        <li><a href="https://www.google.com/analytics/web/?hl=en&pli=1#report/visitors-overview/a43205904w73175684p75565328/" target="_blank">@Messages("main.admin.console.googleAnalytics")</a></li>
+
+        <li class="divider"></li>
+
+        <li class="nav-header">@Messages("main.admin.console.links")</li>
+        <li><a href="https://dashboard.heroku.com/apps/click-wedding-prod-eu/resources" target="_blank">@Messages("main.admin.console.heroku")</a></li>
+        <li><a href="https://status.heroku.com/" target="_blank">@Messages("main.admin.console.heroku") @Messages("main.admin.console.status")</a></li>
+        <li><a href="https://addons-sso.heroku.com/apps/click-wedding-prod-eu/addons/logentries:tryit" target="_blank">@Messages("main.admin.console.logEntries")</a></li>
+        <li><a href="https://addons-sso.heroku.com/apps/click-wedding-prod-eu/addons/cleardb:punch" target="_blank">@Messages("main.admin.console.clearDB")</a></li>
+
+    </ul>
+</div>
